@@ -12,7 +12,7 @@ import ShareDialog from '@/components/ui/ShareDialog.astro';
 import { getDb } from '@/lib/db';
 import { createBreadcrumbSchema } from '@/lib/seo';
 import { nonProfits, nonProfitCategories, media, latestUpdates } from '@/db/schema';
-import { eq, desc, inArray } from 'drizzle-orm';
+import { eq, desc, inArray, and } from 'drizzle-orm';
 
 const db = await getDb();
 
@@ -45,54 +45,72 @@ function parseOpeningHoursSimple(hours: string): Record<string, { open: string; 
   return null;
 }
 
-// SSR: Load non-profit data
-const org = await db.select()
-  .from(nonProfits)
-  .where(eq(nonProfits.slug, slug ?? ''))
-  .get();
-
+// SSR: Load non-profit data with error handling
+let org;
+try {
+  org = await db.select()
+    .from(nonProfits)
+    .where(eq(nonProfits.slug, slug ?? ''))
+    .get();
+} catch (e) {
+  console.error('Non-profit query error:', e instanceof Error ? e.message : String(e));
+  return Astro.redirect('/non-profits');
+}
 // CDN Cache: 2min for detail pages
 Astro.response.headers.set('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=600');
-
 if (!org) {
   return Astro.redirect('/non-profits');
 }
-
 let category = null;
 let parentCategory = null;
-if (org.categoryId) {
-  category = await db.select().from(nonProfitCategories).where(eq(nonProfitCategories.id, org.categoryId)).get();
-  if (category?.parentId) {
-    parentCategory = await db.select().from(nonProfitCategories).where(eq(nonProfitCategories.id, category.parentId)).get();
+try {
+  if (org.categoryId) {
+    category = await db.select().from(nonProfitCategories).where(eq(nonProfitCategories.id, org.categoryId)).get();
+    if (category?.parentId) {
+      parentCategory = await db.select().from(nonProfitCategories).where(eq(nonProfitCategories.id, category.parentId)).get();
+    }
   }
+} catch (e) {
+  console.error('Category query error:', e instanceof Error ? e.message : String(e));
 }
-
 const tags = org.tags ? (org.tags.includes(',') ? org.tags.split(',').map(t => t.trim()) : [org.tags]) : [];
 const openingHours = org.openingHours ? parseOpeningHoursSimple(org.openingHours) : null;
-const socialLinks = org.socialLinks ? JSON.parse(org.socialLinks) : {};
-
-// Load photo gallery from media table (entityType: 'non-profits')
+let socialLinks = {};
+try {
+  socialLinks = org.socialLinks ? JSON.parse(org.socialLinks) : {};
+} catch (e) {
+  console.error('Social links parse error:', e);
+  socialLinks = {};
+}
+// Load photo gallery from media table (entityType: 'non_profit')
 let galleryImages: { id: string; url: string }[] = [];
-const galleryMedia = await db.select({ id: media.id })
-  .from(media)
-  .where(eq(media.entityId, org.id))
-  .where(eq(media.entityType, 'non-profits'))
-  .orderBy(media.sortOrder)
-  .all();
-galleryImages = galleryMedia.map(m => ({ id: m.id, url: `/api/media/${m.id}` }));
-
+try {
+  const galleryMedia = await db.select({ id: media.id })
+    .from(media)
+    .where(and(eq(media.entityId, org.id), eq(media.entityType, 'non_profit')))
+    .orderBy(media.sortOrder)
+    .all();
+  galleryImages = galleryMedia.map(m => ({ id: m.id, url: `/api/media/${m.id}` }));
+} catch (e) {
+  console.error('Gallery query error:', e);
+  galleryImages = [];
+}
 // Load updates from latestUpdates table
-const updatesData = await db.select()
-  .from(latestUpdates)
-  .where(eq(latestUpdates.typeId, org.id))
-  .where(eq(latestUpdates.type, 'non_profit'))
-  .orderBy(desc(latestUpdates.createdAt))
-  .limit(4)
-  .all();
-
+let updatesData: typeof latestUpdates.$inferSelect[] = [];
+try {
+  updatesData = await db.select()
+    .from(latestUpdates)
+    .where(and(eq(latestUpdates.typeId, org.id), eq(latestUpdates.type, 'non_profit')))
+    .orderBy(desc(latestUpdates.createdAt))
+    .limit(4)
+    .all();
+} catch (e) {
+  console.error('Updates query error:', e);
+  updatesData = [];
+}
 const updates = updatesData.map(u => ({
   ...u,
-  images: u.images ? JSON.parse(u.images) : [],
+  images: u.imageIds ? JSON.parse(u.imageIds) : [],
 }));
 
 const pageTitle = `${org.title} - TimorUp`;
