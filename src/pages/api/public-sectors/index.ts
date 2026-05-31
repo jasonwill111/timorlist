@@ -130,7 +130,19 @@ if (!db) throw new Error("Database not available");
 
     const responseData = paginated.map((ps) => ({
       ...ps,
-      tags: ps.tags ? JSON.parse(ps.tags) : [],
+      tags: (() => {
+        if (!ps.tags) return [];
+        try {
+          const parsed = JSON.parse(ps.tags);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          // If tags is not valid JSON, treat as simple comma-separated list or return empty
+          if (typeof ps.tags === 'string' && ps.tags.includes(',')) {
+            return ps.tags.split(',').map(t => t.trim()).filter(Boolean);
+          }
+          return [];
+        }
+      })(),
       categoryName: categoryMap.get(ps.categoryId || '') || 'Public Sector',
     }));
 

@@ -393,6 +393,23 @@ See **AGENTS.md** for Cursor, Copilot, Windsurf, Aider instructions.
 - 单数形式 + slug = 详情页（→ /business/[slug] →）
 - /admin/复数 = CRUD 管理页（→ /admin/businesses →）
 
+### ⚠️ Schema 字段名称（重要！）
+
+**media 表**：
+| 正确字段 | 错误字段 | 说明 |
+|---------|---------|------|
+| `entityType` | `type` | 实体类型：'businesses', 'non-profits', 'public-sectors', 'listings' |
+| `entityId` | `typeId` | 关联的实体ID |
+
+**latestUpdates 表**：
+| 实体 | 正确的 type 值 | 错误值 |
+|------|---------------|--------|
+| Business | `'business'` | `'businesses'` |
+| Non-Profit | `'non_profit'` | `'non_profits'` |
+| Public Sector | `'public_sector'` | `'public_sectors'` |
+
+> ⚠️ **常见错误**：在 detail 页面查询时混用 `type`/`typeId` 而非 `entityType`/`entityId`，或使用 `'non_profits'` 而非 `'non_profit'`
+
 <!-- SW:END:entity-structure -->
 
 ### Server Actions Structure

@@ -130,7 +130,19 @@ if (!db) throw new Error("Database not available");
 
     const responseData = paginated.map((np) => ({
       ...np,
-      tags: np.tags ? JSON.parse(np.tags) : [],
+      tags: (() => {
+        if (!np.tags) return [];
+        try {
+          const parsed = JSON.parse(np.tags);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          // If tags is not valid JSON, treat as simple comma-separated list or return empty
+          if (typeof np.tags === 'string' && np.tags.includes(',')) {
+            return np.tags.split(',').map(t => t.trim()).filter(Boolean);
+          }
+          return [];
+        }
+      })(),
       categoryName: categoryMap.get(np.categoryId || '') || 'Non-Profit',
     }));
 

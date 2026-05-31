@@ -20,6 +20,31 @@ const { slug } = Astro.params;
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
 const canonicalUrl = `${siteUrl}/non-profit/${slug}`;
 
+// Simple opening hours parser for "Mon-Fri: 8:00 AM - 5:00 PM" format
+function parseOpeningHoursSimple(hours: string): Record<string, { open: string; close: string }> | null {
+  if (!hours) return null;
+  // JSON format
+  try {
+    const parsed = JSON.parse(hours);
+    if (typeof parsed === 'object') return parsed;
+  } catch {}
+  // Simple format: "Mon-Fri: 8:00 AM - 5:00 PM"
+  const match = hours.match(/(\w+)-(\w+):\s*(\d+:\d+\s*(?:AM|PM)?)\s*-\s*(\d+:\d+\s*(?:AM|PM)?)/i);
+  if (match) {
+    const [, , , open, close] = match;
+    return {
+      monday: { open: open.trim(), close: close.trim() },
+      tuesday: { open: open.trim(), close: close.trim() },
+      wednesday: { open: open.trim(), close: close.trim() },
+      thursday: { open: open.trim(), close: close.trim() },
+      friday: { open: open.trim(), close: close.trim() },
+      saturday: { open: 'closed', close: '' },
+      sunday: { open: 'closed', close: '' },
+    };
+  }
+  return null;
+}
+
 // SSR: Load non-profit data
 const org = await db.select()
   .from(nonProfits)
@@ -42,16 +67,16 @@ if (org.categoryId) {
   }
 }
 
-const tags = org.tags ? JSON.parse(org.tags) : [];
-const openingHours = org.openingHours ? JSON.parse(org.openingHours) : null;
+const tags = org.tags ? (org.tags.includes(',') ? org.tags.split(',').map(t => t.trim()) : [org.tags]) : [];
+const openingHours = org.openingHours ? parseOpeningHoursSimple(org.openingHours) : null;
 const socialLinks = org.socialLinks ? JSON.parse(org.socialLinks) : {};
 
-// Load photo gallery from media table (type: 'non-profits')
+// Load photo gallery from media table (entityType: 'non-profits')
 let galleryImages: { id: string; url: string }[] = [];
 const galleryMedia = await db.select({ id: media.id })
   .from(media)
-  .where(eq(media.typeId, org.id))
-  .where(eq(media.type, 'non-profits'))
+  .where(eq(media.entityId, org.id))
+  .where(eq(media.entityType, 'non-profits'))
   .orderBy(media.sortOrder)
   .all();
 galleryImages = galleryMedia.map(m => ({ id: m.id, url: `/api/media/${m.id}` }));
@@ -60,7 +85,7 @@ galleryImages = galleryMedia.map(m => ({ id: m.id, url: `/api/media/${m.id}` }))
 const updatesData = await db.select()
   .from(latestUpdates)
   .where(eq(latestUpdates.typeId, org.id))
-  .where(eq(latestUpdates.type, 'non_profits'))
+  .where(eq(latestUpdates.type, 'non_profit'))
   .orderBy(desc(latestUpdates.createdAt))
   .limit(4)
   .all();

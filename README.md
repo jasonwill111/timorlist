@@ -20,10 +20,12 @@ Timor-Leste's business directory platform built with Astro + Cloudflare Workers.
 - **Unified Card Rendering**: Reusable BusinessCard/ListingCard components
 - **Server Actions**: 48 server actions for all write operations
 - **REST API Fallback**: `/api/auth` endpoint for Cloudflare Workers compatibility
+- **Direct SSR Pattern**: All list/detail pages use Server-Side Rendering (not Server Islands `is:defer`)
 - **AI Tools**: Listing creator, SKU creator, blog generator, landing page creator
 - **Admin Dashboard**: Full CRUD for all entities (17 pages)
 - **Media Management**: R2 storage with image compression
 - **Type Safety**: Strict TypeScript with proper types throughout
+- **Cloudflare Workers**: Optimized deployment with D1 database and R2 media storage
 
 ## Pages (100% Tested)
 
