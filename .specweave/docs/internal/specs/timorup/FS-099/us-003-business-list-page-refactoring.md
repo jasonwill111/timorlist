@@ -2,9 +2,9 @@
 id: US-003
 feature: FS-099
 title: "Business List Page Refactoring"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** visitor."
 project: TimorUp
 ---
@@ -21,9 +21,9 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US3-01**: Given /businesses page loads, when businesses exist, then each business renders via `<BusinessCard />` component
-- [ ] **AC-US3-02**: Given /businesses page, when a BusinessCard is clicked, then navigation goes to `/business/{slug}`
-- [ ] **AC-US3-03**: Given /businesses page passes `profileImageId`, `views`, `likes`, `ratingAverage`, `ratingCount`, `address` props, then BusinessCard displays all values correctly
+- [x] **AC-US3-01**: Given /businesses page loads, when businesses exist, then each business renders via `<BusinessCard />` component
+- [x] **AC-US3-02**: Given /businesses page, when a BusinessCard is clicked, then navigation goes to `/business/{slug}`
+- [x] **AC-US3-03**: Given /businesses page passes `profileImageId`, `views`, `likes`, `ratingAverage`, `ratingCount`, `address` props, then BusinessCard displays all values correctly
 
 ---
 
@@ -36,4 +36,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-005**: Refactor /businesses page to use BusinessCard
+_No tasks defined for this user story_

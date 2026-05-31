@@ -2,9 +2,9 @@
 id: US-002
 feature: FS-099
 title: "ListingCard Component Enhancement"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** frontend developer."
 project: TimorUp
 ---
@@ -21,8 +21,8 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US2-01**: Given ListingCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
-- [ ] **AC-US2-02**: Given ListingCard renders thumbnail, then it uses the standard `aspect-square` container matching BusinessCard design
+- [x] **AC-US2-01**: Given ListingCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
+- [x] **AC-US2-02**: Given ListingCard renders thumbnail, then it uses the standard `aspect-square` container matching BusinessCard design
 
 ---
 
@@ -35,4 +35,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-002**: Enhance ListingCard.astro with profileImageId
+_No tasks defined for this user story_

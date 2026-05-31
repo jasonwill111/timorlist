@@ -1,10 +1,10 @@
 ---
 increment: 0099-unified-card-rendering
-title: "Unified Card Rendering + Container Width Standardization"
+title: Unified Card Rendering + Container Width Standardization
 type: feature
 priority: P1
-status: active
-created: 2026-05-31
+status: completed
+created: 2026-05-31T00:00:00.000Z
 structure: user-stories
 test_mode: TDD
 coverage_target: 80
@@ -38,9 +38,9 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** I can replace inline business cards with a consistent component
 
 **Acceptance Criteria**:
-- [ ] **AC-US1-01**: Given BusinessCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
-- [ ] **AC-US1-02**: Given BusinessCard receives `views` prop, when `views > 0`, then it displays views count with eye icon
-- [ ] **AC-US1-03**: Given BusinessCard receives `entityType` prop with value `'nonprofit'|'publicsector'`, then it renders correct href path (`/non-profit/{slug}` or `/public-sector/{slug}`)
+- [x] **AC-US1-01**: Given BusinessCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
+- [x] **AC-US1-02**: Given BusinessCard receives `views` prop, when `views > 0`, then it displays views count with eye icon
+- [x] **AC-US1-03**: Given BusinessCard receives `entityType` prop with value `'nonprofit'|'publicsector'`, then it renders correct href path (`/non-profit/{slug}` or `/public-sector/{slug}`)
 
 ---
 
@@ -51,8 +51,8 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** it can display the listing's primary image from media API
 
 **Acceptance Criteria**:
-- [ ] **AC-US2-01**: Given ListingCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
-- [ ] **AC-US2-02**: Given ListingCard renders thumbnail, then it uses the standard `aspect-square` container matching BusinessCard design
+- [x] **AC-US2-01**: Given ListingCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
+- [x] **AC-US2-02**: Given ListingCard renders thumbnail, then it uses the standard `aspect-square` container matching BusinessCard design
 
 ---
 
@@ -63,9 +63,9 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** business listings are rendered consistently with other pages
 
 **Acceptance Criteria**:
-- [ ] **AC-US3-01**: Given /businesses page loads, when businesses exist, then each business renders via `<BusinessCard />` component
-- [ ] **AC-US3-02**: Given /businesses page, when a BusinessCard is clicked, then navigation goes to `/business/{slug}`
-- [ ] **AC-US3-03**: Given /businesses page passes `profileImageId`, `views`, `likes`, `ratingAverage`, `ratingCount`, `address` props, then BusinessCard displays all values correctly
+- [x] **AC-US3-01**: Given /businesses page loads, when businesses exist, then each business renders via `<BusinessCard />` component
+- [x] **AC-US3-02**: Given /businesses page, when a BusinessCard is clicked, then navigation goes to `/business/{slug}`
+- [x] **AC-US3-03**: Given /businesses page passes `profileImageId`, `views`, `likes`, `ratingAverage`, `ratingCount`, `address` props, then BusinessCard displays all values correctly
 
 ---
 
@@ -76,9 +76,9 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** non-profit listings are rendered consistently
 
 **Acceptance Criteria**:
-- [ ] **AC-US4-01**: Given /non-profits page loads, when non-profits exist, then each non-profit renders via `<BusinessCard entityType="nonprofit" />`
-- [ ] **AC-US4-02**: Given /non-profits page, when a BusinessCard is clicked, then navigation goes to `/non-profit/{slug}`
-- [ ] **AC-US4-03**: Given /non-profits page, when entityType="nonprofit", then BusinessCard renders category badge with rose color scheme
+- [x] **AC-US4-01**: Given /non-profits page loads, when non-profits exist, then each non-profit renders via `<BusinessCard entityType="nonprofit" />`
+- [x] **AC-US4-02**: Given /non-profits page, when a BusinessCard is clicked, then navigation goes to `/non-profit/{slug}`
+- [x] **AC-US4-03**: Given /non-profits page, when entityType="nonprofit", then BusinessCard renders category badge with rose color scheme
 
 ---
 
@@ -89,9 +89,9 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** public sector listings are rendered consistently
 
 **Acceptance Criteria**:
-- [ ] **AC-US5-01**: Given /public-sectors page loads, when public sectors exist, then each renders via `<BusinessCard entityType="publicsector" />`
-- [ ] **AC-US5-02**: Given /public-sectors page, when a BusinessCard is clicked, then navigation goes to `/public-sector/{slug}`
-- [ ] **AC-US5-03**: Given /public-sectors page, when entityType="publicsector", then BusinessCard renders category badge with blue color scheme
+- [x] **AC-US5-01**: Given /public-sectors page loads, when public sectors exist, then each renders via `<BusinessCard entityType="publicsector" />`
+- [x] **AC-US5-02**: Given /public-sectors page, when a BusinessCard is clicked, then navigation goes to `/public-sector/{slug}`
+- [x] **AC-US5-03**: Given /public-sectors page, when entityType="publicsector", then BusinessCard renders category badge with blue color scheme
 
 ---
 
@@ -102,9 +102,9 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** classified ad listings are rendered consistently
 
 **Acceptance Criteria**:
-- [ ] **AC-US6-01**: Given /listings page loads, when listings exist, then each listing renders via `<ListingCard />` component
-- [ ] **AC-US6-02**: Given /listings page, when a ListingCard is clicked, then navigation goes to `/listing/{slug}`
-- [ ] **AC-US6-03**: Given /listings page passes `profileImageId`, `price`, `listingType`, `location`, `likes`, `views` props, then ListingCard displays all values correctly
+- [x] **AC-US6-01**: Given /listings page loads, when listings exist, then each listing renders via `<ListingCard />` component
+- [x] **AC-US6-02**: Given /listings page, when a ListingCard is clicked, then navigation goes to `/listing/{slug}`
+- [x] **AC-US6-03**: Given /listings page passes `profileImageId`, `price`, `listingType`, `location`, `likes`, `views` props, then ListingCard displays all values correctly
 
 ---
 
@@ -115,8 +115,8 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** navigation is aligned with content width
 
 **Acceptance Criteria**:
-- [ ] **AC-US7-01**: Given Header.astro, when desktop viewport, then header container uses `max-w-7xl` instead of `max-w-6xl`
-- [ ] **AC-US7-02**: Given Header.astro mobile menu, when mobile menu is open, then menu container also uses `max-w-7xl`
+- [x] **AC-US7-01**: Given Header.astro, when desktop viewport, then header container uses `max-w-7xl` instead of `max-w-6xl`
+- [x] **AC-US7-02**: Given Header.astro mobile menu, when mobile menu is open, then menu container also uses `max-w-7xl`
 
 ---
 
@@ -127,7 +127,7 @@ Standardize card rendering across all entity list pages by refactoring inline ca
 **So that** footer content is aligned with other content areas
 
 **Acceptance Criteria**:
-- [ ] **AC-US8-01**: Given Footer.astro, when any viewport, then footer container uses `max-w-7xl` instead of `max-w-6xl`
+- [x] **AC-US8-01**: Given Footer.astro, when any viewport, then footer container uses `max-w-7xl` instead of `max-w-6xl`
 
 ---
 

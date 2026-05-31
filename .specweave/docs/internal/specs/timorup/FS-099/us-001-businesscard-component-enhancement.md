@@ -2,9 +2,9 @@
 id: US-001
 feature: FS-099
 title: "BusinessCard Component Enhancement"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** frontend developer."
 project: TimorUp
 ---
@@ -21,9 +21,9 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US1-01**: Given BusinessCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
-- [ ] **AC-US1-02**: Given BusinessCard receives `views` prop, when `views > 0`, then it displays views count with eye icon
-- [ ] **AC-US1-03**: Given BusinessCard receives `entityType` prop with value `'nonprofit'|'publicsector'`, then it renders correct href path (`/non-profit/{slug}` or `/public-sector/{slug}`)
+- [x] **AC-US1-01**: Given BusinessCard receives `profileImageId` prop, when no thumbnail is provided, then it renders image from `/api/media/{profileImageId}`
+- [x] **AC-US1-02**: Given BusinessCard receives `views` prop, when `views > 0`, then it displays views count with eye icon
+- [x] **AC-US1-03**: Given BusinessCard receives `entityType` prop with value `'nonprofit'|'publicsector'`, then it renders correct href path (`/non-profit/{slug}` or `/public-sector/{slug}`)
 
 ---
 
@@ -36,4 +36,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-001**: Enhance BusinessCard.astro with new props
+_No tasks defined for this user story_

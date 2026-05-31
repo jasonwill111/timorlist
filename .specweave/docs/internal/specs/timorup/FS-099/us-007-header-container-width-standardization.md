@@ -2,9 +2,9 @@
 id: US-007
 feature: FS-099
 title: "Header Container Width Standardization"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** visitor."
 project: TimorUp
 ---
@@ -21,8 +21,8 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US7-01**: Given Header.astro, when desktop viewport, then header container uses `max-w-7xl` instead of `max-w-6xl`
-- [ ] **AC-US7-02**: Given Header.astro mobile menu, when mobile menu is open, then menu container also uses `max-w-7xl`
+- [x] **AC-US7-01**: Given Header.astro, when desktop viewport, then header container uses `max-w-7xl` instead of `max-w-6xl`
+- [x] **AC-US7-02**: Given Header.astro mobile menu, when mobile menu is open, then menu container also uses `max-w-7xl`
 
 ---
 
@@ -35,4 +35,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-003**: Update Header.astro container width
+_No tasks defined for this user story_

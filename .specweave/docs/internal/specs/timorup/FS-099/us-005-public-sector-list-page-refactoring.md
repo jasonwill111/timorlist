@@ -2,9 +2,9 @@
 id: US-005
 feature: FS-099
 title: "Public Sector List Page Refactoring"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** visitor."
 project: TimorUp
 ---
@@ -21,9 +21,9 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US5-01**: Given /public-sectors page loads, when public sectors exist, then each renders via `<BusinessCard entityType="publicsector" />`
-- [ ] **AC-US5-02**: Given /public-sectors page, when a BusinessCard is clicked, then navigation goes to `/public-sector/{slug}`
-- [ ] **AC-US5-03**: Given /public-sectors page, when entityType="publicsector", then BusinessCard renders category badge with blue color scheme
+- [x] **AC-US5-01**: Given /public-sectors page loads, when public sectors exist, then each renders via `<BusinessCard entityType="publicsector" />`
+- [x] **AC-US5-02**: Given /public-sectors page, when a BusinessCard is clicked, then navigation goes to `/public-sector/{slug}`
+- [x] **AC-US5-03**: Given /public-sectors page, when entityType="publicsector", then BusinessCard renders category badge with blue color scheme
 
 ---
 
@@ -36,4 +36,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-007**: Refactor /public-sectors page to use BusinessCard
+_No tasks defined for this user story_

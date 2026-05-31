@@ -1,10 +1,10 @@
 {
   "id": "0099-unified-card-rendering",
-  "status": "planned",
+  "status": "completed",
   "type": "feature",
   "priority": "P1",
   "created": "2026-05-31T09:41:03.785Z",
-  "lastActivity": "2026-05-31T09:41:03.786Z",
+  "lastActivity": "2026-05-31T10:19:15.238Z",
   "testMode": "TDD",
   "coverageTarget": 80,
   "feature_id": null,
@@ -13,5 +13,7 @@
   "planning": {
     "parallel": false
   },
-  "project": "TimorUp"
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-05-31T10:18:20.065Z",
+  "approvedAt": "2026-05-31T10:19:15.239Z"
 }

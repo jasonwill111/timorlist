@@ -201,21 +201,50 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
 
     setLoading(true);
 
-    // Use lightAuth.signUp for Free Plan compatibility
-    const { data, error } = await actions.auth.lightSignUp({
-      email: email,
-      password: password,
-      name: name,
-    });
+    // Try REST API as fallback for Cloudflare Workers
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      });
+      const result = await response.json();
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error || !data?.success) {
-      const msg = error?.message || data?.error?.message || 'Registration failed';
-      showError(msg);
-      return;
+      if (result.error) {
+        showError(result.error);
+        return;
+      }
+
+      if (result.success) {
+        window.location.assign('/login?registered=true');
+        return;
+      }
+    } catch (fetchError) {
+      console.error('REST API failed, trying Astro actions:', fetchError);
     }
 
-    window.location.assign('/login?registered=true');
+    // Fallback to Astro actions
+    try {
+      const { data, error } = await actions.auth.lightSignUp({
+        email: email,
+        password: password,
+        name: name,
+      });
+
+      setLoading(false);
+
+      if (error || !data?.success) {
+        const msg = error?.message || data?.error?.message || 'Registration failed';
+        showError(msg);
+        return;
+      }
+
+      window.location.assign('/login?registered=true');
+    } catch (actionError) {
+      setLoading(false);
+      showError('Registration failed. Please try again.');
+    }
   });
 </script>

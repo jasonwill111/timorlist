@@ -2,9 +2,9 @@
 id: FS-099
 title: "Unified Card Rendering + Container Width Standardization"
 type: feature
-status: planned
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 lastUpdated: 2026-05-31
 tldr: "Standardi."
 complexity: high
@@ -16,7 +16,7 @@ stakeholder_relevant: true
 ## TL;DR
 
 **What**: Standardi.
-**Status**: planned | **Priority**: P1
+**Status**: completed | **Priority**: P1
 **User Stories**: 8
 
 ![Unified Card Rendering + Container Width Standardization illustration](assets\feature-fs-099.jpg)
@@ -29,7 +29,7 @@ Standardi
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0099-unified-card-rendering](../../../../../increments/0099-unified-card-rendering/spec.md) | ⏳ planned | 2026-05-31 |
+| [0099-unified-card-rendering](../../../../../increments/0099-unified-card-rendering/spec.md) | ✅ completed | 2026-05-31T00:00:00.000Z |
 
 ## User Stories
 

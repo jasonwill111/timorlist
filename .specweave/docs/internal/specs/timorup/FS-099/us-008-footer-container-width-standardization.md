@@ -2,9 +2,9 @@
 id: US-008
 feature: FS-099
 title: "Footer Container Width Standardization"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** visitor."
 project: TimorUp
 ---
@@ -21,7 +21,7 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US8-01**: Given Footer.astro, when any viewport, then footer container uses `max-w-7xl` instead of `max-w-6xl`
+- [x] **AC-US8-01**: Given Footer.astro, when any viewport, then footer container uses `max-w-7xl` instead of `max-w-6xl`
 
 ---
 
@@ -34,4 +34,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-004**: Update Footer.astro container width
+_No tasks defined for this user story_

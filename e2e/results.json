@@ -59,20 +59,20 @@
   },
   "suites": [
     {
-      "title": "auth-flow.spec.ts",
-      "file": "auth-flow.spec.ts",
+      "title": "basic-test.spec.ts",
+      "file": "basic-test.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "User Registration Flow",
-          "file": "auth-flow.spec.ts",
-          "line": 62,
+          "title": "Core Pages",
+          "file": "basic-test.spec.ts",
+          "line": 5,
           "column": 6,
           "specs": [
             {
-              "title": "registration page loads correctly",
+              "title": "Homepage loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -87,61 +87,61 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2663,
+                      "duration": 2692,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:7:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 7
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m  5 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'Core Pages'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m  6 |\u001b[39m   test(\u001b[32m'Homepage loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  7 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[33mBASE_URL\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  8 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/TimorUp/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m   })\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 7
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/\", waiting until \"load\"\u001b[22m\n\n\n   5 | test.describe('Core Pages', () => {\n   6 |   test('Homepage loads', async ({ page }) => {\n>  7 |     await page.goto(BASE_URL);\n     |                ^\n   8 |     await expect(page.locator('body')).toBeVisible();\n   9 |     await expect(page).toHaveTitle(/TimorUp/);\n  10 |   });\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:7:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:22.314Z",
+                      "startTime": "2026-05-31T11:11:49.908Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registratio-5e0cc-ration-page-loads-correctly-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Homepage-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registratio-5e0cc-ration-page-loads-correctly-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Homepage-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 7
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-cc20a8df48a1ddae6702",
-              "file": "auth-flow.spec.ts",
-              "line": 68,
+              "id": "6a887aa2576b40705ac9-0c150e6c64809544f2af",
+              "file": "basic-test.spec.ts",
+              "line": 6,
               "column": 3
             },
             {
-              "title": "validates required fields",
+              "title": "Login page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -156,61 +156,61 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2660,
+                      "duration": 2697,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/login\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/login\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:13:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 13
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 11 |\u001b[39m\n \u001b[90m 12 |\u001b[39m   test(\u001b[32m'Login page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/login`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#email'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#password'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m   })\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 13
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/login\", waiting until \"load\"\u001b[22m\n\n\n  11 |\n  12 |   test('Login page loads', async ({ page }) => {\n> 13 |     await page.goto(`${BASE_URL}/login`);\n     |                ^\n  14 |     await expect(page.locator('#email')).toBeVisible();\n  15 |     await expect(page.locator('#password')).toBeVisible();\n  16 |   });\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:13:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:26.146Z",
+                      "startTime": "2026-05-31T11:11:53.793Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registration-Flow-validates-required-fields-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Login-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registration-Flow-validates-required-fields-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Login-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 13
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-80b5586b71bfd97f664b",
-              "file": "auth-flow.spec.ts",
-              "line": 79,
+              "id": "6a887aa2576b40705ac9-3afa40b9b15d2a81e0da",
+              "file": "basic-test.spec.ts",
+              "line": 12,
               "column": 3
             },
             {
-              "title": "validates email format",
+              "title": "Register page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -225,61 +225,61 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2722,
+                      "duration": 2677,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/register\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/register\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/register\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/register\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:19:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 19
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m\n \u001b[90m 18 |\u001b[39m   test(\u001b[32m'Register page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/register`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'form'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 19
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/register\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/register\", waiting until \"load\"\u001b[22m\n\n\n  17 |\n  18 |   test('Register page loads', async ({ page }) => {\n> 19 |     await page.goto(`${BASE_URL}/register`);\n     |                ^\n  20 |     await expect(page.locator('form')).toBeVisible();\n  21 |   });\n  22 |\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:19:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:29.984Z",
+                      "startTime": "2026-05-31T11:11:57.681Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registration-Flow-validates-email-format-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Register-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registration-Flow-validates-email-format-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Register-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 19
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-45b639cacdf9470d3471",
-              "file": "auth-flow.spec.ts",
-              "line": 93,
+              "id": "6a887aa2576b40705ac9-0ca4f4d7209717cf051a",
+              "file": "basic-test.spec.ts",
+              "line": 18,
               "column": 3
             },
             {
-              "title": "validates password strength",
+              "title": "Admin login page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -294,61 +294,61 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2705,
+                      "duration": 2677,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/admin/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/admin/login\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/admin/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/admin/login\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:24:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 24
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 22 |\u001b[39m\n \u001b[90m 23 |\u001b[39m   test(\u001b[32m'Admin login page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/admin/login`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'form'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 26 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 24
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/admin/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/admin/login\", waiting until \"load\"\u001b[22m\n\n\n  22 |\n  23 |   test('Admin login page loads', async ({ page }) => {\n> 24 |     await page.goto(`${BASE_URL}/admin/login`);\n     |                ^\n  25 |     await expect(page.locator('form')).toBeVisible();\n  26 |   });\n  27 |\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:24:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:33.896Z",
+                      "startTime": "2026-05-31T11:12:01.572Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registration-Flow-validates-password-strength-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Admin-login-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registration-Flow-validates-password-strength-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Admin-login-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 24
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-24df7bc80581101140cd",
-              "file": "auth-flow.spec.ts",
-              "line": 109,
+              "id": "6a887aa2576b40705ac9-acbd2e339dc992171874",
+              "file": "basic-test.spec.ts",
+              "line": 23,
               "column": 3
             },
             {
-              "title": "registers new user successfully",
+              "title": "Businesses page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -363,69 +363,61 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2664,
+                      "duration": 2678,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/businesses\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/businesses\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/businesses\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/businesses\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:29:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 29
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 27 |\u001b[39m\n \u001b[90m 28 |\u001b[39m   test(\u001b[32m'Businesses page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/businesses`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 29
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:65:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/businesses\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/businesses\", waiting until \"load\"\u001b[22m\n\n\n  27 |\n  28 |   test('Businesses page loads', async ({ page }) => {\n> 29 |     await page.goto(`${BASE_URL}/businesses`);\n     |                ^\n  30 |     await expect(page.locator('body')).toBeVisible();\n  31 |   });\n  32 |\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:29:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:37.929Z",
+                      "startTime": "2026-05-31T11:12:05.412Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registratio-65d87-sters-new-user-successfully-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Businesses-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Registratio-65d87-sters-new-user-successfully-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Businesses-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 29
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-f9785b592affd22a2047",
-              "file": "auth-flow.spec.ts",
-              "line": 125,
+              "id": "6a887aa2576b40705ac9-bb002a6ba9a505fc5f8d",
+              "file": "basic-test.spec.ts",
+              "line": 28,
               "column": 3
-            }
-          ]
-        },
-        {
-          "title": "User Login Flow",
-          "file": "auth-flow.spec.ts",
-          "line": 147,
-          "column": 6,
-          "specs": [
+            },
             {
-              "title": "login page loads correctly",
+              "title": "Search page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -440,61 +432,61 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2627,
+                      "duration": 2685,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/search\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/search\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/search\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/search\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:34:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 34
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m   test(\u001b[32m'Search page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/search`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 36 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 34
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/search\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/search\", waiting until \"load\"\u001b[22m\n\n\n  32 |\n  33 |   test('Search page loads', async ({ page }) => {\n> 34 |     await page.goto(`${BASE_URL}/search`);\n     |                ^\n  35 |     await expect(page.locator('body')).toBeVisible();\n  36 |   });\n  37 |\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:34:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:41.798Z",
+                      "startTime": "2026-05-31T11:12:09.212Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-login-page-loads-correctly-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Search-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-login-page-loads-correctly-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Search-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 34
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-7fe88e07c0ca20cb0f14",
-              "file": "auth-flow.spec.ts",
-              "line": 152,
+              "id": "6a887aa2576b40705ac9-f2f988549f3422aff3c6",
+              "file": "basic-test.spec.ts",
+              "line": 33,
               "column": 3
             },
             {
-              "title": "logs in existing user",
+              "title": "Pricing page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -509,61 +501,61 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2700,
+                      "duration": 2682,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/pricing\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/pricing\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/pricing\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/pricing\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:39:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 39
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 37 |\u001b[39m\n \u001b[90m 38 |\u001b[39m   test(\u001b[32m'Pricing page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 39 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/pricing`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 40 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 41 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 42 |\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 39
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/pricing\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/pricing\", waiting until \"load\"\u001b[22m\n\n\n  37 |\n  38 |   test('Pricing page loads', async ({ page }) => {\n> 39 |     await page.goto(`${BASE_URL}/pricing`);\n     |                ^\n  40 |     await expect(page.locator('body')).toBeVisible();\n  41 |   });\n  42 |\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:39:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:45.593Z",
+                      "startTime": "2026-05-31T11:12:13.111Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-logs-in-existing-user-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Pricing-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-logs-in-existing-user-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-Pricing-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 39
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-1a0c9c1139502a85799e",
-              "file": "auth-flow.spec.ts",
-              "line": 161,
+              "id": "6a887aa2576b40705ac9-51c9e305929bff1a0d0c",
+              "file": "basic-test.spec.ts",
+              "line": 38,
               "column": 3
             },
             {
-              "title": "rejects invalid credentials",
+              "title": "About page loads",
               "ok": false,
               "tags": [],
               "tests": [
@@ -578,61 +570,69 @@
                       "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2662,
+                      "duration": 2680,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/about\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/about\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/about\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/about\", waiting until \"load\"\u001b[22m\n\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:44:16",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
+                          "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                          "column": 16,
+                          "line": 44
                         },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 42 |\u001b[39m\n \u001b[90m 43 |\u001b[39m   test(\u001b[32m'About page loads'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 44 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/about`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'body'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 46 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 47 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                            "column": 16,
+                            "line": 44
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4322/about\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4322/about\", waiting until \"load\"\u001b[22m\n\n\n  42 |\n  43 |   test('About page loads', async ({ page }) => {\n> 44 |     await page.goto(`${BASE_URL}/about`);\n     |                ^\n  45 |     await expect(page.locator('body')).toBeVisible();\n  46 |   });\n  47 | });\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:44:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:49.641Z",
+                      "startTime": "2026-05-31T11:12:17.010Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-rejects-invalid-credentials-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-About-page-loads-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-rejects-invalid-credentials-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-Core-Pages-About-page-loads-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts",
+                        "column": 16,
+                        "line": 44
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-864e6c8b2beb70717197",
-              "file": "auth-flow.spec.ts",
-              "line": 175,
+              "id": "6a887aa2576b40705ac9-343276485df6248e7e24",
+              "file": "basic-test.spec.ts",
+              "line": 43,
               "column": 3
-            },
+            }
+          ]
+        },
+        {
+          "title": "API Endpoints",
+          "file": "basic-test.spec.ts",
+          "line": 49,
+          "column": 6,
+          "specs": [
             {
-              "title": "redirects already logged in user",
+              "title": "Homepage API returns HTML",
               "ok": false,
               "tags": [],
               "tests": [
@@ -647,229 +647,56 @@
                       "workerIndex": 8,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2645,
+                      "duration": 551,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11",
+                        "message": "Error: apiRequestContext.get: connect ECONNREFUSED ::1:4322\nCall log:\n\u001b[2m  - → GET http://localhost:4322/\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n",
+                        "stack": "Error: apiRequestContext.get: connect ECONNREFUSED ::1:4322\nCall log:\n\u001b[2m  - → GET http://localhost:4322/\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\n    at apiRequestContext.get: connect ECONNREFUSED ::1:4322\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:51:41",
                         "location": {
-                          "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                          "column": 14,
-                          "line": 49
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 47 |\u001b[39m\n \u001b[90m 48 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m logout(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 49 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${BASE_URL}/`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 50 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 51 |\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[90m// Try logout button if exists\u001b[39m\u001b[0m"
+                          "file": "apiRequestContext.get: connect ECONNREFUSED :",
+                          "column": 4322,
+                          "line": 1
+                        }
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "column": 14,
-                            "line": 49
+                            "file": "apiRequestContext.get: connect ECONNREFUSED :",
+                            "column": 4322,
+                            "line": 1
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:4321/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:4321/\", waiting until \"load\"\u001b[22m\n\n\n  47 |\n  48 | async function logout(page: Page) {\n> 49 |   await page.goto(`${BASE_URL}/`);\n     |              ^\n  50 |   await page.waitForLoadState('networkidle');\n  51 |\n  52 |   // Try logout button if exists\n    at logout (D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:49:14)\n    at D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts:149:11"
+                          "message": "Error: apiRequestContext.get: connect ECONNREFUSED ::1:4322\nCall log:\n\u001b[2m  - → GET http://localhost:4322/\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.96 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\n    at apiRequestContext.get: connect ECONNREFUSED ::1:4322\n    at D:\\Dev Projects\\timorup\\e2e\\basic-test.spec.ts:51:41"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-31T08:38:53.609Z",
+                      "startTime": "2026-05-31T11:12:20.892Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-redirects-already-logged-in-user-chromium\\test-failed-1.png"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-API-Endpoints-Homepage-API-returns-HTML-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "D:\\Dev Projects\\timorup\\test-results\\auth-flow-User-Login-Flow-redirects-already-logged-in-user-chromium\\error-context.md"
+                          "path": "D:\\Dev Projects\\timorup\\test-results\\basic-test-API-Endpoints-Homepage-API-returns-HTML-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "column": 14,
-                        "line": 49
+                        "file": "apiRequestContext.get: connect ECONNREFUSED :",
+                        "column": 4322,
+                        "line": 1
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "df6b40174562c70df515-df8c47117af94839e247",
-              "file": "auth-flow.spec.ts",
-              "line": 196,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "Account Page",
-          "file": "auth-flow.spec.ts",
-          "line": 213,
-          "column": 6,
-          "specs": [
-            {
-              "title": "shows user info when logged in",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "line": 225,
-                        "column": 12
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 9,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 2624,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-31T08:38:57.624Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "line": 225,
-                            "column": 12
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "df6b40174562c70df515-92be3dd545c190c0f872",
-              "file": "auth-flow.spec.ts",
-              "line": 214,
-              "column": 3
-            },
-            {
-              "title": "redirects to login when not logged in",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "line": 238,
-                        "column": 12
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 9,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 2619,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-31T08:39:00.445Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "line": 238,
-                            "column": 12
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "df6b40174562c70df515-a91c18c736e50502a8ce",
-              "file": "auth-flow.spec.ts",
-              "line": 229,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "Logout Flow",
-          "file": "auth-flow.spec.ts",
-          "line": 245,
-          "column": 6,
-          "specs": [
-            {
-              "title": "logs out user and redirects",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                        "line": 256,
-                        "column": 12
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 9,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 2639,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-31T08:39:03.094Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "D:\\Dev Projects\\timorup\\e2e\\auth-flow.spec.ts",
-                            "line": 256,
-                            "column": 12
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "df6b40174562c70df515-827bfbb3fd9a267e62b6",
-              "file": "auth-flow.spec.ts",
-              "line": 246,
+              "id": "6a887aa2576b40705ac9-fa98ed1b30aa1be04a8b",
+              "file": "basic-test.spec.ts",
+              "line": 50,
               "column": 3
             }
           ]
@@ -879,10 +706,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-31T08:38:21.136Z",
-    "duration": 44802.765,
+    "startTime": "2026-05-31T11:11:49.009Z",
+    "duration": 32742.734000000004,
     "expected": 0,
-    "skipped": 3,
+    "skipped": 0,
     "unexpected": 9,
     "flaky": 0
   }

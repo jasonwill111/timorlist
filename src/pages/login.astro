@@ -234,26 +234,58 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
     const rememberMeCheckbox = document.getElementById('remember-me') as HTMLInputElement;
     const rememberMe = rememberMeCheckbox?.checked || false;
 
-    // Use lightAuth.signIn for Free Plan compatibility
-    const { data, error } = await actions.auth.lightSignIn({
-      email: email,
-      password: password,
-      rememberMe: rememberMe,
-    });
+    // Try REST API as fallback for Cloudflare Workers
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const result = await response.json();
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error || !data?.success) {
-      const msg = error?.message || data?.error?.message || 'Invalid email or password';
-      showError(msg);
-      return;
+      if (result.error) {
+        showError(result.error);
+        return;
+      }
+
+      if (result.success && result.token) {
+        // Set session cookie
+        const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
+        document.cookie = `better-auth.session_token=${result.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
+        window.location.assign('/account');
+        return;
+      }
+    } catch (fetchError) {
+      console.error('REST API failed, trying Astro actions:', fetchError);
     }
 
-    // Set session cookie (match the name used by auth verification)
-    if (data?.token) {
-      const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
-      document.cookie = `better-auth.session_token=${data.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
-      window.location.assign('/account');
+    // Fallback to Astro actions
+    try {
+      const { data, error } = await actions.auth.lightSignIn({
+        email: email,
+        password: password,
+        rememberMe: rememberMe,
+      });
+
+      setLoading(false);
+
+      if (error || !data?.success) {
+        const msg = error?.message || data?.error?.message || 'Invalid email or password';
+        showError(msg);
+        return;
+      }
+
+      // Set session cookie (match the name used by auth verification)
+      if (data?.token) {
+        const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
+        document.cookie = `better-auth.session_token=${data.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
+        window.location.assign('/account');
+      }
+    } catch (actionError) {
+      setLoading(false);
+      showError('Authentication failed. Please try again.');
     }
   });
 </script>

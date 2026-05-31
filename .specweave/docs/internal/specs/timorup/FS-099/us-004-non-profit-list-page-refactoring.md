@@ -2,9 +2,9 @@
 id: US-004
 feature: FS-099
 title: "Non-Profit List Page Refactoring"
-status: not_started
+status: completed
 priority: P1
-created: 2026-05-31
+created: 2026-05-31T00:00:00.000Z
 tldr: "**As a** visitor."
 project: TimorUp
 ---
@@ -21,9 +21,9 @@ project: TimorUp
 
 ## Acceptance Criteria
 
-- [ ] **AC-US4-01**: Given /non-profits page loads, when non-profits exist, then each non-profit renders via `<BusinessCard entityType="nonprofit" />`
-- [ ] **AC-US4-02**: Given /non-profits page, when a BusinessCard is clicked, then navigation goes to `/non-profit/{slug}`
-- [ ] **AC-US4-03**: Given /non-profits page, when entityType="nonprofit", then BusinessCard renders category badge with rose color scheme
+- [x] **AC-US4-01**: Given /non-profits page loads, when non-profits exist, then each non-profit renders via `<BusinessCard entityType="nonprofit" />`
+- [x] **AC-US4-02**: Given /non-profits page, when a BusinessCard is clicked, then navigation goes to `/non-profit/{slug}`
+- [x] **AC-US4-03**: Given /non-profits page, when entityType="nonprofit", then BusinessCard renders category badge with rose color scheme
 
 ---
 
@@ -36,4 +36,4 @@ project: TimorUp
 
 ## Tasks
 
-- [ ] **T-006**: Refactor /non-profits page to use BusinessCard
+_No tasks defined for this user story_

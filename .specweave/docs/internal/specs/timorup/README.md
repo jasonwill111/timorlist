@@ -57,6 +57,7 @@ sw:sync-docs 0001
 - [FS-067: D1 Database Schema Fix](FS-067/FEATURE.md)
 - [FS-068: Admin UI Fix](FS-068/FEATURE.md)
 - [FS-078: UI/UX Optimization](FS-078/FEATURE.md)
+- [FS-099: Unified Card Rendering + Container Width Standardization](FS-099/FEATURE.md)
 
 ---
 
