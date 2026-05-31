@@ -193,8 +193,8 @@ const urlParams = new URL(Astro.request.url).searchParams;
     }
   });
 
-  // Dropdown menu animations via CSS classes
-  const dropdownGroups = document.querySelectorAll('.group');
+  // Dropdown menu animations via CSS classes - ONLY target nav dropdown groups, not all .group elements
+  const dropdownGroups = document.querySelectorAll('nav .group');
   dropdownGroups.forEach(group => {
     const dropdown = group.querySelector('div:last-child');
     if (dropdown) {
