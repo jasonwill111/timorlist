@@ -1,19 +1,181 @@
 ---
-// Listings page - Astro 6 Server Islands pattern
-// Banner renders immediately, listings load async via is:defer
+// Listings page - Direct SSR pattern (matches businesses/non-profits/public-sectors)
 export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
 import CarouselBanner from '../../components/ui/CarouselBanner.astro';
-import ListingListIsland from '../../components/islands/ListingListNew.astro';
+import ListingCard from '../../components/business/ListingCard.astro';
+import { getDb } from '@/lib/db';
+import { listings } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 
-// Astro 6: Set streaming headers for progressive page load
+// Get URL params
+const searchParams = Astro.url.searchParams;
+const search = searchParams.get('q') || '';
+const type = searchParams.get('type') || '';
+const page = parseInt(searchParams.get('page') || '1', 10);
+const LIMIT = 12;
+const offset = (page - 1) * LIMIT;
+
+// Set caching headers
+const hasSearchParams = search || type;
+Astro.response.headers.set('Cache-Control', hasSearchParams ? 'public, max-age=30, s-maxage=60, stale-while-revalidate=120' : 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
+
+// Initialize DB and fetch listings
+const db = await getDb();
+
+interface ListingRecord {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  price: string | null;
+  listingType: string | null;
+  location: string | null;
+  imageIds: string[];
+  likes: number | null;
+  views: number | null;
+  status: string | null;
+}
+
+let allEntities: ListingRecord[] = [];
+
+if (db) {
+  try {
+    allEntities = await db.select({
+      id: listings.id,
+      title: listings.title,
+      slug: listings.slug,
+      description: listings.description,
+      price: listings.price,
+      listingType: listings.listingType,
+      location: listings.location,
+      imageIds: listings.imageIds,
+      likes: listings.likes,
+      views: listings.views,
+      status: listings.status,
+    })
+    .from(listings)
+    .orderBy(desc(listings.createdAt))
+    .all();
+  } catch (e) {
+    console.log('Query error:', e);
+    allEntities = [];
+  }
+}
+
+// Apply filters
+if (search) {
+  const searchLower = search.toLowerCase();
+  allEntities = allEntities.filter(e =>
+    e.title.toLowerCase().includes(searchLower) ||
+    (e.description && e.description.toLowerCase().includes(searchLower))
+  );
+}
+if (type) {
+  allEntities = allEntities.filter(e => e.listingType === type);
+}
+
+// Filter for visible statuses
+allEntities = allEntities.filter(e =>
+  e.status === 'active' || e.status === 'published' || e.status === 'live'
+);
+
+const total = allEntities.length;
+const totalPages = Math.ceil(total / LIMIT);
+const entities = allEntities.slice(offset, offset + LIMIT);
+
+const buildUrl = (params: Record<string, string>) => {
+  const p = new URLSearchParams();
+  if (search) p.set('q', search);
+  if (type) p.set('type', type);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v) p.set(k, v);
+  });
+  return `/listings?${p.toString()}`;
+};
 ---
 
 <Layout title="Classified Ads - TimorUp">
-  <!-- Banner - renders immediately, no DB dependency -->
-  <CarouselBanner position="listings" class="mb-6" />
+  <div class="max-w-7xl mx-auto px-4" data-page-content>
+    <CarouselBanner position="listings" class="mb-6" />
 
-  <!-- Listing List Island - loads async from D1 -->
-  <ListingListIsland is:defer />
+    <!-- Header with count -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl sm:text-3xl font-bold">Classified Ads</h1>
+      <span class="text-sm text-muted-foreground">{total} total</span>
+    </div>
+
+    <!-- Search & Filter -->
+    <form method="GET" action="/listings" class="bg-card rounded-2xl border border-border/50 p-4 mb-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input name="q" type="search" placeholder="Search listings..." value={search}
+            class="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200" />
+        </div>
+        <div class="flex gap-2">
+          <select name="type" onchange="this.form.submit()"
+            class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
+            <option value="">All Types</option>
+            <option value="product" selected={type === 'product'}>Product</option>
+            <option value="vehicle" selected={type === 'vehicle'}>Vehicle</option>
+            <option value="property" selected={type === 'property'}>Property</option>
+            <option value="job" selected={type === 'job'}>Job</option>
+            <option value="service" selected={type === 'service'}>Service</option>
+            <option value="wanted" selected={type === 'wanted'}>Wanted</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <!-- Listings Grid using ListingCard component -->
+    {entities.length > 0 ? (
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {entities.map(l => (
+          <ListingCard
+            title={l.title}
+            slug={l.slug}
+            price={l.price || ''}
+            listingType={l.listingType || 'product'}
+            location={l.location?.split(',')[0] || ''}
+            imageIds={l.imageIds || []}
+            likes={l.likes || 0}
+            views={l.views || 0}
+          />
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-16">
+        <svg class="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <h3 class="text-lg font-medium mb-2">No listings found</h3>
+        <p class="text-muted-foreground">Try adjusting your search or filters</p>
+      </div>
+    )}
+
+    <!-- Pagination -->
+    {totalPages > 1 ? (
+      <nav class="flex items-center justify-center gap-2 mt-8" aria-label="Pagination">
+        <a href={buildUrl({ page: String(page - 1) })}
+           class={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${page > 1 ? 'hover:border-primary hover:text-primary cursor-pointer' : 'opacity-50 pointer-events-none text-muted-foreground'}`}>
+          &larr; Prev
+        </a>
+        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+          const p = i + 1;
+          return (
+            <a href={buildUrl({ page: String(p) })}
+               class={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${p === page ? 'bg-primary text-primary-foreground border-primary' : 'hover:border-primary hover:text-primary cursor-pointer'}`}>
+              {p}
+            </a>
+          );
+        })}
+        <a href={buildUrl({ page: String(page + 1) })}
+           class={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${page < totalPages ? 'hover:border-primary hover:text-primary cursor-pointer' : 'opacity-50 pointer-events-none text-muted-foreground'}`}>
+          Next &rarr;
+        </a>
+      </nav>
+    ) : null}
+  </div>
 </Layout>
