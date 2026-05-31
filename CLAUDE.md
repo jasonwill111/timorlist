@@ -413,14 +413,14 @@ See **AGENTS.md** for Cursor, Copilot, Windsurf, Aider instructions.
 | 分类 | 数量 | 说明 |
 |------|------|------|
 | **Public Read-only** | 10 | businesses, non-profits, public-sectors, categories, products, banners (SSR缓存) |
-| **Auth** | 1 | `/api/auth/session` (客户端认证) |
+| **Auth** | 2 | `/api/auth` (sign-in/sign-up), `/api/auth/session` (客户端认证) |
 | **Scheduled** | 5 | Cron定时任务，必须保留 |
 | **Admin CRUD** | 0 | 已迁移至 Server Actions ✅ |
 | **Account/Profile** | 0 | 已迁移至 Server Actions ✅ |
 | **Blog/Settings/Plans** | 3 | 公开数据，保留 REST |
 | **Orphaned** | 0 | Admin APIs 已清理 ✅ |
 
-> **重要**: 48 个 Server Actions (含 account 模块) 覆盖所有写操作和用户私有数据。剩余 21 个 REST APIs 主要用于公开读取缓存和 Cron 任务。
+> **重要**: 48 个 Server Actions (含 account 模块) 覆盖所有写操作和用户私有数据。REST API `/api/auth` 作为 Cloudflare Workers 兼容性回退方案。剩余 21 个 REST APIs 主要用于公开读取缓存和 Cron 任务。
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence

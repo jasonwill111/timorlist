@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Fixed
+- **0100-workers-testing-fix** (2026-05-31): Workers 100% functional testing fixes:
+  - `/listings` page: Converted Server Island to Direct SSR (cards now render)
+  - Auth forms: Added REST API `/api/auth` fallback for Cloudflare Workers
+  - Admin auth: Fixed `getAdminUser` to parse Request cookies (17 admin pages now work)
+- **0099-unified-card-rendering** (2026-05-31): Unified card rendering + container width:
+  - BusinessCard, ListingCard components enhanced with new props
+  - All 4 list pages (businesses, non-profits, public-sectors, listings) use card components
+  - Header/Footer standardized to `max-w-7xl` container width
 - **0098-critical-bug-fixes** (2026-05-31): Workers production bug fixes:
   - `business/[slug].astro`: Fixed `planStatus` → `subscriptionStatus` (correct schema field)
   - `business/[slug].astro`: Fixed media query `type`/`typeId` → `entityType`/`entityId`

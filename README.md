@@ -6,9 +6,9 @@ Timor-Leste's business directory platform built with Astro + Cloudflare Workers.
 
 | Component | Technology |
 |-----------|------------|
-| Framework | Astro 6.2.1 |
+| Framework | Astro 6.4.2 |
 | Database | Drizzle ORM + D1 |
-| Auth | better-auth 1.6.9 |
+| Auth | better-auth 1.6.11 (with REST API fallback) |
 | AI | Mastra 1.29.1 + Workers AI |
 | Validation | Zod 4.4.1 |
 | Styling | TailwindCSS 4.2.4 |
@@ -16,12 +16,33 @@ Timor-Leste's business directory platform built with Astro + Cloudflare Workers.
 
 ## Features
 
-- **Business Listings**: Commercial businesses, government agencies, NGOs
-- **Server Islands**: Optimized rendering with dynamic content islands
+- **4 Entity Types**: Businesses, Non-Profits, Public Sectors, Classified Listings
+- **Unified Card Rendering**: Reusable BusinessCard/ListingCard components
+- **Server Actions**: 48 server actions for all write operations
+- **REST API Fallback**: `/api/auth` endpoint for Cloudflare Workers compatibility
 - **AI Tools**: Listing creator, SKU creator, blog generator, landing page creator
-- **Admin Dashboard**: Full CRUD for all entities
-- **Media Management**: R2 storage with video compression
+- **Admin Dashboard**: Full CRUD for all entities (17 pages)
+- **Media Management**: R2 storage with image compression
 - **Type Safety**: Strict TypeScript with proper types throughout
+
+## Pages (100% Tested)
+
+### Public Pages
+- `/` - Homepage with carousel, business cards, listings, non-profits, public sectors
+- `/businesses` - Business directory with 20 cards, filters, pagination
+- `/non-profits` - Non-profit directory with category badges
+- `/public-sectors` - Government offices directory
+- `/listings` - Classified ads with 24 cards, type filters
+- `/login`, `/register` - Authentication forms
+- `/pricing`, `/about`, `/faq`, `/contact`
+
+### Admin Pages
+- `/admin` - Dashboard with stats and charts
+- `/admin/businesses`, `/admin/listings`, `/admin/non-profits`, `/admin/public-sectors`
+- `/admin/categories` - Category management (hierarchical)
+- `/admin/media` - Media upload and management
+- `/admin/users`, `/admin/products`, `/admin/orders`, `/admin/reviews`
+- `/admin/blogs`, `/admin/ad-banners`, `/admin/service-packages`, `/admin/ai-tools`
 
 ## Commands
 
