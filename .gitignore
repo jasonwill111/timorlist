@@ -117,3 +117,5 @@ plugins/
 !.specweave/docs/
 .gstack/
 .gitnexus
+.pnpm-store-new/
+.pnpm-store-virtual/

@@ -6,6 +6,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Button from '../../../components/ui/Button.astro';
 import Input from '../../../components/ui/Input.astro';
 import Label from '../../../components/ui/Label.astro';
+import { actions } from 'astro:actions';
 
 import Card from '../../../components/ui/Card.astro'
 import CardHeader from '../../../components/ui/CardHeader.astro'
@@ -191,11 +192,9 @@ import CardContent from '../../../components/ui/CardContent.astro'
   // Load subscription status
   async function loadSubscription(businessId: string) {
     try {
-      const res = await fetch(`/api/account/subscription/${businessId}`);
-      const data = await res.json();
-
-      if (data.success) {
-        return data.data;
+      const result = await actions.account.getBusinessSubscription({ businessId });
+      if (result.success) {
+        return result.data;
       }
     } catch (err) {
       console.error('Error loading subscription:', err);

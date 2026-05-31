@@ -174,8 +174,8 @@ export async function updateBusinessRating(businessId: string): Promise<void> {
 
   await db.update(businesses)
     .set({
-      rating: stats?.avgRating || null,
-      reviewCount: stats?.reviewCount || 0,
+      ratingAverage: stats?.avgRating || null,
+      ratingCount: stats?.reviewCount || 0,
       updatedAt: Math.floor(Date.now() / 1000),
     })
     .where(eq(businesses.id, businessId))

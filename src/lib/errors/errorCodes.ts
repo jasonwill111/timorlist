@@ -10,6 +10,9 @@ export enum ErrorCode {
   AUTH_USER_EXISTS = 'AUTH_USER_EXISTS',
   AUTH_SESSION_EXPIRED = 'AUTH_SESSION_EXPIRED',
 
+  // User errors (1xxx)
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+
   // Business errors (2xxx)
   BUSINESS_NOT_FOUND = 'BUSINESS_NOT_FOUND',
   BUSINESS_LIMIT_REACHED = 'BUSINESS_LIMIT_REACHED',
@@ -58,6 +61,8 @@ export const ErrorCodeToStatus: Record<ErrorCode, number> = {
   [ErrorCode.AUTH_RATE_LIMITED]: 429,
   [ErrorCode.AUTH_USER_EXISTS]: 409,
   [ErrorCode.AUTH_SESSION_EXPIRED]: 401,
+
+  [ErrorCode.USER_NOT_FOUND]: 404,
 
   [ErrorCode.BUSINESS_NOT_FOUND]: 404,
   [ErrorCode.BUSINESS_LIMIT_REACHED]: 403,

@@ -38,8 +38,8 @@ export function createAuthInstance(env: Record<string, unknown>, _cf?: Record<st
         storeSessionInDatabase: true,
         cookieConfig: {
           name: 'better-auth.session_token',
-          secure: false, // Allow in development
-          sameSite: 'lax', // Allow cross-site cookies for development
+          secure: import.meta.env.PROD, // true in production, false in development
+          sameSite: 'strict', // Prevent CSRF
           httpOnly: true,
           path: '/',
         },

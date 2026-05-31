@@ -40,7 +40,8 @@ export const uploadMedia = defineAction({
         return createErrorResponse(ErrorCode.MEDIA_NO_FILE, 'No file provided');
       }
 
-      // Use centralized validation
+      // Use centralized validation - extract entityType from input.type (e.g., 'businesses/biz-123/profile' -> 'businesses')
+      const entityType = input.type.split('/')[0];
       const validation = validateMediaFile(file, entityType);
       if (!validation.valid) {
         return createErrorResponse(validation.error!.code, validation.error!.message);

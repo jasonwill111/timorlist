@@ -71,17 +71,17 @@ if (business.status === 'draft') {
 const isPending = business.status === 'pending_payment';
 
 // Check grace period using plan fields
-const planStatus = business.planStatus || 'none';
+const subscriptionStatus = business.subscriptionStatus || 'none';
 const gracePeriodEndDate = business.gracePeriodEndDate
   ? new Date(business.gracePeriodEndDate as unknown as number * 1000)
   : null;
 
 const now = new Date();
 const isInGracePeriod = gracePeriodEndDate
-  ? planStatus === 'expired' && now < gracePeriodEndDate
+  ? subscriptionStatus === 'expired' && now < gracePeriodEndDate
   : false;
 
-const isExpiredBeyondGrace = planStatus === 'expired' && (!gracePeriodEndDate || now >= gracePeriodEndDate);
+const isExpiredBeyondGrace = subscriptionStatus === 'expired' && (!gracePeriodEndDate || now >= gracePeriodEndDate);
 
 const daysRemaining = gracePeriodEndDate
   ? Math.max(0, Math.ceil((gracePeriodEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
@@ -145,8 +145,8 @@ try {
 try {
   const galleryMedia = await db.select({ id: media.id })
     .from(media)
-    .where(eq(media.typeId, business.id))
-    .where(eq(media.type, 'businesses'))
+    .where(eq(media.entityId, business.id))
+    .where(eq(media.entityType, 'businesses'))
     .orderBy(media.sortOrder)
     .all();
   galleryImages = galleryMedia.map(m => ({ id: m.id, url: `/api/media/${m.id}` }));

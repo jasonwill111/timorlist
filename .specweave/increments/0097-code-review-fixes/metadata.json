@@ -1,0 +1,19 @@
+{
+  "id": "0097-code-review-fixes",
+  "status": "completed",
+  "type": "feature",
+  "priority": "P1",
+  "created": "2026-05-31T07:26:45.241Z",
+  "lastActivity": "2026-05-31T07:26:45.242Z",
+  "completed": "2026-05-31T07:35:00.000Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "summary": "Fixed 2 critical + 2 high code review findings: media upload bug, auth cookie security, query column names, DB-level filtering"
+}

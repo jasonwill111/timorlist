@@ -3,7 +3,7 @@
 // Uses is:defer for streaming, renders immediately with fallback
 import { getDb } from '@/lib/db';
 import { businesses, businessCategories } from '@/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, inArray } from 'drizzle-orm';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('q') || '';
@@ -45,13 +45,13 @@ let allEntities = [];
 if (db) {
   try {
     console.log('[BusinessListNew] Fetching businesses...');
-    const raw = await db.select().from(businesses).all();
+    // Filter for active/live/published status at DB level (not in memory)
+    const raw = await db.select().from(businesses)
+      .where(inArray(businesses.status, ['active', 'live', 'published']))
+      .all();
     console.log('[BusinessListNew] Raw businesses count:', raw.length);
 
-    // Filter for active/live/published status
-    allEntities = raw.filter(e =>
-      e.status === 'active' || e.status === 'live' || e.status === 'published'
-    );
+    allEntities = raw;
     console.log('[BusinessListNew] Filtered businesses count:', allEntities.length);
   } catch (e) {
     console.error('Query error:', e);

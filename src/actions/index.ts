@@ -1,4 +1,5 @@
 // Astro Server Actions - Central Export
+import * as account from './account';
 import * as admin from './admin';
 import * as auth from './auth';
 import * as business from './business';
@@ -9,6 +10,7 @@ import * as banners from './banners';
 
 // Re-export everything
 export const actions = {
+  account,
   admin,
   auth,
   business,

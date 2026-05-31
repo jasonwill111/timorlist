@@ -7,6 +7,16 @@ import { eq, desc, or } from 'drizzle-orm';
 import BusinessCard from '@/components/business/BusinessCard.astro';
 import ListingCard from '@/components/business/ListingCard.astro';
 
+// Safe JSON parser
+function safeJsonParse<T>(str: unknown, fallback: T): T {
+  if (!str || typeof str !== 'string') return fallback;
+  try {
+    return JSON.parse(str);
+  } catch {
+    return fallback;
+  }
+}
+
 // Define types for better TypeScript safety
 
 type BusinessListing = {
@@ -77,7 +87,7 @@ try {
   .limit(12);
 
   featuredBusinesses = businessesResult.map(b => {
-    const tags = b.tags ? JSON.parse(b.tags) : [];
+    const tags = safeJsonParse(b.tags, [] as string[]);
     return {
       id: b.id,
       title: b.title,
@@ -103,7 +113,7 @@ try {
   );
 
   featuredListings = listingsResult.map(l => {
-    const imageIds = l.imageIds ? JSON.parse(l.imageIds) : [];
+    const imageIds = safeJsonParse(l.imageIds, [] as string[]);
     return {
       id: l.id,
       title: l.title,
@@ -139,7 +149,7 @@ try {
   .limit(12);
 
   featuredPublicSectors = publicSectorsResult.map(b => {
-    const tags = b.tags ? JSON.parse(b.tags) : [];
+    const tags = safeJsonParse(b.tags, [] as string[]);
     return {
       id: b.id,
       title: b.title,
@@ -181,7 +191,7 @@ try {
   .limit(12);
 
   featuredNonProfits = nonProfitsResult.map(b => {
-    const tags = b.tags ? JSON.parse(b.tags) : [];
+    const tags = safeJsonParse(b.tags, [] as string[]);
     return {
       id: b.id,
       title: b.title,

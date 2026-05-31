@@ -9,6 +9,7 @@ import Label from '@components/ui/Label.astro';
 import Card from '@components/ui/Card.astro';
 import { getDb } from '@/lib/db';
 import { productCategories } from '@/db/schema';
+import { actions } from 'astro:actions';
 
 const db = await getDb();
 const allCategories = db ? await db.select().from(productCategories).all() : [];
@@ -335,9 +336,8 @@ const UNIT_OPTIONS = [
   // Check subscription status
   async function checkSubscription(businessId: string) {
     try {
-      const res = await fetch(`/api/account/subscription/${businessId}`);
-      const data = await res.json();
-      return data;
+      const result = await actions.account.getBusinessSubscription({ businessId });
+      return result;
     } catch (err) {
       console.error('Error loading subscription:', err);
     }
