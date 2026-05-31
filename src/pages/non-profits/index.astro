@@ -1,6 +1,8 @@
 ---
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
+import CarouselBanner from '../../components/ui/CarouselBanner.astro';
+import BusinessCard from '../../components/business/BusinessCard.astro';
 import { getDb } from '@/lib/db';
 import { nonProfits, nonProfitCategories } from '@/db/schema';
 import { desc } from 'drizzle-orm';
@@ -38,6 +40,7 @@ interface NonProfitRecord {
   slug: string;
   categoryId: string | null;
   address: string | null;
+  profileImageId: string | null;
   tags: string[];
   likes: number;
   saves: number;
@@ -82,12 +85,14 @@ const buildUrl = (params: Record<string, string>) => {
   Object.entries(params).forEach(([k, v]) => {
     if (v) p.set(k, v);
   });
-  return `/non-profits${p.toString()}`;
+  return `/non-profits?${p.toString()}`;
 };
 ---
 
 <Layout title="Non-Profits - TimorUp">
-  <div class="container py-4 sm:py-8" data-page-content>
+  <div class="max-w-7xl mx-auto px-4" data-page-content>
+    <CarouselBanner position="businesses" class="mb-6" />
+
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl sm:text-3xl font-bold">Non-Profits</h1>
       <span class="text-sm text-muted-foreground">{total} total</span>
@@ -116,65 +121,19 @@ const buildUrl = (params: Record<string, string>) => {
     </form>
 
     {entities.length > 0 ? (
-      <div id="entities-grid" class="hidden">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {entities.map(e => (
-          <a href={`/non-profit/${e.slug}`} class="group block bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/60 overflow-hidden cursor-pointer transition-all duration-200">
-            <div class="aspect-[4/3] bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/30 dark:to-pink-900/30 relative overflow-hidden">
-              {e.profileImageId ? (
-                <img src={`/api/media/${e.profileImageId}`} alt={e.title} class="w-full h-full object-cover" loading="lazy" />
-              ) : (
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <svg class="w-16 h-16 text-rose-400/60 dark:text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.682l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                  </svg>
-                </div>
-              )}
-              {e.categoryId && categoryMap[e.categoryId] ? (
-                <span class="absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-300 font-semibold shadow-md">
-                  {categoryMap[e.categoryId]}
-                </span>
-              ) : null}
-            </div>
-            <div class="p-4 space-y-3">
-              <h3 class="font-bold text-base line-clamp-2 group-hover:text-primary transition-colors">{e.title}</h3>
-              {e.address ? (
-                <p class="text-sm text-muted-foreground flex items-start gap-2">
-                  <svg class="w-4 h-4 mt-0.5 shrink-0 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                  <span class="truncate">{e.address.split(',')[0]}</span>
-                </p>
-              ) : null}
-              <div class="flex items-center gap-4 pt-2 border-t border-border/50">
-                {e.likes > 0 ? (
-                  <span class="flex items-center gap-1 text-xs text-muted-foreground">
-                    <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.682l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                    {e.likes}
-                  </span>
-                ) : null}
-                <span class="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                  {e.views > 999 ? `${(e.views/1000).toFixed(1)}k` : e.views}
-                </span>
-              </div>
-            </div>
-          </a>
-        ))}
-      </div>
-      </div>
-      <!-- Skeleton Loader -->
-      <div id="skeleton-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 12 }).map(() => (
-          <div class="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
-            <div class="aspect-[4/3] bg-muted animate-pulse"></div>
-            <div class="p-4 space-y-3">
-              <div class="h-4 bg-muted rounded animate-pulse w-3/4"></div>
-              <div class="h-3 bg-muted rounded animate-pulse w-1/2"></div>
-              <div class="flex items-center justify-between pt-2 border-t border-border/50">
-                <div class="h-3 bg-muted rounded animate-pulse w-16"></div>
-                <div class="h-5 bg-muted rounded animate-pulse w-12"></div>
-              </div>
-            </div>
-          </div>
+          <BusinessCard
+            title={e.title}
+            slug={e.slug}
+            category={categoryMap[e.categoryId || ''] || ''}
+            profileImageId={e.profileImageId}
+            likes={e.likes}
+            reviews={e.ratingCount}
+            views={e.views}
+            location={e.address?.split(',')[0] || ''}
+            entityType="nonprofit"
+          />
         ))}
       </div>
     ) : (
@@ -210,29 +169,3 @@ const buildUrl = (params: Record<string, string>) => {
     ) : null}
   </div>
 </Layout>
-
-<script>
-  import { initCSSAnimations } from '@/lib/css-animations';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Page transition
-    document.querySelector('[data-page-content]')?.classList.add('page-enter');
-
-    // Show real content, hide skeleton
-    const entitiesGrid = document.getElementById('entities-grid');
-    const skeletonGrid = document.getElementById('skeleton-grid');
-    if (entitiesGrid && skeletonGrid) {
-      entitiesGrid.classList.remove('hidden');
-      skeletonGrid.classList.add('hidden');
-    }
-
-    // Card animations via CSS
-    const cardLinks = document.querySelectorAll('.grid a');
-    cardLinks.forEach(card => {
-      card.classList.add('reveal-on-scroll', 'card-hover', 'card-glow');
-    });
-
-    // Initialize CSS animations
-    initCSSAnimations();
-  });
-</script>

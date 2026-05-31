@@ -4,6 +4,7 @@
 import { getDb } from '@/lib/db';
 import { listings } from '@/db/schema';
 import { desc } from 'drizzle-orm';
+import ListingCard from '../business/ListingCard.astro';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('q') || '';
@@ -12,7 +13,20 @@ const page = parseInt(searchParams.get('page') || '1', 10);
 const LIMIT = 12;
 const offset = (page - 1) * LIMIT;
 
-let allListings = [];
+let allListings: Array<{
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  price: string | null;
+  listingType: string | null;
+  location: string | null;
+  imageIds: string[];
+  likes: number | null;
+  views: number | null;
+  status: string | null;
+}> = [];
+
 const db = await getDb();
 if (db) {
   try {
@@ -50,15 +64,6 @@ if (db) {
 const total = allListings.length;
 const totalPages = Math.ceil(total / LIMIT);
 const entities = allListings.slice(offset, offset + LIMIT);
-
-const typeColors: Record<string, { bg: string; text: string }> = {
-  product: { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-700 dark:text-emerald-300' },
-  vehicle: { bg: 'bg-red-100 dark:bg-red-900/40', text: 'text-red-700 dark:text-red-300' },
-  property: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-300' },
-  job: { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-700 dark:text-blue-300' },
-  service: { bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-700 dark:text-purple-300' },
-  wanted: { bg: 'bg-teal-100 dark:bg-teal-900/40', text: 'text-teal-700 dark:text-teal-300' },
-};
 ---
 
 <!-- Header with count -->
@@ -90,52 +95,21 @@ const typeColors: Record<string, { bg: string; text: string }> = {
   </div>
 </form>
 
-<!-- Listings Grid -->
+<!-- Listings Grid using ListingCard component -->
 {entities.length > 0 ? (
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    {entities.map(l => {
-      const colors = typeColors[l.listingType || 'product'] || typeColors.product;
-      return (
-        <a href={`/listing/${l.slug}`} class="group block bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/60 overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02]">
-          <div class="aspect-[4/3] bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
-            <div class="absolute inset-0 flex items-center justify-center">
-              <svg class="w-16 h-16 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-              </svg>
-            </div>
-            {l.listingType && (
-              <span class={`absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full font-semibold ${colors.bg} ${colors.text}`}>
-                {l.listingType.charAt(0).toUpperCase() + l.listingType.slice(1)}
-              </span>
-            )}
-          </div>
-          <div class="p-4 space-y-3">
-            <h3 class="font-bold text-base line-clamp-2 group-hover:text-primary transition-colors">{l.title}</h3>
-            {l.location ? (
-              <p class="text-sm text-muted-foreground flex items-center gap-2">
-                <svg class="w-4 h-4 text-primary/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                <span class="truncate">{l.location?.split(',')[0] || l.location}</span>
-              </p>
-            ) : null}
-            <div class="flex items-center justify-between pt-2 border-t border-border/50">
-              {l.price ? (
-                <span class="text-sm font-bold text-primary">{l.price}</span>
-              ) : null}
-              <div class="flex items-center gap-3">
-                <span class="flex items-center gap-1 text-xs text-muted-foreground">
-                  <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.682l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                  {l.likes}
-                </span>
-                <span class="flex items-center gap-1 text-xs text-muted-foreground">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                  {l.views > 999 ? `${(l.views/1000).toFixed(1)}k` : l.views}
-                </span>
-              </div>
-            </div>
-          </div>
-        </a>
-      );
-    })}
+    {entities.map(l => (
+      <ListingCard
+        title={l.title}
+        slug={l.slug}
+        price={l.price || ''}
+        listingType={l.listingType || 'product'}
+        location={l.location?.split(',')[0] || ''}
+        imageIds={l.imageIds || []}
+        likes={l.likes || 0}
+        views={l.views || 0}
+      />
+    ))}
   </div>
 ) : (
   <div class="text-center py-16">

@@ -7,6 +7,7 @@ interface Props {
   condition?: string;
   location?: string;
   thumbnail?: string | null;
+  profileImageId?: string | null;
   imageIds?: string[];
   likes?: number;
   views?: number;
@@ -21,11 +22,15 @@ const {
   condition = "",
   location = "",
   thumbnail = null,
+  profileImageId = null,
   imageIds = [],
   likes = 0,
   views = 0,
   class: className = "",
 } = Astro.props;
+
+// Image resolution: thumbnail > profileImageId > first imageId > null
+const imageSrc = thumbnail || (profileImageId ? `/api/media/${profileImageId}` : (imageIds[0] ? `/api/media/${imageIds[0]}` : null));
 
 const href = `/listing/${slug}`;
 
@@ -56,8 +61,8 @@ const typeLabel = listingTypeLabels[listingType] || listingType;
   <div class="relative bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200 overflow-hidden cursor-pointer">
     <!-- Thumbnail -->
     <div class:list={["aspect-square relative overflow-hidden bg-gradient-to-br", gradientClass]}>
-      {thumbnail ? (
-        <img src={thumbnail} alt={title} class="w-full h-full object-cover" loading="lazy" />
+      {imageSrc ? (
+        <img src={imageSrc} alt={title} class="w-full h-full object-cover" loading="lazy" />
       ) : (
         <div class="absolute inset-0 flex items-center justify-center">
           <span class="text-4xl font-bold text-emerald-500/40">{title.charAt(0)}</span>
