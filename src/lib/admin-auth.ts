@@ -41,8 +41,20 @@ export async function requireAdmin(
 /**
  * Get admin user - returns null on any failure (backward compatible)
  */
-export async function getAdminUser(cookies?: Record<string, string>): Promise<AuthUser | null> {
+export async function getAdminUser(cookies?: Record<string, string> | Request): Promise<AuthUser | null> {
   if (!cookies) return null;
+
+  // Handle Request object - extract cookie header
+  if (cookies instanceof Request) {
+    const cookieHeader = cookies.headers.get('cookie') || '';
+    const cookiesObj = Object.fromEntries(
+      cookieHeader.split('; ').map(c => {
+        const [k, ...v] = c.split('=');
+        return [k, v.join('=')];
+      })
+    );
+    return getAdminUser(cookiesObj);
+  }
 
   const result = await requireAdmin(cookies);
 
