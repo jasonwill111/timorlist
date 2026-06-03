@@ -4,7 +4,7 @@ export const prerender = false;
 import { getDb } from '@/lib/db';
 import { businesses, businessCategories } from '@/db/schema';
 import { eq, like, and, or, ne, isNull, type SQL } from 'drizzle-orm';
-import { checkRateLimitKV, getRateLimitHeaders } from '@/lib/rate-limit';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { PaginationSchema } from '@/lib/validation';
 
 function getErrorMessage(error: unknown): string {
@@ -49,7 +49,7 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
 if (!db) throw new Error("Database not available");
 
   const clientIP = getClientIP(request);
-  const rateLimit = await checkRateLimitKV(`businesses:${clientIP}`);
+  const rateLimit = await checkRateLimit(`businesses:${clientIP}`);
 
   if (!rateLimit.allowed) {
     return new Response(JSON.stringify({
@@ -97,17 +97,14 @@ if (!db) throw new Error("Database not available");
     }
 
     // Build conditions - include 'active', 'live', and 'published' status
-    // Also exclude expired subscriptions
+    // Note: subscription_status removed - now derived from orders table dynamically
     const conditions: SQL[] = [
       or(
         eq(businesses.status, 'active'),
         eq(businesses.status, 'live'),
         eq(businesses.status, 'published')
       )!,
-      or(
-        ne(businesses.subscriptionStatus, 'expired'),
-        isNull(businesses.subscriptionStatus)
-      )!
+      isNull(businesses.deletedAt)!
     ];
 
     if (search) {
