@@ -54,23 +54,24 @@ export async function GET({ request }: { request: Request }) {
     const first = allProducts[0];
     console.log('[Products API] First product keys:', Object.keys(first));
 
-    // Map results
+    // Map results - Drizzle ORM returns camelCase field names (JavaScript convention)
+    // even though schema uses snake_case for SQL column names
     const parsedProducts = allProducts.map((p: Record<string, unknown>) => ({
       id: p.id,
       title: p.title,
       slug: p.slug,
       description: p.description,
-      categoryId: p.category_id,
-      productType: p.product_type,
-      priceFields: safeParse(p.price_fields),
+      categoryId: p.categoryId,
+      productType: p.productType,
+      priceFields: safeParse(p.priceFields),
       specifications: safeParse(p.specifications),
       images: safeParse(p.images),
       featured: p.featured,
       active: p.active,
-      businessId: p.business_id,
-      sortOrder: p.sort_order,
-      createdAt: p.created_at,
-      updatedAt: p.updated_at,
+      businessId: p.businessId,
+      sortOrder: p.sortOrder,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
     }));
 
     return new Response(JSON.stringify({
