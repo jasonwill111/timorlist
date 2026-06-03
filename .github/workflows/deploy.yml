@@ -32,6 +32,7 @@ jobs:
 
       - name: Build for Cloudflare Workers
         run: |
+          # Skip wrangler types - types are pre-generated and committed
           CI=true npx astro build && cp public/_routes.json dist/_routes.json
 
       - name: Deploy to Cloudflare Workers

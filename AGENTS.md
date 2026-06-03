@@ -1,4 +1,4 @@
-<!-- specweave:living-doc {"name": "AGENTS.md", "version": "1.0.0", "updated": "2026-05-31", "type": "conventions", "domain": "project"} -->
+<!-- specweave:living-doc {"name": "AGENTS.md", "version": "1.0.6", "updated": "2026-06-03", "type": "conventions", "domain": "project"} -->
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 

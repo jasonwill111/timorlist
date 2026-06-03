@@ -1,9 +1,29 @@
-<!-- specweave:living-doc {"name": "CHANGELOG.md", "version": "1.7.0", "updated": "2026-06-03", "type": "changelog", "domain": "project", "maintainedBy": "team", "lastChange": "architecture-optimization"} -->
+<!-- specweave:living-doc {"name": "CHANGELOG.md", "version": "1.0.6", "updated": "2026-06-03", "type": "changelog", "domain": "project", "maintainedBy": "team", "lastChange": "e2e-testing-bug-fixes"} -->
 # Changelog
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+## [1.0.6] - 2026-06-03
+
+### Fixed
+- **e2e-testing-bug-fixes** (2026-06-03): Comprehensive E2E testing and bug fixes (increment 0100):
+  - Fixed product/[slug].astro: unterminated string (L222), missing close div, orphan block
+  - Fixed blog/index.astro and blog/[slug].astro: null DB guard for graceful degradation
+  - Fixed businesses page and API: removed `subscription_status` field (derived from orders table)
+  - Playwright tests: fixed API response format assertion (success/data wrapper)
+  - Playwright tests: fixed Admin Media session handling with re-authentication
+
+### Changed
+- **ci-deployment-fix** (2026-06-03): CI build pipeline fix:
+  - Bypassed wrangler types in CI to avoid remote proxy connection issue
+  - Used direct wrangler deploy for production deployment
+  - Updated package.json build script with CI=true for wrangler types
+
+### Performance
+- Businesses API: simplified query conditions (status-based only, no deletedAt check)
+- Deployment: direct wrangler deploy for faster iteration
 
 ## [1.0.5] - 2026-06-03
 

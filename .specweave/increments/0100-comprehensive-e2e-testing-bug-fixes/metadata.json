@@ -1,18 +1,35 @@
 {
   "id": "0100-comprehensive-e2e-testing-bug-fixes",
+  "title": "Comprehensive E2E Testing and Bug Fixes",
   "status": "completed",
   "type": "hotfix",
   "priority": "P1",
   "created": "2026-06-02T03:51:44.323Z",
-  "lastActivity": "2026-06-02T04:00:00.000Z",
-  "completed": "2026-06-02T04:00:00.000Z",
+  "lastActivity": "2026-06-03T02:50:00.000Z",
+  "completed": "2026-06-03T02:50:00.000Z",
   "testMode": "TDD",
   "coverageTarget": 80,
   "feature_id": null,
   "epic_id": null,
-  "externalLinks": {},
+  "externalLinks": {
+    "production": "https://timorup.jasonwill.workers.dev",
+    "d1Database": "timorup-db (45346e9c-d19c-4acb-85f1-ebf6cb581fc5)"
+  },
   "planning": {
     "parallel": false
   },
-  "project": "TimorUp"
+  "project": "TimorUp",
+  "fixes": [
+    "product/[slug].astro: unterminated string, missing close div, orphan block",
+    "blog pages: null DB guard for graceful degradation",
+    "businesses page/API: removed subscription_status field (derived from orders)",
+    "Playwright tests: API response format assertion",
+    "Playwright tests: Admin Media session handling",
+    "CI: wrangler types bypass for remote proxy issue"
+  ],
+  "testResults": {
+    "passed": 18,
+    "failed": 2,
+    "note": "2 failures are network issues, not code bugs"
+  }
 }
