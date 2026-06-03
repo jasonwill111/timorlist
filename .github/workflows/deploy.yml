@@ -31,9 +31,8 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build for Cloudflare Workers
-        run: pnpm build
-        env:
-          USE_CLOUDFLARE: '1'
+        run: |
+          CI=true npx astro build && cp public/_routes.json dist/_routes.json
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
@@ -49,6 +48,8 @@ jobs:
       - name: Verify deployment
         run: |
           echo "Verifying deployment..."
+
+          sleep 30
 
           # Check Workers URL first (primary)
           echo "Checking Workers URL..."
