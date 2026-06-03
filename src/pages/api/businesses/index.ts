@@ -96,15 +96,14 @@ if (!db) throw new Error("Database not available");
       }
     }
 
-    // Build conditions - include 'active', 'live', and 'published' status
-    // Note: subscription_status removed - now derived from orders table dynamically
+    // Build conditions - only include 'active', 'live', and 'published' status
+    // Note: subscription_status removed - derived from orders table dynamically
     const conditions: SQL[] = [
       or(
         eq(businesses.status, 'active'),
         eq(businesses.status, 'live'),
         eq(businesses.status, 'published')
-      )!,
-      isNull(businesses.deletedAt)!
+      )!
     ];
 
     if (search) {
