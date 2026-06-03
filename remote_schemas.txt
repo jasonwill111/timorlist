@@ -1,0 +1,420 @@
+=== businesses ===
+CREATE TABLE businesses (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    owner_id TEXT NOT NULL,
+    category_id TEXT,
+    status TEXT DEFAULT 'draft',
+    banner_image_id TEXT,
+    profile_image_id TEXT,
+    contact_name TEXT,
+    contact_number TEXT,
+    country_code TEXT DEFAULT '+670',
+    year_of_establishment INTEGER,
+    email TEXT,
+    address TEXT,
+    location_lat REAL,
+    location_lng REAL,
+    opening_hours TEXT,
+    about_us TEXT,
+    latest_updates TEXT,
+    tags TEXT,
+    likes INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    views INTEGER DEFAULT 0,
+    rating_average REAL DEFAULT 0,
+    rating_count INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    plan_type TEXT,
+    publish_date INTEGER,
+    expiry_date INTEGER,
+    subscription_status TEXT DEFAULT 'none',
+    subscription_expires_at INTEGER,
+    grace_period_end_date INTEGER,
+    limits TEXT,
+    plan_slug TEXT,
+    verified_badge INTEGER DEFAULT 0,
+    social_links TEXT,
+    photo_gallery TEXT,
+    organization_type TEXT,
+    deleted_at INTEGER,
+    created_at INTEGER,
+    updated_at INTEGER
+  , latest_update TEXT, latest_update_images TEXT, latest_update_date INTEGER, registration_url TEXT, plan_expires_at INTEGER, grace_period_end_at INTEGER)
+
+=== non_profits ===
+CREATE TABLE non_profits (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    owner_id TEXT NOT NULL,
+    category_id TEXT,
+    status TEXT DEFAULT 'draft',
+    banner_image_id TEXT,
+    profile_image_id TEXT,
+    contact_name TEXT,
+    contact_number TEXT,
+    country_code TEXT DEFAULT '+670',
+    year_of_establishment INTEGER,
+    email TEXT,
+    address TEXT,
+    location_lat REAL,
+    location_lng REAL,
+    opening_hours TEXT,
+    about_us TEXT,
+    latest_updates TEXT,
+    tags TEXT,
+    likes INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    views INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    photo_gallery TEXT,
+    latest_update TEXT,
+    latest_update_images TEXT,
+    latest_update_date INTEGER,
+    registration_url TEXT,
+    verified_badge INTEGER DEFAULT 0,
+    social_links TEXT,
+    deleted_at INTEGER,
+    created_at INTEGER,
+    updated_at INTEGER
+  , rating_average REAL DEFAULT 0, rating_count INTEGER DEFAULT 0, trial_started_at INTEGER, grace_period_end_date INTEGER, subscription_status TEXT DEFAULT 'none', subscription_expires_at INTEGER)
+
+=== public_sectors ===
+CREATE TABLE public_sectors (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    owner_id TEXT NOT NULL,
+    category_id TEXT,
+    status TEXT DEFAULT 'draft',
+    banner_image_id TEXT,
+    profile_image_id TEXT,
+    contact_name TEXT,
+    contact_number TEXT,
+    country_code TEXT DEFAULT '+670',
+    year_of_establishment INTEGER,
+    email TEXT,
+    address TEXT,
+    location_lat REAL,
+    location_lng REAL,
+    opening_hours TEXT,
+    about_us TEXT,
+    latest_updates TEXT,
+    tags TEXT,
+    likes INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    views INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    photo_gallery TEXT,
+    latest_update TEXT,
+    latest_update_images TEXT,
+    latest_update_date INTEGER,
+    government_data TEXT,
+    registration_url TEXT,
+    verified_badge INTEGER DEFAULT 0,
+    social_links TEXT,
+    deleted_at INTEGER,
+    created_at INTEGER,
+    updated_at INTEGER
+  , rating_average REAL DEFAULT 0, rating_count INTEGER DEFAULT 0, trial_started_at INTEGER, grace_period_end_date INTEGER, subscription_status TEXT DEFAULT 'none', subscription_expires_at INTEGER, plan_type TEXT, publish_date INTEGER, expiry_date INTEGER)
+
+=== listings ===
+CREATE TABLE listings (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    owner_id TEXT NOT NULL,
+    category_id TEXT,
+    status TEXT DEFAULT 'draft',
+    listing_type TEXT NOT NULL DEFAULT 'product',
+    description TEXT NOT NULL,
+    price TEXT,
+    condition TEXT,
+    location TEXT,
+    location_lat REAL,
+    location_lng REAL,
+    contact_name TEXT,
+    contact_number TEXT,
+    country_code TEXT DEFAULT '+670',
+    email TEXT,
+    image_ids TEXT,
+    tags TEXT,
+    likes INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    views INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    last_renewed_at INTEGER,
+    featured INTEGER DEFAULT 0,
+    featured_until INTEGER,
+    extra_data TEXT,
+    created_at INTEGER,
+    updated_at INTEGER
+  , expires_at INTEGER, plan_expires_at INTEGER, address TEXT, grace_period_end_at INTEGER)
+
+=== products ===
+CREATE TABLE products (
+    id TEXT PRIMARY KEY NOT NULL,
+    business_id TEXT NOT NULL,
+    category_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    product_type TEXT DEFAULT 'product',
+    price_fields TEXT,
+    specifications TEXT,
+    images TEXT DEFAULT '[]',
+    featured INTEGER DEFAULT 0,
+    active INTEGER DEFAULT 1,
+    sort_order INTEGER DEFAULT 0,
+    views INTEGER DEFAULT 0,
+    likes INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    deleted_at INTEGER,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== media ===
+CREATE TABLE media (
+    id TEXT PRIMARY KEY NOT NULL,
+    r2_key TEXT NOT NULL UNIQUE,
+    filename TEXT NOT NULL,
+    mime_type TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    width INTEGER,
+    height INTEGER,
+    entity_type TEXT NOT NULL,
+    entity_id TEXT NOT NULL,
+    purpose TEXT NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    alt TEXT,
+    hash TEXT UNIQUE,
+    created_by_id TEXT,
+    created_at INTEGER,
+    deleted_at INTEGER
+  )
+
+=== orders ===
+CREATE TABLE orders (
+    id TEXT PRIMARY KEY NOT NULL,
+    service_package_id TEXT,
+    variant_snapshot TEXT NOT NULL,
+    type TEXT NOT NULL,
+    type_id TEXT,
+    user_id TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    status TEXT DEFAULT 'pending',
+    payment_method TEXT,
+    paid_date INTEGER,
+    expires_at INTEGER,
+    admin_notes TEXT,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== service_packages ===
+CREATE TABLE service_packages (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    service_type TEXT NOT NULL,
+    service_relation_to TEXT,
+    description TEXT,
+    variants TEXT NOT NULL,
+    is_active INTEGER DEFAULT 1,
+    sort_order INTEGER DEFAULT 0,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== ad_banners ===
+CREATE TABLE ad_banners (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    image_id TEXT,
+    link_url TEXT,
+    link_type TEXT NOT NULL,
+    position TEXT NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    order_id TEXT,
+    is_active INTEGER DEFAULT 1,
+    start_date INTEGER,
+    end_date INTEGER,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== blog_posts ===
+CREATE TABLE blog_posts (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    excerpt TEXT,
+    content TEXT,
+    cover_image_id TEXT,
+    author_id TEXT,
+    author_name TEXT,
+    status TEXT DEFAULT 'draft',
+    tags TEXT,
+    published_at INTEGER,
+    views INTEGER DEFAULT 0,
+    likes INTEGER DEFAULT 0,
+    saves INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    meta_title TEXT,
+    meta_description TEXT,
+    canonical_url TEXT,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== user ===
+CREATE TABLE user (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, emailVerified INTEGER DEFAULT 0, phone TEXT, name TEXT NOT NULL, image TEXT, role TEXT DEFAULT 'user', createdAt INTEGER DEFAULT (strftime('%s', 'now')), updatedAt INTEGER DEFAULT (strftime('%s', 'now')))
+
+=== session ===
+CREATE TABLE session (id TEXT PRIMARY KEY, userId TEXT NOT NULL, token TEXT NOT NULL UNIQUE, expiresAt INTEGER NOT NULL, userAgent TEXT, ipAddress TEXT, createdAt INTEGER DEFAULT (strftime('%s', 'now')), updatedAt INTEGER DEFAULT (strftime('%s', 'now')))
+
+=== account ===
+CREATE TABLE account (id TEXT PRIMARY KEY, userId TEXT NOT NULL, accountId TEXT NOT NULL, providerId TEXT NOT NULL, accessToken TEXT, refreshToken TEXT, idToken TEXT, accessTokenExpiresAt INTEGER, refreshTokenExpiresAt INTEGER, scope TEXT, password TEXT, createdAt INTEGER DEFAULT (strftime('%s', 'now')), updatedAt INTEGER DEFAULT (strftime('%s', 'now')))
+
+=== verification ===
+CREATE TABLE verification (id TEXT PRIMARY KEY, identifier TEXT NOT NULL, value TEXT NOT NULL, expiresAt INTEGER NOT NULL, createdAt INTEGER DEFAULT (strftime('%s', 'now')))
+
+=== reviews ===
+CREATE TABLE reviews (
+    id TEXT PRIMARY KEY NOT NULL,
+    business_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    rating INTEGER NOT NULL,
+    title TEXT,
+    content TEXT,
+    reply TEXT,
+    replied_at INTEGER,
+    replied_by TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== saved_items ===
+CREATE TABLE saved_items (
+    id TEXT PRIMARY KEY NOT NULL,
+    user_id TEXT NOT NULL,
+    item_type TEXT NOT NULL,
+    item_id TEXT NOT NULL,
+    created_at INTEGER
+  )
+
+=== business_categories ===
+CREATE TABLE business_categories (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    icon TEXT,
+    parent_id TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== non_profit_categories ===
+CREATE TABLE non_profit_categories (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    icon TEXT,
+    parent_id TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== public_sector_categories ===
+CREATE TABLE public_sector_categories (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    icon TEXT,
+    parent_id TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== listing_categories ===
+CREATE TABLE listing_categories (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    icon TEXT,
+    parent_id TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER,
+    updated_at INTEGER
+  , form_fields TEXT)
+
+=== product_categories ===
+CREATE TABLE product_categories (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    icon TEXT,
+    parent_id TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    form_fields TEXT,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== blog_categories ===
+CREATE TABLE blog_categories (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    icon TEXT,
+    parent_id TEXT,
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== site_settings ===
+CREATE TABLE site_settings (
+    id TEXT PRIMARY KEY NOT NULL,
+    key TEXT NOT NULL UNIQUE,
+    value TEXT,
+    type TEXT DEFAULT 'string',
+    description TEXT,
+    is_public INTEGER DEFAULT 0,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+
+=== latest_updates ===
+CREATE TABLE latest_updates (
+    id TEXT PRIMARY KEY NOT NULL,
+    type TEXT NOT NULL,
+    type_id TEXT NOT NULL,
+    content TEXT NOT NULL,
+    image_ids TEXT,
+    video_id TEXT,
+    created_at INTEGER,
+    updated_at INTEGER
+  )
+

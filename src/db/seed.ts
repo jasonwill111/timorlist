@@ -26,7 +26,7 @@ const db = drizzle(sqlite, { schema });
 // CATEGORIES
 // ========================
 const categories = [
-  { id: 'cat-1', name: 'Restaurants & Cafes', slug: 'restaurants-cafes', description: 'Food and beverage establishments', icon: '🍽�? },
+  { id: 'cat-1', name: 'Restaurants & Cafes', slug: 'restaurants-cafes', description: 'Food and beverage establishments', icon: '🍽�? },
   { id: 'cat-2', name: 'Hotels & Accommodation', slug: 'hotels-accommodation', description: 'Hotels, hostels, and lodging', icon: '🏨' },
   { id: 'cat-3', name: 'Shopping', slug: 'shopping', description: 'Retail stores and shops', icon: '🛒' },
   { id: 'cat-4', name: 'Health & Beauty', slug: 'health-beauty', description: 'Healthcare and beauty services', icon: '💆' },
@@ -35,7 +35,7 @@ const categories = [
   { id: 'cat-7', name: 'Education', slug: 'education', description: 'Schools, tutoring, training', icon: '📚' },
   { id: 'cat-8', name: 'Entertainment', slug: 'entertainment', description: 'Bars, clubs, venues', icon: '🎉' },
   { id: 'cat-9', name: 'Travel & Tours', slug: 'travel-tours', description: 'Tour operators, travel agencies', icon: '✈️' },
-  { id: 'cat-10', name: 'Construction', slug: 'construction', description: 'Builders, contractors, hardware', icon: '🏗�? },
+  { id: 'cat-10', name: 'Construction', slug: 'construction', description: 'Builders, contractors, hardware', icon: '🏗�? },
   { id: 'cat-11', name: 'Supermarkets', slug: 'supermarkets', description: 'Grocery stores and supermarkets', icon: '🏪' },
   { id: 'cat-12', name: 'Electronics', slug: 'electronics', description: 'Phones, computers, gadgets', icon: '📱' },
 ];
@@ -92,14 +92,13 @@ const businesses = [
     ratingAverage: 4.5,
     ratingCount: 28,
     views: 1250,
-    planType: 'pro',
     yearOfEstablishment: 2010,
     socialLinks: JSON.stringify({
       facebook: 'https://facebook.com/cafetimordili',
       instagram: 'https://instagram.com/cafetimordili',
       tiktok: null,
     }),
-    latestUpdate: '�?Now serving breakfast menu! Try our new avocado toast with Timor coffee.',
+    latestUpdate: '�?Now serving breakfast menu! Try our new avocado toast with Timor coffee.',
     latestUpdateDate: new Date('2026-04-25'),
   },
   {
@@ -125,7 +124,6 @@ const businesses = [
     ratingAverage: 4.6,
     ratingCount: 45,
     views: 1890,
-    planType: 'pro',
   },
   {
     id: 'biz-7',
@@ -150,7 +148,6 @@ const businesses = [
     ratingAverage: 4.3,
     ratingCount: 32,
     views: 1450,
-    planType: 'basic',
   },
   {
     id: 'biz-8',
@@ -175,7 +172,6 @@ const businesses = [
     ratingAverage: 4.8,
     ratingCount: 67,
     views: 2340,
-    planType: 'pro',
   },
   {
     id: 'biz-9',
@@ -200,7 +196,6 @@ const businesses = [
     ratingAverage: 4.4,
     ratingCount: 38,
     views: 1890,
-    planType: 'pro',
   },
 
   // CAT-2: Hotels & Accommodation (3 businesses)
@@ -227,7 +222,6 @@ const businesses = [
     ratingAverage: 4.8,
     ratingCount: 52,
     views: 3420,
-    planType: 'max',
     yearOfEstablishment: 2015,
     socialLinks: JSON.stringify({
       facebook: 'https://facebook.com/hoteltimordili',
@@ -260,7 +254,6 @@ const businesses = [
     ratingAverage: 4.2,
     ratingCount: 78,
     views: 2100,
-    planType: 'basic',
   },
   {
     id: 'biz-11',
@@ -285,7 +278,6 @@ const businesses = [
     ratingAverage: 4.9,
     ratingCount: 34,
     views: 1560,
-    planType: 'max',
   },
 
   // CAT-3: Shopping (3 businesses)
@@ -312,7 +304,6 @@ const businesses = [
     ratingAverage: 4.0,
     ratingCount: 8,
     views: 456,
-    planType: 'basic',
   },
   {
     id: 'biz-12',
@@ -337,7 +328,6 @@ const businesses = [
     ratingAverage: 4.1,
     ratingCount: 56,
     views: 3450,
-    planType: 'basic',
   },
   {
     id: 'biz-13',
@@ -362,7 +352,6 @@ const businesses = [
     ratingAverage: 4.7,
     ratingCount: 43,
     views: 1230,
-    planType: 'basic',
   },
 
   // CAT-4: Health & Beauty (2 businesses)
@@ -389,7 +378,6 @@ const businesses = [
     ratingAverage: 4.9,
     ratingCount: 41,
     views: 2100,
-    planType: 'pro',
   },
   {
     id: 'biz-14',
@@ -414,7 +402,6 @@ const businesses = [
     ratingAverage: 4.8,
     ratingCount: 67,
     views: 2340,
-    planType: 'pro',
   },
 
   // CAT-5: Automotive (2 businesses)
@@ -441,7 +428,6 @@ const businesses = [
     ratingAverage: 4.5,
     ratingCount: 89,
     views: 2890,
-    planType: 'basic',
   },
   {
     id: 'biz-16',
@@ -466,7 +452,6 @@ const businesses = [
     ratingAverage: 4.3,
     ratingCount: 45,
     views: 3450,
-    planType: 'pro',
   },
 
   // CAT-6: Professional Services (2 businesses)
@@ -493,7 +478,6 @@ const businesses = [
     ratingAverage: 4.2,
     ratingCount: 15,
     views: 890,
-    planType: 'pro',
     yearOfEstablishment: 2020,
     socialLinks: JSON.stringify({
       facebook: 'https://facebook.com/timortechsolutions',
@@ -526,7 +510,6 @@ const businesses = [
     ratingAverage: 4.6,
     ratingCount: 18,
     views: 780,
-    planType: 'basic',
   },
 
   // CAT-7: Education (2 businesses)
@@ -553,7 +536,6 @@ const businesses = [
     ratingAverage: 4.9,
     ratingCount: 56,
     views: 4560,
-    planType: 'max',
     yearOfEstablishment: 2012,
     socialLinks: JSON.stringify({
       facebook: 'https://facebook.com/eflschooltimor',
@@ -586,7 +568,6 @@ const businesses = [
     ratingAverage: 4.7,
     ratingCount: 89,
     views: 3450,
-    planType: 'pro',
   },
 
   // CAT-9: Travel & Tours (2 businesses)
@@ -613,14 +594,13 @@ const businesses = [
     ratingAverage: 4.9,
     ratingCount: 234,
     views: 8900,
-    planType: 'max',
     yearOfEstablishment: 2018,
     socialLinks: JSON.stringify({
       facebook: 'https://facebook.com/tourstimetor',
       instagram: 'https://instagram.com/tourstimetor',
       tiktok: 'https://tiktok.com/@tourstimetor',
     }),
-    latestUpdate: '🏔�?New adventure! Mountain sunrise tours now available. Limited spots!',
+    latestUpdate: '🏔�?New adventure! Mountain sunrise tours now available. Limited spots!',
     latestUpdateDate: new Date('2026-04-24'),
   },
   {
@@ -646,7 +626,6 @@ const businesses = [
     ratingAverage: 4.9,
     ratingCount: 156,
     views: 5670,
-    planType: 'max',
     yearOfEstablishment: 2019,
     socialLinks: JSON.stringify({
       facebook: 'https://facebook.com/timordivecenter',
@@ -681,7 +660,6 @@ const businesses = [
     ratingAverage: 4.3,
     ratingCount: 123,
     views: 4560,
-    planType: 'pro',
   },
   {
     id: 'biz-23',
@@ -706,7 +684,6 @@ const businesses = [
     ratingAverage: 4.5,
     ratingCount: 89,
     views: 2890,
-    planType: 'basic',
   },
 ];
 
@@ -748,7 +725,6 @@ const organizations = [
     ratingAverage: 3.8,
     ratingCount: 23,
     views: 5600,
-    planType: null,
   },
   {
     id: 'org-2',
@@ -783,7 +759,6 @@ const organizations = [
     ratingAverage: 4.1,
     ratingCount: 12,
     views: 3200,
-    planType: null,
   },
   // NGOs
   {
@@ -819,7 +794,6 @@ const organizations = [
     ratingAverage: 4.6,
     ratingCount: 18,
     views: 2100,
-    planType: null,
   },
   {
     id: 'org-4',
@@ -854,7 +828,6 @@ const organizations = [
     ratingAverage: 4.4,
     ratingCount: 21,
     views: 2800,
-    planType: null,
   },
   // Nonprofits
   {
@@ -889,7 +862,6 @@ const organizations = [
     ratingAverage: 4.9,
     ratingCount: 34,
     views: 4100,
-    planType: null,
   },
   // Foundations
   {
@@ -925,7 +897,6 @@ const organizations = [
     ratingAverage: 4.7,
     ratingCount: 28,
     views: 3500,
-    planType: null,
   },
 ];
 
@@ -1242,7 +1213,7 @@ async function seed() {
   accountsData = users.map((user) => ({
     id: `acc-${user.id}`,
     accountId: user.id,
-    providerId: 'credential',  // Email/password provider
+    providerId: 'email',  // Email/password provider
     userId: user.id,
     password: user.role === 'admin' ? adminPasswordHash : userPasswordHash,
     createdAt: now,
@@ -1262,7 +1233,7 @@ async function seed() {
   }
 
   // Batch insert organizations
-  console.log('🏛�?Inserting organizations...');
+  console.log('🏛�?Inserting organizations...');
   if (organizations.length > 0) {
     await db.insert(schema.businessPages).values(organizations);
   }
@@ -1274,12 +1245,12 @@ async function seed() {
   }
 
   // Batch insert reviews
-  console.log('�?Inserting reviews...');
+  console.log('�?Inserting reviews...');
   if (reviews.length > 0) {
     await db.insert(schema.reviews).values(reviews);
   }
 
-  console.log('�?Seed completed!');
+  console.log('�?Seed completed!');
   console.log('');
   console.log('📊 Summary:');
   console.log(`   - ${categories.length} categories`);

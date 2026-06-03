@@ -46,41 +46,14 @@ import { actions } from 'astro:actions';
       <form id="order-form" class="p-4 space-y-4">
         <input type="hidden" id="order-id" name="orderId" />
 
-        <!-- Plan Type -->
+        <!-- Service Package -->
         <div>
-          <label for="plan-type" class="block text-sm font-medium mb-1">Plan Type</label>
-          <select id="plan-type" name="planType" class="w-full px-3 py-2 border rounded-lg bg-background">
-            <option value="basic-monthly">Basic Monthly - $29</option>
-            <option value="basic-yearly">Basic Yearly - $290</option>
-            <option value="pro-monthly">Pro Monthly - $59</option>
-            <option value="pro-yearly">Pro Yearly - $590</option>
-            <option value="max-monthly">Max Monthly - $89</option>
-            <option value="max-yearly">Max Yearly - $890</option>
+          <label for="plan-type" class="block text-sm font-medium mb-1">Service Package</label>
+          <select id="plan-type" name="servicePackageId" class="w-full px-3 py-2 border rounded-lg bg-background">
+            <option value="sp-business-basic">Basic Monthly - $29</option>
+            <option value="sp-business-pro">Pro Monthly - $59</option>
+            <option value="sp-business-max">Max Monthly - $89</option>
           </select>
-        </div>
-
-        <!-- Actual Amount -->
-        <div>
-          <label for="amount" class="block text-sm font-medium mb-1">Actual Amount (USD)</label>
-          <input type="number" id="amount" name="amount" step="0.01" min="0" class="w-full px-3 py-2 border rounded-lg bg-background" />
-          <p class="text-xs text-muted-foreground mt-1">Leave empty to use plan default</p>
-        </div>
-
-        <!-- Status -->
-        <div>
-          <label for="status" class="block text-sm font-medium mb-1">Payment Status</label>
-          <select id="status" name="status" class="w-full px-3 py-2 border rounded-lg bg-background">
-            <option value="unpaid">Unpaid</option>
-            <option value="paid">Paid</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="refunded">Refunded</option>
-          </select>
-        </div>
-
-        <!-- Expiry Date -->
-        <div>
-          <label for="expiry-date" class="block text-sm font-medium mb-1">Expiry Date</label>
-          <input type="date" id="expiry-date" name="expiryDate" class="w-full px-3 py-2 border rounded-lg bg-background" />
         </div>
 
         <!-- Admin Notes -->
@@ -220,7 +193,7 @@ import { actions } from 'astro:actions';
       (document.getElementById('plan-type') as HTMLSelectElement).value = order.servicePackageId || '';
       (document.getElementById('amount') as HTMLInputElement).value = (order.amount / 100).toString();
       (document.getElementById('status') as HTMLSelectElement).value = order.status;
-      (document.getElementById('expiry-date') as HTMLInputElement).value = order.expiresAt ? new Date(order.expiresAt * 1000).toISOString().split('T')[0] : '';
+      (document.getElementById('expiry-date') as HTMLInputElement).value = order.planExpiresAt ? new Date(order.planExpiresAt * 1000).toISOString().split('T')[0] : '';
       (document.getElementById('admin-notes') as HTMLTextAreaElement).value = order.adminNotes || '';
 
       // Info display
@@ -264,13 +237,12 @@ import { actions } from 'astro:actions';
     try {
       const result = await actions.admin.subscriptions.update({
         id: selectedOrderId,
-        planType,
+        servicePackageId: (document.getElementById('plan-type') as HTMLSelectElement).value,
         amount: amount ? parseFloat(amount) : undefined,
-        status: status as 'pending' | 'paid' | 'rejected' | 'draft',
-        expiryDate: expiryDate ? Math.floor(new Date(expiryDate).getTime() / 1000) : undefined,
+        status: status as 'pending' | 'paid' | 'cancelled' | 'refunded',
+        planExpiresAt: expiryDate ? Math.floor(new Date(expiryDate).getTime() / 1000) : undefined,
         adminNotes: adminNotes || undefined,
       });
-
       if (result.success) {
         toast.success('Order updated successfully!');
         closeModal();
@@ -292,9 +264,7 @@ import { actions } from 'astro:actions';
     try {
       const result = await actions.admin.subscriptions.updateStatus({
         id: selectedOrderId,
-        status: 'paid',
       });
-
       if (result.success) {
         toast.success('Payment confirmed! Listing published.');
         closeModal();
@@ -307,7 +277,6 @@ import { actions } from 'astro:actions';
       toast.error('Error confirming payment');
     }
   });
-
   // Reject payment
   document.getElementById('reject-order-btn')?.addEventListener('click', async () => {
     if (!selectedOrderId || !currentOrderData) return;

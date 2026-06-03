@@ -1,20 +1,16 @@
+<!-- specweave:living-doc {"name": "README.md", "version": "1.0.0", "updated": "2026-05-31", "type": "overview", "domain": "project", "maintainedBy": "team"} -->
 # TimorUp - Business Directory Platform
 
-Timor-Leste's business directory platform built with Astro + Cloudflare Workers.
-
 ## Tech Stack
-
 | Component | Technology |
 |-----------|------------|
 | Framework | Astro 6.4.2 |
-| Database | Drizzle ORM + D1 |
-| Auth | better-auth 1.6.11 (with REST API fallback) |
-| AI | Mastra 1.29.1 + Workers AI |
-| Validation | Zod 4.4.1 |
-| Styling | TailwindCSS 4.2.4 |
-| Deploy | Cloudflare Workers |
-
-## Features
+| Database | Drizzle ORM 0.45.2 + D1 |
+| Auth | better-auth 1.6.13 (KV rate limiting, CSRF protection) |
+| AI | Mastra 1.37.1 + Workers AI |
+| Validation | Zod 4.4.3 |
+| Styling | TailwindCSS 4.3.0 |
+| Deploy | Cloudflare Workers (wrangler 4.95.0) |
 
 - **4 Entity Types**: Businesses, Non-Profits, Public Sectors, Classified Listings
 - **Unified Card Rendering**: Reusable BusinessCard/ListingCard components

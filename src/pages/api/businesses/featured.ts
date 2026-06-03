@@ -28,7 +28,7 @@ if (!db) throw new Error("Database not available");
       ratingAverage: businesses.ratingAverage,
       ratingCount: businesses.ratingCount,
       views: businesses.views,
-      planType: businesses.planType,
+      planExpiresAt: businesses.planExpiresAt,
     })
     .from(businesses)
     .where(eq(businesses.status, 'active'))

@@ -22,15 +22,11 @@ export interface BusinessWithCategory {
   email: string | null;
   address: string | null;
   openingHours: string | null;
-  aboutUs: string | null;
-  tags: string | null;
-
   likes: number | null;
   ratingAverage: number | null;
   ratingCount: number | null;
   views: number | null;
-  publishDate: Date | null;
-  expiryDate: Date | null;
+  planExpiresAt: number | null;
   categoryName?: string;
   categorySlug?: string;
   profileImageUrl?: string | null;
@@ -83,8 +79,7 @@ if (!db) throw new Error("Database not available");
         ratingAverage: businesses.ratingAverage,
         ratingCount: businesses.ratingCount,
         views: businesses.views,
-        publishDate: businesses.publishDate,
-        expiryDate: businesses.expiryDate,
+        planExpiresAt: businesses.planExpiresAt,
         categoryName: businessCategories.name,
         categorySlug: businessCategories.slug,
       })
@@ -162,8 +157,8 @@ if (!db) throw new Error("Database not available");
         ratingAverage: businesses.ratingAverage,
         ratingCount: businesses.ratingCount,
         views: businesses.views,
-        publishDate: businesses.publishDate,
-        expiryDate: businesses.expiryDate,
+        
+        planExpiresAt: businesses.planExpiresAt,
         categoryName: businessCategories.name,
         categorySlug: businessCategories.slug,
       })
@@ -271,8 +266,8 @@ if (!db) throw new Error("Database not available");
         ratingAverage: businesses.ratingAverage,
         ratingCount: businesses.ratingCount,
         views: businesses.views,
-        publishDate: businesses.publishDate,
-        expiryDate: businesses.expiryDate,
+        
+        planExpiresAt: businesses.planExpiresAt,
         categoryName: businessCategories.name,
         categorySlug: businessCategories.slug,
       })
@@ -336,8 +331,8 @@ if (!db) throw new Error("Database not available");
         ratingAverage: businesses.ratingAverage,
         ratingCount: businesses.ratingCount,
         views: businesses.views,
-        publishDate: businesses.publishDate,
-        expiryDate: businesses.expiryDate,
+        
+        planExpiresAt: businesses.planExpiresAt,
         categoryName: businessCategories.name,
         categorySlug: businessCategories.slug,
       })
@@ -384,8 +379,8 @@ if (!db) throw new Error("Database not available");
         ratingAverage: businesses.ratingAverage,
         ratingCount: businesses.ratingCount,
         views: businesses.views,
-        publishDate: businesses.publishDate,
-        expiryDate: businesses.expiryDate,
+        
+        planExpiresAt: businesses.planExpiresAt,
         categoryName: businessCategories.name,
         categorySlug: businessCategories.slug,
       })

@@ -10,10 +10,9 @@ import MediaGallery from '../../components/ui/MediaGallery.astro';
 import UpdatesSection from '../../components/UpdatesSection.astro';
 import ProductsSection from '../../components/islands/ProductsSection.astro';
 import BusinessSidebar from '../../components/islands/BusinessSidebar.astro';
+import TipTapRenderer from '../../components/ui/TipTapRenderer.astro';
 import { Eye, Heart, Bookmark, Globe, MapPin, Tag, Clock } from '@lucide/astro';
-import ShareDialog from '@/components/ui/ShareDialog.astro';
-import { getDb } from '@/lib/db';
-import { createBreadcrumbSchema } from '@/lib/seo';
+import { getSubscriptionDashboard } from '@/lib/subscription';
 const db = await getDb();
 import { businesses, businessCategories, reviews, media, latestUpdates } from '@/db/schema';
 import { eq, desc, inArray } from 'drizzle-orm';
@@ -21,7 +20,6 @@ import { eq, desc, inArray } from 'drizzle-orm';
 const { slug } = Astro.params;
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
 const canonicalUrl = `${siteUrl}/business/${slug}`;
-
 // SSR: Load business data from businesses table with error handling
 let business;
 try {
@@ -37,6 +35,31 @@ try {
 if (!business) {
   return Astro.redirect('/businesses');
 }
+
+// Get subscription status from orders table (not from business.subscriptionStatus)
+const subscriptionInfo = await getSubscriptionDashboard(business.id);
+const subscriptionStatus = subscriptionInfo?.status || 'none';
+const planExpiresAt = subscriptionInfo?.planExpiresAt || null;
+
+// Calculate grace period end date from planExpiresAt
+const GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const gracePeriodEndDate = planExpiresAt
+  ? new Date(planExpiresAt + GRACE_PERIOD_MS)
+  : null;
+
+const now = new Date();
+const isInGracePeriod = gracePeriodEndDate
+  ? subscriptionStatus === 'expired' && now < gracePeriodEndDate
+  : false;
+
+const isExpiredBeyondGrace = subscriptionStatus === 'expired' && (!gracePeriodEndDate || now >= gracePeriodEndDate);
+
+const daysRemaining = gracePeriodEndDate
+  ? Math.max(0, Math.ceil((gracePeriodEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+  : 0;
+
+// Check pending_payment status - show message to owner
+const isPending = business.status === 'pending_payment';
 
 // Draft pages only visible to owner (check via session)
 let isOwner = false;
@@ -56,7 +79,7 @@ if (business.status === 'draft') {
 
     if (session && session.userId === business.ownerId) {
       isOwner = true;
-      cacheControl = 'no-store'; // Don't cache draft pages
+      cacheControl = 'no-store';
     }
   }
 
@@ -65,28 +88,6 @@ if (business.status === 'draft') {
     return Astro.redirect('/businesses');
   }
 }
-
-
-// Check pending_payment status - show message to owner
-const isPending = business.status === 'pending_payment';
-
-// Check grace period using plan fields
-const subscriptionStatus = business.subscriptionStatus || 'none';
-const gracePeriodEndDate = business.gracePeriodEndDate
-  ? new Date(business.gracePeriodEndDate as unknown as number * 1000)
-  : null;
-
-const now = new Date();
-const isInGracePeriod = gracePeriodEndDate
-  ? subscriptionStatus === 'expired' && now < gracePeriodEndDate
-  : false;
-
-const isExpiredBeyondGrace = subscriptionStatus === 'expired' && (!gracePeriodEndDate || now >= gracePeriodEndDate);
-
-const daysRemaining = gracePeriodEndDate
-  ? Math.max(0, Math.ceil((gracePeriodEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-  : 0;
-
 // Safe JSON parser with fallback
 function safeJsonParse(str: unknown, fallback: unknown): unknown {
   if (!str || typeof str !== 'string') return fallback;
@@ -394,7 +395,7 @@ const pageDesc = business.aboutUs?.substring(0, 160) || `${business.title} - ${c
             <Card>
               <div class="p-4">
                 <h2 class="font-semibold text-base mb-2">About Us</h2>
-                <p class="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{business.aboutUs}</p>
+                <TipTapRenderer content={business.aboutUs} class="text-sm" />
               </div>
             </Card>
           )}

@@ -14,11 +14,12 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 
   interface Subscription {
     id: string;
-    planType: string;
+    planSlug: string;
+    servicePackageId: string;
     amount: number;
     status: string;
+    planExpiresAt: number | null;
   }
-
   // Auth fetch helper
   async function authFetch(url, options = {}) {
     return fetch(url, {
@@ -170,7 +171,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
         <div class="flex items-center justify-between p-2 border rounded text-sm">
           <div class="min-w-0 flex-1">
             <p class="font-medium truncate">#${sub.id.slice(0, 8)}</p>
-            <p class="text-xs text-muted-foreground truncate">${sub.planType || 'Subscription'} - $${sub.amount}</p>
+            <p class="text-xs text-muted-foreground truncate">${sub.servicePackageId || sub.planSlug || 'Subscription'} - $${sub.amount}</p>
           </div>
           <span class="px-2 py-0.5 text-xs rounded-full ${sub.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'} ml-2">${sub.status}</span>
         </div>

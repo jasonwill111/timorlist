@@ -15,11 +15,18 @@ if (!slug) {
 const db = await getDb();
 
 // Fetch the post
-const post = await db
-  .select()
-  .from(blogPosts)
-  .where(eq(blogPosts.slug, slug))
-  .get();
+let post = null;
+try {
+  if (db) {
+    post = await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.slug, slug))
+      .get();
+  }
+} catch (e) {
+  console.error('[blog/slug] DB error:', e);
+}
 
 if (!post || post.status !== 'published') {
   return Astro.redirect('/blog');
@@ -49,9 +56,30 @@ const publishDate = post.publishedAt
 // SEO
 const metaTitle = post.metaTitle || post.title;
 const metaDescription = post.metaDescription || post.excerpt || '';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://timorup.com';
+// BlogPosting structured data for SEO
+const blogPostingSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.title,
+  "description": post.excerpt || post.metaDescription || post.title,
+  "image": post.coverImageId ? `${siteUrl}/api/media/${post.coverImageId}` : undefined,
+  "datePublished": post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
+  "dateModified": post.updatedAt ? new Date(post.updatedAt).toISOString() : undefined,
+  "author": {
+    "@type": "Person",
+    "name": post.authorName || "TimorUp"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TimorUp",
+    "url": siteUrl
+  },
+  "url": `${siteUrl}/blog/${slug}`,
+  "keywords": postTags.join(', ')
+};
 ---
-
-<Layout title={metaTitle} description={metaDescription}>
+<Layout title={metaTitle} description={metaDescription} structuredData={blogPostingSchema}>
   <main class="container mx-auto px-4 py-8 max-w-4xl">
     <!-- Back Link -->
     <a
@@ -143,7 +171,7 @@ const metaDescription = post.metaDescription || post.excerpt || '';
           href={`https://wa.me/?text=${encodeURIComponent(post.title + ' ' + Astro.url.href)}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="px-4 py-2 bg-[#25D366] text-white rounded-lg hover:opacity-90 transition-opacity"
+          class="px-4 py-2 bg-whatsapp text-white rounded-lg hover:opacity-90 transition-opacity"
         >
           WhatsApp
         </a>

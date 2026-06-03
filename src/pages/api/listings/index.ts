@@ -4,7 +4,7 @@ export const prerender = false;
 import { getDb } from '@/lib/db';
 import { listings, listingCategories } from '@/db/schema';
 import { eq, desc, like, and, or, ne, type SQL } from 'drizzle-orm';
-import { checkRateLimitKV, getRateLimitHeaders } from '@/lib/rate-limit';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { PaginationSchema } from '@/lib/validation';
 
 function getErrorMessage(error: unknown): string {
@@ -19,24 +19,21 @@ function getClientIP(request: Request): string {
 }
 
 export async function GET({ url, request }: { url: URL; request: Request }) {
-  const db = await getDb();
-if (!db) throw new Error("Database not available");
-
-  // Rate limiting
-  const clientIP = getClientIP(request);
-  const rateLimit = await checkRateLimitKV(`listings:${clientIP}`);
-
-  if (!rateLimit.allowed) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: { message: 'Rate limit exceeded', resetIn: rateLimit.resetIn }
-    }), {
-      status: 429,
-      headers: { 'Content-Type': 'application/json', ...getRateLimitHeaders(rateLimit) },
-    });
-  }
-
   try {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    // Rate limiting
+    const clientIP = getClientIP(request);
+    const rateLimit = await checkRateLimit(`listings:${clientIP}`);
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: { message: 'Rate limit exceeded', resetIn: rateLimit.resetIn }
+      }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', ...getRateLimitHeaders(rateLimit) },
+      });
+    }
     const search = url.searchParams.get('search') || '';
     const category = url.searchParams.get('category') || '';
     const sort = url.searchParams.get('sort') || 'recent';
@@ -58,52 +55,56 @@ if (!db) throw new Error("Database not available");
         categoryId = cats[0].id;
       }
     }
-
-    // Build conditions - only show published listings
-    const conditions: SQL[] = [
-      eq(listings.status, 'published')
-    ];
-
+    // Build conditions - show published or active listings (both statuses are valid in DB)
+    // Use UNION to combine and limit results at the database level
+    const maxResults = 1000; // Safety cap to prevent memory issues
+    const publishedResults = await db.select()
+      .from(listings)
+      .where(eq(listings.status, 'published'))
+      .limit(maxResults)
+      .all();
+    const activeResults = await db.select()
+      .from(listings)
+      .where(eq(listings.status, 'active'))
+      .limit(maxResults)
+      .all();
+    // Combine both results and deduplicate by id
+    const resultsMap = new Map<string, typeof publishedResults[0]>();
+    publishedResults.forEach(r => resultsMap.set(r.id, r));
+    activeResults.forEach(r => resultsMap.set(r.id, r));
+    const results = Array.from(resultsMap.values());
+    // Apply search filter
+    let filteredResults = results;
     if (search) {
-      const searchPattern = `%${search}%`;
-      conditions.push(
-        or(
-          like(listings.title, searchPattern),
-          like(listings.description, searchPattern),
-          like(listings.location, searchPattern)
-        )!
+      const searchLower = search.toLowerCase();
+      filteredResults = filteredResults.filter(r =>
+        r.title.toLowerCase().includes(searchLower) ||
+        (r.description && r.description.toLowerCase().includes(searchLower)) ||
+        (r.location && r.location.toLowerCase().includes(searchLower))
       );
     }
-
+    // Apply category filter
     if (categoryId) {
-      conditions.push(eq(listings.categoryId, categoryId));
+      filteredResults = filteredResults.filter(r => r.categoryId === categoryId);
     }
-
-    // Query listings table
-    let results = await db.select()
-      .from(listings)
-      .where(and(...conditions))
-      .all();
-
     // Apply sorting
     switch (sort) {
       case 'recent':
-        results.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        filteredResults.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         break;
       case 'price-low':
-        results.sort((a, b) => (a.price || 0) - (b.price || 0));
+        filteredResults.sort((a, b) => (a.price || 0) - (b.price || 0));
         break;
       case 'price-high':
-        results.sort((a, b) => (b.price || 0) - (a.price || 0));
+        filteredResults.sort((a, b) => (b.price || 0) - (a.price || 0));
         break;
       case 'popular':
-        results.sort((a, b) => (b.views || 0) - (a.views || 0));
+        filteredResults.sort((a, b) => (b.views || 0) - (a.views || 0));
         break;
     }
-
     // Apply pagination
-    const paginated = results.slice(offset, offset + limit);
-    const total = results.length;
+    const paginated = filteredResults.slice(offset, offset + limit);
+    const total = filteredResults.length;
 
     // Get category names
     const categoryMap = new Map<string, string>();

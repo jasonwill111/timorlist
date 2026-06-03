@@ -3,8 +3,16 @@
 // Service packages are managed in admin/service-packages
 // All changes sync automatically to this page
 export const prerender = false;
+
 import Layout from '../layouts/Layout.astro';
 import PricingCards from '@/components/islands/PricingCards.astro';
+
+// Cache: 60s browser, 5min CDN, stale-while-revalidate 1h
+// Admin updates trigger cache purge via Cloudflare Cache API
+const cacheControl = import.meta.env.PROD
+  ? 'public, max-age=60, s-maxage=300, stale-while-revalidate=3600'
+  : 'no-store';
+Astro.response.headers.set('Cache-Control', cacheControl);
 ---
 
 <Layout title="Pricing - TimorUp">

@@ -1,41 +1,59 @@
-// Scheduled cleanup - runs weekly to delete expired businesses (60+ days after expiry)
+// Scheduled cleanup - runs weekly to delete expired businesses (past grace period)
 export const prerender = false;
 
 // Cloudflare Workers scheduled handler type
 type ScheduledHandler = (event: { scheduledTime: number; cron: string }) => Promise<Response>;
 
 import { getDb } from '@/lib/db';
-import { businesses, media, products } from '@/db/schema';
-import { lt, and, inArray, eq } from 'drizzle-orm';
+import { businesses, media, products, orders } from '@/db/schema';
+import { lt, and, inArray, eq, desc } from 'drizzle-orm';
 import { getR2Bucket, deleteFolderFromR2 } from '@/lib/media';
-
-// 60 days grace period in seconds
-const GRACE_PERIOD_SECONDS = 60 * 24 * 60 * 60;
+import { GRACE_PERIOD_DAYS } from '@/lib/subscription';
 
 export const onRequest: ScheduledHandler = async (_event) => {
   const db = await getDb();
-if (!db) throw new Error("Database not available");
-  const now = Math.floor(Date.now() / 1000); // current timestamp in seconds
-  const cutoffDate = now - GRACE_PERIOD_SECONDS;
+  if (!db) throw new Error("Database not available");
+  const now = Date.now(); // current timestamp in milliseconds
+  // Grace period = 30 days after planExpiresAt
+  const cutoffDate = now - (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
 
   // Starting cleanup silently
 
   try {
-    // Find businesses expired past grace period
-    const expiredBusinesses = await db
+    // Find all businesses
+    const allBusinesses = await db
       .select({
         id: businesses.id,
         slug: businesses.slug,
         ownerId: businesses.ownerId,
       })
       .from(businesses)
-      .where(
-        and(
-          eq(businesses.subscriptionStatus, 'expired'),
-          lt(businesses.gracePeriodEndDate, cutoffDate)
-        )
-      )
       .all();
+
+    // Filter those past grace period by checking orders
+    const expiredBusinesses: typeof allBusinesses = [];
+
+    for (const business of allBusinesses) {
+      // Get most recent paid order
+      const activeOrder = await db.select({
+        planExpiresAt: orders.planExpiresAt,
+      })
+        .from(orders)
+        .where(eq(orders.typeId, business.id))
+        .where(eq(orders.type, 'business'))
+        .where(eq(orders.status, 'paid'))
+        .orderBy(desc(orders.planExpiresAt))
+        .limit(1)
+        .get();
+
+      if (activeOrder?.planExpiresAt) {
+        const graceEnd = activeOrder.planExpiresAt + (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
+        if (graceEnd < now) {
+          expiredBusinesses.push(business);
+        }
+      }
+      // Businesses without orders are not expired (they're in initial state)
+    }
 
     // Found count not logged to reduce log noise
 
@@ -58,8 +76,11 @@ if (!db) throw new Error("Database not available");
         // 3. Delete products
         await db.delete(products).where(inArray(products.businessId, [business.id])).run();
 
-        // 4. Delete business
-        await db.delete(businesses).where(inArray(businesses.id, [business.id])).run();
+        // 4. Soft delete business (set deleted_at)
+        await db.update(businesses)
+          .set({ deletedAt: Math.floor(now / 1000) })
+          .where(eq(businesses.id, business.id))
+          .run();
 
         deletedCount++;
       } catch (error) {

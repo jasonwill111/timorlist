@@ -8,6 +8,8 @@ import '../../styles/globals.css';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Robots - admin login should not be indexed -->
+    <meta name="robots" content="noindex, nofollow" />
     <title>Admin Login - TimorUp</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
@@ -81,7 +83,7 @@ import '../../styles/globals.css';
       <!-- Back to Site -->
       <div class="text-center mt-6 space-y-2">
         <a href="/" class="text-sm text-muted-foreground hover:text-foreground">
-          â†Back to Website
+          ← Back to Website
         </a>
         <div class="text-sm text-muted-foreground">
           Don't have an account <a href="/register" class="text-primary hover:underline">Sign up</a>
@@ -100,24 +102,24 @@ import '../../styles/globals.css';
   const eyeIcon = document.getElementById('eye-icon');
   const eyeOffIcon = document.getElementById('eye-off-icon');
 
-  toggleBtn.addEventListener('click', () => {
+  toggleBtn?.addEventListener('click', () => {
     if (passwordInput.type === 'password') {
       passwordInput.type = 'text';
-      eyeIcon.classList.add('hidden');
-      eyeOffIcon.classList.remove('hidden');
+      eyeIcon?.classList.add('hidden');
+      eyeOffIcon?.classList.remove('hidden');
     } else {
       passwordInput.type = 'password';
-      eyeIcon.classList.remove('hidden');
-      eyeOffIcon.classList.add('hidden');
+      eyeIcon?.classList.remove('hidden');
+      eyeOffIcon?.classList.add('hidden');
     }
   });
 
   const form = document.getElementById('login-form') as HTMLFormElement;
   const errorMsg = document.getElementById('error-message');
 
-  form.addEventListener('submit', async (e) => {
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    errorMsg!.classList.add('hidden');
+    errorMsg?.classList.add('hidden');
 
     const formData = new FormData(form);
     const email = formData.get('email') as string;
@@ -185,4 +187,3 @@ import '../../styles/globals.css';
     }
   });
 </script>
-

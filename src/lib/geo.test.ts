@@ -1,11 +1,11 @@
 /**
- * Unit tests for src/lib/geo.ts â€?Nominatim geocoding utility (T-006)
+ * Unit tests for src/lib/geo.ts ï¿½?Nominatim geocoding utility (T-006)
  *
  * Test plan:
- * TC-001: Nominatim returns valid result â†?resolves to { lat, lng }
- * TC-002: Nominatim returns empty array â†?resolves to null
- * TC-003: Two rapid calls (within 500ms) â†?second call waits full 1100ms debounce
- * TC-004: Network error â†?resolves to null
+ * TC-001: Nominatim returns valid result ï¿½?resolves to { lat, lng }
+ * TC-002: Nominatim returns empty array ï¿½?resolves to null
+ * TC-003: Two rapid calls (within 500ms) ï¿½?second call waits full 1100ms debounce
+ * TC-004: Network error ï¿½?resolves to null
  * TC-005: Query includes "Timor-Leste" suffix
  * TC-006: Request includes User-Agent: TimorUp/1.0 header
  * TC-007: calculateDistance returns correct km between two coordinates
@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { geocodeAddress, __resetGeoState, calculateDistance, validateCoordinates } from './geo';
+import { geocodeAddress, calculateDistance, validateCoordinates } from './geo';
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -23,8 +23,6 @@ vi.stubGlobal('fetch', mockFetch);
 beforeEach(() => {
   vi.resetAllMocks();
   vi.useRealTimers();
-  vi.restoreAllMocks();
-  __resetGeoState();
 });
 
 describe('TC-001: Nominatim returns valid result', () => {
@@ -58,7 +56,7 @@ describe('TC-003: Debounce blocks rapid calls', () => {
   it('second call fired within 500ms waits at least 1100ms before network request', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: false });
 
-    // Also control Date.now() â€?Vitest fake timers don't mock it in Node
+    // Also control Date.now() ï¿½?Vitest fake timers don't mock it in Node
     let fakeTime = 0;
     const dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => fakeTime);
 
@@ -68,21 +66,21 @@ describe('TC-003: Debounce blocks rapid calls', () => {
         json: async () => [{ lat: '-8.5', lon: '125.5' }],
       });
 
-      // Fire first call â€?sets lastCallTime = fakeTime (= 0)
+      // Fire first call ï¿½?sets lastCallTime = fakeTime (= 0)
       const p1 = geocodeAddress('Dili');
       // Advance fake time slightly so second call's elapsed < DEBOUNCE_MS
       fakeTime = 500;
-      // Fire second call immediately â€?will need to wait 1100ms
+      // Fire second call immediately ï¿½?will need to wait 1100ms
       const p2 = geocodeAddress('Dili');
 
       // At t=500ms: first fetch has fired (elapsed was 0), second is waiting
-      // Advance by 1000ms (fakeTime goes from 500 to 1500) â€?still within debounce
+      // Advance by 1000ms (fakeTime goes from 500 to 1500) ï¿½?still within debounce
       await vi.advanceTimersByTimeAsync(1000);
       fakeTime += 1000; // Date.now() now returns 1500
       // Only first fetch should have fired (second is still waiting on its setTimeout)
       expect(mockFetch).toHaveBeenCalledTimes(1);
 
-      // Advance to 1100ms from lastCallTime (fakeTime = 1600 total) â€?debounce satisfied
+      // Advance to 1100ms from lastCallTime (fakeTime = 1600 total) ï¿½?debounce satisfied
       await vi.advanceTimersByTimeAsync(100);
       fakeTime += 100; // Date.now() now returns 1600
       expect(mockFetch).toHaveBeenCalledTimes(2);

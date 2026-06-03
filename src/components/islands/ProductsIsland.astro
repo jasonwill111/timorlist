@@ -1,19 +1,29 @@
 ---
-// Server Island: Products list with client-side filtering
-// Uses is:defer for streaming, renders immediately with fallback
+// Server-rendered Products list with proper pagination
+// All filtering, sorting, and pagination happens on the server
 import { getDb } from '@/lib/db';
 import { products, businesses } from '@/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, like, asc, sql, and } from 'drizzle-orm';
 
 const searchParams = Astro.url.searchParams;
+const search = searchParams.get('search') || '';
+const businessId = searchParams.get('business') || '';
+const sort = searchParams.get('sort') || 'recent';
+const page = parseInt(searchParams.get('page') || '1', 10);
+const LIMIT = 12;
+const offset = (page - 1) * LIMIT;
 
-// Fetch all businesses for filter
+// Cache: Products page - 2min browser, 10min CDN
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=120, s-maxage=600, stale-while-revalidate=1200'
+);
+
+// Fetch all businesses for filter dropdown
 let allBusinesses: { id: string; title: string; slug: string }[] = [];
-let allProducts = [];
-
-const db = await getDb();
-if (db) {
-  try {
+try {
+  const db = await getDb();
+  if (db) {
     allBusinesses = await db
       .select({
         id: businesses.id,
@@ -22,74 +32,124 @@ if (db) {
       })
       .from(businesses)
       .where(eq(businesses.status, 'active'))
+      .orderBy(asc(businesses.title))
       .limit(100)
       .all();
-  } catch (e) {
-    console.error('Failed to fetch businesses:', e);
   }
+} catch (e) {
+  console.error('Failed to fetch businesses:', e);
+}
 
-  try {
-    allProducts = await db
+// Build WHERE conditions
+const conditions = [eq(products.active, 1)];
+
+if (search) {
+  conditions.push(like(products.title, `%${search}%`));
+}
+
+if (businessId) {
+  conditions.push(eq(products.businessId, businessId));
+}
+
+// Count total matching products
+let total = 0;
+try {
+  const db = await getDb();
+  if (db) {
+    const countResult = db
+      .select({ count: sql<number>`count(*)` })
+      .from(products)
+      .where(and(...conditions))
+      .get();
+    total = countResult?.count || 0;
+  }
+} catch (e) {
+  console.error('Count error:', e);
+}
+
+// Fetch paginated products
+let paginatedProducts: {
+  id: string;
+  title: string;
+  slug: string;
+  priceFields: string | null;
+  productType: string | null;
+  businessId: string | null;
+}[] = [];
+
+try {
+  const db = await getDb();
+  if (db) {
+    let query = db
       .select({
         id: products.id,
         title: products.title,
         slug: products.slug,
-        description: products.description,
         priceFields: products.priceFields,
         productType: products.productType,
         businessId: products.businessId,
-        active: products.active,
       })
       .from(products)
-      .orderBy(desc(products.createdAt))
-      .limit(200)
+      .where(and(...conditions));
+
+    // Apply sorting
+    if (sort === 'name') {
+      query = query.orderBy(asc(products.title));
+    } else {
+      query = query.orderBy(desc(products.createdAt));
+    }
+
+    paginatedProducts = await query
+      .limit(LIMIT)
+      .offset(offset)
       .all();
-  } catch (e) {
-    console.error('Failed to fetch products:', e);
+  }
+} catch (e) {
+  console.error('Failed to fetch products:', e);
+}
+
+// Parse price fields for display
+function parsePrice(priceFields: string | null): { min?: number; max?: number; currency?: string } {
+  if (!priceFields) return {};
+  try {
+    return JSON.parse(priceFields);
+  } catch {
+    return {};
   }
 }
 
-// Serialize for client
-const safeBusinesses = allBusinesses.map(b => ({
-  id: String(b.id || ''),
-  title: String(b.title || ''),
-  slug: String(b.slug || ''),
-}));
+const totalPages = Math.ceil(total / LIMIT);
 
-const safeProducts = allProducts
-  .filter(p => p.active === 1 || p.active === true)  // Only active products
-  .map(p => ({
-    id: String(p.id || ''),
-    title: String(p.title || ''),
-    priceFields: p.priceFields != null ? String(p.priceFields) : null,
-    productType: p.productType != null ? String(p.productType) : null,
-    businessId: String(p.businessId || ''),
-  }));
-
-const businessesJson = JSON.stringify(safeBusinesses);
-const productsJson = JSON.stringify(safeProducts);
-const searchValue = searchParams.get('search') || '';
+// Build pagination URL helper
+const buildUrl = (pageNum: number) => {
+  const p = new URLSearchParams();
+  if (search) p.set('search', search);
+  if (businessId) p.set('business', businessId);
+  if (sort !== 'recent') p.set('sort', sort);
+  if (pageNum > 1) p.set('page', pageNum.toString());
+  return `/products-services?${p.toString()}`;
+};
 ---
 
 <!-- Header -->
 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4 sm:mb-6">
   <div>
     <h1 class="text-2xl sm:text-3xl font-bold">Products & Services</h1>
-    <p class="text-xs sm:text-sm text-muted-foreground">Browse all products and services</p>
+    <p class="text-xs sm:text-sm text-muted-foreground">{total} products found</p>
   </div>
   <a href="/listings" class="text-xs sm:text-sm text-primary hover:underline">← Directory</a>
 </div>
 
 <!-- Filters -->
-<form id="filter-form" class="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
+<form id="filter-form" method="GET" action="/products-services" class="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
   <div class="relative flex-1 min-w-[200px]">
     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
     <input
       id="search"
       name="search"
       type="search"
-      placeholder="Search..."
-      value={searchValue}
+      placeholder="Search products..."
+      value={search}
       class="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-background text-sm"
     />
   </div>
@@ -97,124 +157,100 @@ const searchValue = searchParams.get('search') || '';
   <select id="business-filter" name="business"
     class="h-10 px-3 rounded-lg border border-input bg-background text-sm cursor-pointer">
     <option value="">All Businesses</option>
-    {safeBusinesses.map(b => (
-      <option value={b.id}>{b.title}</option>
+    {allBusinesses.map(b => (
+      <option value={b.id} selected={businessId === b.id}>{b.title}</option>
     ))}
   </select>
 
   <select id="sort-filter" name="sort"
     class="h-10 px-3 rounded-lg border border-input bg-background text-sm cursor-pointer">
-    <option value="recent">Recent</option>
-    <option value="name">Name A-Z</option>
-    <option value="price-low">Price ↑</option>
-    <option value="price-high">Price ↓</option>
+    <option value="recent" selected={sort === 'recent'}>Recent</option>
+    <option value="name" selected={sort === 'name'}>Name A-Z</option>
   </select>
+
+  <button type="submit" class="h-10 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium">
+    Filter
+  </button>
 </form>
 
-<!-- Results -->
-<div id="results-container" class="mb-3 sm:mb-4 text-sm text-muted-foreground">
-  {safeProducts.length} products found
-</div>
-
 <!-- Products Grid -->
-<div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
-  <!-- Content rendered by client script -->
-</div>
+{paginatedProducts.length > 0 ? (
+  <>
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
+      {paginatedProducts.map(p => {
+        const price = parsePrice(p.priceFields);
+        const business = allBusinesses.find(b => b.id === p.businessId);
+        return (
+          <a href={`/product/${p.slug}`} class="group block bg-card rounded-xl overflow-hidden border border-border/50 hover:border-primary/40 hover:shadow-md transition-all">
+            {/* Product Image Placeholder */}
+            <div class="aspect-square bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+              <svg class="w-12 h-12 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            
+            {/* Content */}
+            <div class="p-3">
+              <h3 class="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                {p.title}
+              </h3>
+              {business && (
+                <p class="text-xs text-muted-foreground mt-1 truncate">
+                  {business.title}
+                </p>
+              )}
+              {price.min !== undefined && (
+                <p class="text-sm font-medium text-primary mt-2">
+                  {price.currency || '$'}{price.min.toLocaleString()}
+                  {price.max !== undefined && ` - ${price.currency || '$'}${price.max.toLocaleString()}`}
+                </p>
+              )}
+            </div>
+          </a>
+        );
+      })}
+    </div>
 
-<script define:vars={{ businessesJson, productsJson }}>
-  const businesses = JSON.parse(businessesJson);
-  let products = JSON.parse(productsJson);
-
-  const form = document.getElementById('filter-form');
-  const resultsContainer = document.getElementById('results-container');
-  const grid = document.getElementById('products-grid');
-
-  function formatPrice(product) {
-    if (product.priceFields) {
-      try {
-        const fields = JSON.parse(product.priceFields);
-        if (fields.length > 0 && fields[0].value) {
-          const unit = fields[0].unit ? `/${fields[0].unit.replace('/', '')}` : '';
-          return `$${fields[0].value}${unit}`;
-        }
-      } catch {}
-    }
-    return 'Price on request';
-  }
-
-  function renderProducts(filtered) {
-    if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="col-span-full text-center py-16">
-          <svg class="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-          </svg>
-          <h3 class="text-lg font-medium mb-2">No products found</h3>
-          <p class="text-muted-foreground">Try adjusting your search or filters</p>
-        </div>
-      `;
-      resultsContainer.textContent = '0 products found';
-      return;
-    }
-
-    resultsContainer.textContent = `${filtered.length} products found`;
-    grid.innerHTML = filtered.map(p => {
-      const business = businesses.find(b => b.id === p.businessId);
-      return `
-        <a href="/products-services?business=${p.businessId}#${p.id}" class="group block bg-card rounded-lg border shadow-sm hover:shadow-lg hover:border-primary/60 overflow-hidden transition-all duration-200 hover:scale-[1.02]">
-          <div class="aspect-square bg-gradient-to-br from-primary/10 to-primary/5 relative flex items-center justify-center">
-            <svg class="w-12 h-12 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-          </div>
-          <div class="p-3 space-y-1">
-            <h3 class="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">${p.title}</h3>
-            <p class="text-xs text-muted-foreground truncate">${business?.title || 'Unknown'}</p>
-            <p class="text-sm font-bold text-primary mt-2">${formatPrice(p)}</p>
-          </div>
-        </a>
-      `;
-    }).join('');
-  }
-
-  function getPrice(product) {
-    if (product.priceFields) {
-      try {
-        const fields = JSON.parse(product.priceFields);
-        if (fields.length > 0 && fields[0].value) {
-          return Number(fields[0].value);
-        }
-      } catch {}
-    }
-    return 0;
-  }
-
-  function applyFilters() {
-    const search = document.getElementById('search')?.value?.toLowerCase() || '';
-    const business = document.getElementById('business-filter')?.value || '';
-    const sort = document.getElementById('sort-filter')?.value || 'recent';
-
-    let filtered = products.filter(p => {
-      const matchSearch = !search || p.title.toLowerCase().includes(search);
-      const matchBusiness = !business || p.businessId === business;
-      return matchSearch && matchBusiness;
-    });
-
-    if (sort === 'name') {
-      filtered.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sort === 'price-low') {
-      filtered.sort((a, b) => getPrice(a) - getPrice(b));
-    } else if (sort === 'price-high') {
-      filtered.sort((a, b) => getPrice(b) - getPrice(a));
-    }
-
-    renderProducts(filtered);
-  }
-
-  // Event listeners
-  form?.addEventListener('input', applyFilters);
-  form?.addEventListener('change', applyFilters);
-
-  // Initial render
-  renderProducts(products);
-</script>
+    {/* Pagination */}
+    {totalPages > 1 && (
+      <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
+        {page > 1 && (
+          <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+            ← Previous
+          </a>
+        )}
+        
+        {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+          const pageNum = i + 1;
+          const isActive = pageNum === page;
+          return (
+            <a 
+              href={buildUrl(pageNum)} 
+              class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {pageNum}
+            </a>
+          );
+        })}
+        
+        {page < totalPages && (
+          <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+            Next →
+          </a>
+        )}
+      </nav>
+    )}
+  </>
+) : (
+  <div class="text-center py-16">
+    <svg class="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+    <h3 class="text-xl font-semibold text-foreground mb-2">No products found</h3>
+    <p class="text-muted-foreground">Try adjusting your search or filters</p>
+    <a href="/products-services" class="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md">
+      View all products
+    </a>
+  </div>
+)}

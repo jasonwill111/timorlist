@@ -1,239 +1,109 @@
 ---
-// Account page with SSR
+// User account page
 export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
-import Button from '../components/ui/Button.astro';
-import Card from '../components/ui/Card.astro';
-import CardHeader from '../components/ui/CardHeader.astro';
-import CardTitle from '../components/ui/CardTitle.astro';
-import CardDescription from '../components/ui/CardDescription.astro';
-import CardContent from '../components/ui/CardContent.astro';
-import CardFooter from '../components/ui/CardFooter.astro';
+import Card from '@/components/ui/Card.astro';
+import CardHeader from '@/components/ui/CardHeader.astro';
+import CardTitle from '@/components/ui/CardTitle.astro';
+import CardDescription from '@/components/ui/CardDescription.astro';
+import CardContent from '@/components/ui/CardContent.astro';
+import CardFooter from '@/components/ui/CardFooter.astro';
+import Button from '@/components/ui/Button.astro';
+import { getDb, getRawDb } from '@/lib/db';
+import { businesses, orders, reviews } from '@/db/schema';
+import { eq, desc } from 'drizzle-orm';
 
-// Check auth via session cookie
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 let user: { id: string; name: string; email: string } | null = null;
-let userPages: Array<{ id: string; title: string; slug: string; entityType: string; planType: string | null; expiryDate: Date | null }> = [];
-let subscription: { planType: string; amount: number; status: string; expiryDate: Date | null } | null = null;
-let businessReviews: Array<{ id: string; rating: number; comment: string | null; reviewerName: string; createdAt: Date | null; reply: string | null; repliedAt: Date | null }> = [];
-let savedSkus: Array<{ id: string; title: string; businessTitle: string; slug: string }> = [];
-let savedPages: Array<{ id: string; title: string; entityType: string; slug: string }> = [];
+let userPages: Array<{ id: string; title: string; slug: string; entityType: string; status: string; createdAt: number | null }> = [];
+let subscription: { planSlug: string; amount: number; status: string; planExpiresAt: number | null } | null = null;
+let businessReviews: Array<{ id: string; rating: number; comment: string | null; reviewerName: string; createdAt: number | null; reply: string | null; repliedAt: number | null }> = [];
 
 try {
   const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
 
   if (tokenMatch) {
-    const { getDb } = await import('@/lib/db');
-    const db = await getDb();
-    const { sessions, users, businesses, nonProfits, publicSectors, orders, reviews, products, savedItems } = await import('@/db/schema');
-    const { eq, and, desc, sql, inArray, or } = await import('drizzle-orm');
-
-    const session = await db.select()
-      .from(sessions)
-      .where(eq(sessions.token, tokenMatch[1]))
-      .limit(1)
-      .get();
-
-    if (session && session.expiresAt) {
-        const expiresAtMs = typeof session.expiresAt === 'number' ? session.expiresAt * 1000 : new Date(session.expiresAt).getTime();
+    const db = await getRawDb();
+    if (db) {
+      const session = await db.prepare('SELECT userId, expiresAt FROM session WHERE token = ? LIMIT 1')
+        .bind(tokenMatch[1])
+        .first() as { userId: string; expiresAt: number | string } | null;
+      if (session) {
+        const expiresAtMs = typeof session.expiresAt === 'number'
+          ? (session.expiresAt < 1e12 ? session.expiresAt * 1000 : session.expiresAt)
+          : new Date(session.expiresAt).getTime();
         if (expiresAtMs > Date.now()) {
-          const userRecord = await db.select()
-        .from(users)
-        .where(eq(users.id, session.userId))
-        .limit(1)
-        .get();
+          const userRecord = await db.prepare('SELECT id, name, email FROM user WHERE id = ? LIMIT 1')
+            .bind(session.userId)
+            .first() as { id: string; name: string; email: string } | null;
 
-      if (userRecord) {
-        user = { id: userRecord.id, name: userRecord.name || '', email: userRecord.email };
-
-        // Get user's all pages from all three tables
-        const allPages: typeof userPages = [];
-
-        // Query businesses
-        const bizPages = await db.select({
-          id: businesses.id,
-          title: businesses.title,
-          slug: businesses.slug,
-          entityType: businesses.entityType,
-          planType: businesses.planType,
-          expiryDate: businesses.expiryDate,
-        })
-        .from(businesses)
-        .where(eq(businesses.ownerId, user.id))
-        .orderBy(desc(businesses.createdAt));
-        allPages.push(...bizPages);
-
-        // Query non-profits
-        const npPages = await db.select({
-          id: nonProfits.id,
-          title: nonProfits.title,
-          slug: nonProfits.slug,
-          entityType: nonProfits.entityType,
-          planType: nonProfits.planType,
-          expiryDate: nonProfits.expiryDate,
-        })
-        .from(nonProfits)
-        .where(eq(nonProfits.ownerId, user.id))
-        .orderBy(desc(nonProfits.createdAt));
-        allPages.push(...npPages);
-
-        // Query public sectors
-        const psPages = await db.select({
-          id: publicSectors.id,
-          title: publicSectors.title,
-          slug: publicSectors.slug,
-          entityType: publicSectors.entityType,
-          planType: publicSectors.planType,
-          expiryDate: publicSectors.expiryDate,
-        })
-        .from(publicSectors)
-        .where(eq(publicSectors.ownerId, user.id))
-        .orderBy(desc(publicSectors.createdAt));
-        allPages.push(...psPages);
-
-        // Sort by createdAt descending
-        allPages.sort((a, b) => {
-          const aTime = a.expiryDate ? new Date(a.expiryDate).getTime() : 0;
-          const bTime = b.expiryDate ? new Date(b.expiryDate).getTime() : 0;
-          return bTime - aTime;
-        });
-
-        userPages = allPages;
-
-        if (userPages.length > 0) {
-          const firstPage = userPages[0];
-
-          // Get reviews for the first page
-          const reviewsList = await db.select()
-            .from(reviews)
-            .where(eq(reviews.businessId, firstPage.id))
-            .orderBy(desc(reviews.createdAt))
-            .limit(20);
-
-          // Get user info for reviewers
-          const reviewerIds = [...new Set(reviewsList.map(r => r.userId))];
-          const reviewerList = reviewerIds.length > 0
-            ? await db.select({ id: users.id, name: users.name })
-                .from(users)
-                .where(sql`${users.id} IN (${sql.join(reviewerIds.map(id => sql`${id}`), sql`, `)})`)
-            : [];
-          const reviewerMap = new Map(reviewerList.map(u => [u.id, u]));
-
-          businessReviews = reviewsList.map(r => ({
-            ...r,
-            reviewerName: reviewerMap.get(r.userId)?.name || 'Anonymous',
-          }));
-
-          // Get latest paid subscription for first page
-          const latestOrder = await db.select()
-            .from(orders)
-            .where(and(
-              eq(orders.typeId, firstPage.id),
-              eq(orders.status, 'paid')
-            ))
-            .orderBy(desc(orders.paidDate))
-            .limit(1)
-            .get();
-
-          if (latestOrder) {
-            const variantSnapshot = latestOrder.variantSnapshot ? JSON.parse(latestOrder.variantSnapshot) : {};
-            subscription = {
-              planType: latestOrder.servicePackageId || 'basic',
-              planName: variantSnapshot?.name || '',
-              amount: latestOrder.amount || 0,
-              status: latestOrder.status,
-              expiresAt: latestOrder.expiresAt ? new Date(latestOrder.expiresAt * 1000) : null,
-            };
-          }
-        }
-
-        // Get saved SKUs
-        const savedSkuRecords = await db.select()
-          .from(savedItems)
-          .where(and(
-            eq(savedItems.userId, user.id),
-            eq(savedItems.itemType, 'sku')
-          ))
-          .orderBy(desc(savedItems.createdAt));
-
-        if (savedSkuRecords.length > 0) {
-          const skuIds = savedSkuRecords.map(s => s.itemId);
-          const skuProducts = await db.select({
-            id: products.id,
-            title: products.title,
-            businessId: products.businessId,
-          })
-          .from(products)
-          .where(inArray(products.id, skuIds));
-
-          const businessIds = [...new Set(skuProducts.map(p => p.businessId))];
-          const businessList = businessIds.length > 0
-            ? await db.select({ id: businesses.id, title: businesses.title, slug: businesses.slug })
-                .from(businesses)
-                .where(inArray(businesses.id, businessIds))
-            : [];
-          const businessMap = new Map(businessList.map(b => [b.id, b]));
-
-          savedSkus = skuProducts.map(p => ({
-            id: p.id,
-            title: p.title,
-            businessTitle: businessMap.get(p.businessId)?.title || '',
-            slug: businessMap.get(p.businessId)?.slug || '',
-          }));
-        }
-
-        // Get saved Pages (savedItems with itemType='page' may point to any table)
-        const savedPageRecords = await db.select()
-          .from(savedItems)
-          .where(and(
-            eq(savedItems.userId, user.id),
-            eq(savedItems.itemType, 'page')
-          ))
-          .orderBy(desc(savedItems.createdAt));
-
-        if (savedPageRecords.length > 0) {
-          // Try to find saved pages in businesses table (most common case)
-          const pageIds = savedPageRecords.map(s => s.itemId);
-          const savedPageList = await db.select({
-            id: businesses.id,
-            title: businesses.title,
-            entityType: businesses.entityType,
-            slug: businesses.slug,
-          })
-          .from(businesses)
-          .where(inArray(businesses.id, pageIds));
-
-          savedPages = savedPageList;
+          if (userRecord) {
+            user = { id: userRecord.id, name: userRecord.name || '', email: userRecord.email };
           }
         }
       }
     }
   }
 } catch (e) {
-  console.error('Auth check failed:', e);
+  console.error('Account auth check failed:', e);
 }
 
-// Redirect if not logged in
 if (!user) {
   return Astro.redirect('/login?redirect=/account');
 }
 
-// Check if subscription is expired
-const isSubscriptionExpired = subscription?.expiryDate ? new Date(subscription.expiryDate) < new Date() : false;
+// Load user pages (businesses)
+try {
+  const db = await getDb();
+  if (db) {
+    // Get businesses
+    const businessList = await db.select({
+      id: businesses.id,
+      title: businesses.title,
+      slug: businesses.slug,
+      status: businesses.status,
+      createdAt: businesses.createdAt,
+    })
+    .from(businesses)
+    .where(eq(businesses.ownerId, user.id))
+    .all();
 
-// Check if subscription is active (paid and not expired)
-const isSubscriptionActive = subscription?.status === 'paid' && !isSubscriptionExpired;
+    userPages = businessList.map(b => ({ ...b, entityType: 'business' }));
 
-// Entity type labels
-const entityLabels: Record<string, string> = {
-  business: 'Business',
-  government: 'Government',
-  nonprofit: 'Non-Profit',
-  personal: 'Personal',
-};
+    // Get subscription if any business exists
+    if (userPages.length > 0) {
+      const subOrder = await db.select({
+        planSlug: orders.servicePackageId,
+        amount: orders.amount,
+        status: orders.status,
+        planExpiresAt: orders.planExpiresAt,
+      })
+      .from(orders)
+      .where(eq(orders.typeId, userPages[0].id))
+      .where(eq(orders.type, 'business'))
+      .where(eq(orders.status, 'paid'))
+      .orderBy(desc(orders.planExpiresAt))
+      .limit(1)
+      .get();
+
+      if (subOrder) {
+        subscription = {
+          planSlug: subOrder.planSlug || 'basic-monthly',
+          amount: subOrder.amount,
+          status: subOrder.status,
+          planExpiresAt: subOrder.planExpiresAt,
+        };
+      }
+    }
+  }
+} catch (e) {
+  console.error('Failed to load user data:', e);
+}
+
+const isSubscriptionActive = subscription?.status === 'paid' && subscription?.planExpiresAt && subscription.planExpiresAt > Date.now() / 1000;
+const isSubscriptionExpired = subscription?.status === 'paid' && subscription?.planExpiresAt && subscription.planExpiresAt <= Date.now() / 1000;
 ---
-
 <Layout title="My Account - TimorUp">
   <div class="container py-8">
     <div class="flex items-center justify-between mb-8">
@@ -242,96 +112,35 @@ const entityLabels: Record<string, string> = {
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Main Content -->
-      <div class="lg:col-span-2">
-        <!-- Profile Section -->
-        <Card class="mb-6">
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>Manage your account details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div class="flex items-center gap-4 mb-6">
-              <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-2xl font-bold">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p class="font-semibold">{user.name}</p>
-                <p class="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <!-- My Pages Section -->
+      <div class="lg:col-span-2 space-y-6">
         {userPages.length > 0 && (
           <div>
-            {userPages.map(page => (
-              <div>
-                <Card class="mb-6">
-                  <CardHeader class="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>{entityLabels[page.entityType] || 'Page'}: {page.title}</CardTitle>
-                      <CardDescription>Created on {page.createdAt ? new Date(page.createdAt).toLocaleDateString() : ''}</CardDescription>
+            <h2 class="text-xl font-semibold mb-4">Your Pages</h2>
+            <div class="space-y-4">
+              {userPages.map(page => (
+                <Card>
+                  <CardHeader>
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <CardTitle>{page.title}</CardTitle>
+                        <CardDescription>Created on {page.createdAt ? new Date(page.createdAt * 1000).toLocaleDateString() : ''}</CardDescription>
+                      </div>
+                      <span class={`px-2 py-1 text-xs rounded-full ${page.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
+                        {page.status}
+                      </span>
                     </div>
-                    <div class="flex gap-2">
-                      <a href={page.entityType === 'business' ? `/business/${page.slug}` : page.entityType === 'nonprofit' ? `/non-profit/${page.slug}` : `/public-sector/${page.slug}`}>
+                    <div class="flex gap-2 mt-4">
+                      <a href={`/business/${page.slug}`}>
                         <Button variant="outline" size="sm">View</Button>
                       </a>
-                      <a href={page.entityType === 'business' ? `/business/${page.slug}/edit` : `#`}>
+                      <a href={`/business/${page.slug}/edit`}>
                         <Button size="sm">Edit</Button>
                       </a>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div class="flex items-center gap-4">
-                      <span class={`px-3 py-1 text-sm rounded-full ${isSubscriptionActive ? 'bg-green-100 text-green-800' : isSubscriptionExpired ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {isSubscriptionActive ? 'Active' : isSubscriptionExpired ? 'Expired' : 'Inactive'}
-                      </span>
-                      <span class="text-sm text-muted-foreground">
-                        {subscription ? `${subscription.planType.replace('-', ' ').toUpperCase()} Plan` : 'Free Plan'}
-                      </span>
-                    </div>
-                  </CardContent>
                 </Card>
-
-                {page.id === userPages[0].id && businessReviews.length > 0 && (
-                  <Card class="mb-6">
-                    <CardHeader>
-                      <CardTitle>Customer Reviews</CardTitle>
-                      <CardDescription>View and reply to customer reviews</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div class="space-y-4">
-                        {businessReviews.map(review => (
-                          <div class="border rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                              <div class="flex items-center gap-2">
-                                <span class="font-medium">{review.reviewerName}</span>
-                                <div class="flex">
-                                  {Array.from({ length: 5 }).map((_, i) => (
-                                    <span key={i} class={i < review.rating ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                                  ))}
-                                </div>
-                              </div>
-                              <span class="text-sm text-muted-foreground">
-                                {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ''}
-                              </span>
-                            </div>
-                            <p class="text-gray-700 mb-3">{review.comment || 'No comment'}</p>
-                            <button
-                              class="text-sm text-primary hover:text-primary/80 reply-btn"
-                              data-review-id={review.id}
-                            >
-                              Reply to Review
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
@@ -346,65 +155,9 @@ const entityLabels: Record<string, string> = {
                 Create a Business, Government, or Non-Profit page to get started.
               </p>
               <div class="flex flex-wrap gap-2">
-                <a href="/listings/create?type=business">
+                <a href="/business/create">
                   <Button>Create Business</Button>
                 </a>
-                <a href="/listings/create?type=government">
-                  <Button variant="outline">Add Government</Button>
-                </a>
-                <a href="/listings/create?type=non-profit">
-                  <Button variant="outline">Add Non-Profit</Button>
-                </a>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <!-- Saved SKUs Section -->
-        {savedSkus.length > 0 && (
-          <Card class="mb-6">
-            <CardHeader>
-              <CardTitle>Saved Products/SKUs</CardTitle>
-              <CardDescription>Items you've saved from other businesses</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div class="space-y-3">
-                {savedSkus.map(sku => (
-                  <div class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                    <div>
-                      <p class="font-medium">{sku.title}</p>
-                      <p class="text-sm text-muted-foreground">from {sku.businessTitle}</p>
-                    </div>
-                    <a href={`/business/${sku.slug}`}>
-                      <Button variant="ghost" size="sm">View</Button>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <!-- Saved Pages Section -->
-        {savedPages.length > 0 && (
-          <Card class="mb-6">
-            <CardHeader>
-              <CardTitle>Saved Pages</CardTitle>
-              <CardDescription>Businesses and organizations you've saved</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div class="space-y-3">
-                {savedPages.map(page => (
-                  <div class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                    <div>
-                      <p class="font-medium">{page.title}</p>
-                      <p class="text-sm text-muted-foreground">{entityLabels[page.entityType] || 'Page'}</p>
-                    </div>
-                    <a href={`/business/${page.slug}`}>
-                      <Button variant="ghost" size="sm">View</Button>
-                    </a>
-                  </div>
-                ))}
               </div>
             </CardContent>
           </Card>
@@ -419,39 +172,32 @@ const entityLabels: Record<string, string> = {
             <CardTitle>Subscription</CardTitle>
           </CardHeader>
           <CardContent>
-            {isSubscriptionActive ? (
+            {subscription ? (
               <div class="text-center">
                 <p class="text-2xl font-bold text-green-600">Active</p>
                 <p class="text-sm text-muted-foreground mt-1">
-                  {subscription?.planType.replace('-', ' ').toUpperCase()} Plan
+                  {subscription.planSlug.replace('-', ' ').toUpperCase()} Plan
                 </p>
-                {subscription?.expiryDate && (
+                {subscription.planExpiresAt && (
                   <p class="text-xs text-muted-foreground mt-2">
-                    Expires: {new Date(subscription.expiryDate).toLocaleDateString()}
+                    Expires: {new Date(subscription.planExpiresAt * 1000).toLocaleDateString()}
                   </p>
                 )}
               </div>
             ) : (
               <div class="text-center">
-                {isSubscriptionExpired ? (
+                {userPages.length > 0 ? (
                   <>
-                    <p class="text-2xl font-bold text-red-600">Expired</p>
+                    <p class="text-2xl font-bold text-yellow-600">No Plan</p>
                     <p class="text-sm text-muted-foreground mt-1">
-                      Your subscription has expired
-                    </p>
-                  </>
-                ) : userPages.length > 0 ? (
-                  <>
-                    <p class="text-2xl font-bold text-yellow-600">Inactive</p>
-                    <p class="text-sm text-muted-foreground mt-1">
-                      No active subscription
+                      Subscribe to activate
                     </p>
                   </>
                 ) : (
                   <>
-                    <p class="text-lg font-semibold text-muted-foreground">No Page Yet</p>
+                    <p class="text-lg font-semibold text-muted-foreground">Create a Page First</p>
                     <p class="text-sm text-muted-foreground mt-1">
-                      Create a page to subscribe to a plan
+                      Then subscribe
                     </p>
                   </>
                 )}
@@ -461,11 +207,11 @@ const entityLabels: Record<string, string> = {
           <CardFooter class="flex-col gap-2">
             <a href="/pricing" class="w-full">
               <Button variant="outline" class="w-full">
-                {isSubscriptionExpired ? 'Renew Subscription' : isSubscriptionActive ? 'Change Plan' : 'View Plans'}
+                {isSubscriptionExpired ? 'Renew' : isSubscriptionActive ? 'Change Plan' : 'View Plans'}
               </Button>
             </a>
-            {!isSubscriptionActive && userPages.length > 0 && (
-              <a href={`/subscribe?plan=basic-monthly&page=${userPages[0].id}`} class="w-full">
+            {userPages.length > 0 && !subscription && (
+              <a href={`/subscribe?page=${userPages[0].id}`} class="w-full">
                 <Button class="w-full">Subscribe Now</Button>
               </a>
             )}
@@ -478,84 +224,15 @@ const entityLabels: Record<string, string> = {
             <CardTitle>Quick Links</CardTitle>
           </CardHeader>
           <CardContent class="space-y-2">
-            <a href="/listings" class="block">
+            <a href="/businesses" class="block">
               <Button variant="ghost" class="w-full justify-start">Browse Directory</Button>
-            </a>
-            <a href="/products-services" class="block">
-              <Button variant="ghost" class="w-full justify-start">Products & Services</Button>
             </a>
             <a href="/pricing" class="block">
               <Button variant="ghost" class="w-full justify-start">Pricing</Button>
             </a>
-            <form action="/api/auth/sign-out" method="POST">
-              <Button type="submit" variant="ghost" class="w-full justify-start text-red-500 hover:text-red-600">
-                Log Out
-              </Button>
-            </form>
           </CardContent>
         </Card>
       </div>
     </div>
   </div>
-
-  <!-- Reply Modal -->
-  <div id="reply-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div class="bg-background rounded-lg p-6 max-w-md w-full mx-4">
-      <h3 class="text-lg font-semibold mb-4" id="reply-modal-title">Reply to Review</h3>
-      <textarea id="reply-text" class="w-full border rounded-lg p-3 h-32 resize-none" placeholder="Write your reply..."></textarea>
-      <input type="hidden" id="reply-review-id" value="" />
-      <input type="hidden" id="reply-action" value="create" />
-      <div class="flex gap-2 mt-4 justify-end">
-        <Button variant="outline" id="reply-modal-cancel">Cancel</Button>
-        <Button id="reply-modal-submit">Submit</Button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Reply button handlers
-    document.querySelectorAll('.reply-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const reviewId = btn.getAttribute('data-review-id');
-        document.getElementById('reply-review-id').value = reviewId;
-        document.getElementById('reply-action').value = 'create';
-        document.getElementById('reply-modal-title').textContent = 'Reply to Review';
-        document.getElementById('reply-text').value = '';
-        document.getElementById('reply-modal').classList.remove('hidden');
-        document.getElementById('reply-modal').classList.add('flex');
-      });
-    });
-
-    // Modal handlers
-    document.getElementById('reply-modal-cancel')?.addEventListener('click', () => {
-      document.getElementById('reply-modal').classList.add('hidden');
-      document.getElementById('reply-modal').classList.remove('flex');
-    });
-
-    document.getElementById('reply-modal-submit')?.addEventListener('click', async () => {
-      const reviewId = document.getElementById('reply-review-id').value;
-      const action = document.getElementById('reply-action').value;
-      const comment = document.getElementById('reply-text').value;
-
-      if (!comment.trim()) {
-        alert('Please enter a reply');
-        return;
-      }
-
-      const method = action === 'create' ? 'POST' : 'PUT';
-      const res = await fetch(`/api/reviews/${reviewId}/reply`, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comment }),
-      });
-
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        const data = await res.json();
-        alert(data.error?.message || 'Failed to submit reply');
-      }
-    });
-  </script>
 </Layout>
-

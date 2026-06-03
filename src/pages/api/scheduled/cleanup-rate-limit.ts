@@ -24,15 +24,22 @@ export async function GET({ request }: { request: Request }) {
   // Optional: verify cron secret for additional security
   const authHeader = request.headers.get('Authorization');
   const cronSecret = import.meta.env.CRON_SECRET || '';
-  
-  // Allow if cron trigger OR if secret matches
-  if (!isCron && cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  // If cron secret is configured, enforce auth; allow if cron trigger from Cloudflare
+  if (cronSecret) {
+    // Auth is required - check Bearer token
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  } else if (!isCron) {
+    // No cron secret configured - only allow if called by Cloudflare cron
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });
   }
-
   try {
     // Perform cleanup
     const cleanedCount = cleanupRateLimitStore();

@@ -12,79 +12,90 @@ interface CfEnv {
   [key: string]: unknown;
 }
 
-// Global singleton - initialized once per Worker cold start
-let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
-let _rawDb: D1Database | null = null;
+// Module-level cached instances - per-isolate, cached after first init
+// NOTE: In Cloudflare Workers, each isolate handles one request at a time,
+// so these globals are safe for the isolate lifetime
+let _cachedDb: ReturnType<typeof drizzle<typeof schema>> | null = null;
+let _cachedRawDb: D1Database | null = null;
+let _cacheBindingKey: string | null = null;
 
 /**
- * Get Drizzle DB instance
+ * Get Drizzle DB instance (cached per binding)
  * Uses cloudflare:workers env.DB - works with remote bindings in local dev
+ * Caches the instance so we don't re-create drizzle on every request
  */
 export async function getDb(): Promise<ReturnType<typeof drizzle<typeof schema>> | null> {
-  // Always check env first - don't rely on cached _db
   try {
-    // Try to get env from cloudflare:workers module
-    let cfEnv: { DB?: D1Database } | null = null;
-
-    try {
-      const { env: workersEnv } = await import('cloudflare:workers');
-      cfEnv = workersEnv as { DB?: D1Database };
-    } catch {
-      // cloudflare:workers not available, try globalThis
-      cfEnv = (globalThis as unknown as { env?: { DB?: D1Database } }).env;
-    }
+    // Get env from cloudflare:workers module
+    const { env: workersEnv } = await import('cloudflare:workers');
+    const cfEnv = workersEnv as CfEnv;
 
     if (cfEnv?.DB) {
+      // Create a cache key from the binding reference (stable for isolate lifetime)
+      const bindingKey = String(cfEnv.DB);
+
+      // Return cached instance if binding hasn't changed
+      if (_cachedDb && _cacheBindingKey === bindingKey) {
+        return _cachedDb;
+      }
+
+      // Create new instance and cache it
       const freshDb = drizzle(cfEnv.DB as D1Database, { schema });
-      _db = freshDb; // Update cache
-      _rawDb = cfEnv.DB as D1Database; // Store raw D1 for direct queries
+      _cachedDb = freshDb;
+      _cachedRawDb = cfEnv.DB as D1Database;
+      _cacheBindingKey = bindingKey;
       console.log('[getDb] Fresh DB initialized from cloudflare:workers env.DB');
       return freshDb;
     } else {
-      console.error('[getDb] env.DB not available. CF_ENV keys:', Object.keys(cfEnv || {}));
-      if (_db) return _db; // Return cached if available
+      console.error('[getDb] env.DB not available');
+      // Return cached instance even if binding is missing (better than null)
+      if (_cachedDb) return _cachedDb;
       return null;
     }
   } catch (e) {
     console.error('[getDb] Failed to initialize:', e);
-    return _db; // Return cached if available
+    // Return cached instance on error (better than null)
+    if (_cachedDb) return _cachedDb;
+    return null;
   }
 }
 
 /**
- * Get raw D1Database instance for direct queries
- * Use this when Drizzle ORM has compatibility issues with D1
+ * Get raw D1Database instance for direct queries (cached)
+ * NOTE: Returns null if env.DB is not bound. Requires cloudflare:workers env.DB binding.
+ * In production, ensure the DB binding is configured in wrangler.jsonc.
  */
 export async function getRawDb(): Promise<D1Database | null> {
-  if (_rawDb) return _rawDb;
-
+  if (_cachedRawDb) return _cachedRawDb;
   try {
     const { env: workersEnv } = await import('cloudflare:workers');
-    const cfEnv = workersEnv as { DB?: D1Database };
+    const cfEnv = workersEnv as CfEnv;
     if (cfEnv?.DB) {
-      _rawDb = cfEnv.DB as D1Database;
-      return _rawDb;
+      _cachedRawDb = cfEnv.DB as D1Database;
+      return _cachedRawDb;
     }
   } catch {
     // cloudflare:workers not available
   }
-  return _rawDb;
+  return _cachedRawDb;
 }
 
 /**
- * Initialize DB with a D1Database instance (for middleware)
+ * Initialize DB with a D1Database instance (for middleware/context)
+ * Use this when you have a raw D1Database from a request context
  */
 export function initDb(d1Db: D1Database): ReturnType<typeof drizzle<typeof schema>> {
-  _db = drizzle(d1Db, { schema });
-  _rawDb = d1Db;
-  return _db;
+  _cachedDb = drizzle(d1Db, { schema });
+  _cachedRawDb = d1Db;
+  _cacheBindingKey = String(d1Db);
+  return _cachedDb;
 }
 
 /**
  * Check if db is ready
  */
 export function isDbReady(): boolean {
-  return _db !== null;
+  return _cachedDb !== null;
 }
 
 // Legacy sync export - DO NOT USE

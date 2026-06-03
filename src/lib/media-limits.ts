@@ -86,21 +86,13 @@ export const ENTITY_LIMITS: Record<string, MediaLimits> = {
  * Get limits for an entity type
  *
  * @param entityType - The entity type (e.g., 'businesses', 'blogs', 'hero')
- * @param planType - Optional plan type for businesses
  * @returns Media limits configuration
  *
  * @example
  * const limits = getMediaLimits('blogs');
  * console.log(`Max ${limits.maxImages} images`);
  */
-export function getMediaLimits(entityType: string, planType?: string): MediaLimits {
-  // Special handling for businesses with plans
-  if (entityType === 'businesses' && planType) {
-    // Plan-based limits are handled in upload.ts
-    // Return base limits here
-    return ENTITY_LIMITS.businesses ?? DEFAULT_LIMITS;
-  }
-
+export function getMediaLimits(entityType: string): MediaLimits {
   // Return entity-specific or default
   return ENTITY_LIMITS[entityType] ?? DEFAULT_LIMITS;
 }

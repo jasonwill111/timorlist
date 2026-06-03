@@ -103,7 +103,7 @@ interface ReviewData {
 interface SubscriptionData {
   id: number;
   userId: number;
-  planType: string;
+  servicePackageId: string;
   status: string;
   amount: number;
   createdAt: string;
@@ -186,7 +186,7 @@ declare global {
 interface OrderData {
   id: number;
   userId: number;
-  planType: string;
+  servicePackageId: string;
   amount: number;
   createdAt: string;
   status: string;

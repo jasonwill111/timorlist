@@ -68,20 +68,7 @@ export const lightSignIn = defineAction({
         return createErrorResponse(ErrorCode.AUTH_INVALID_CREDENTIALS, 'Invalid email or password');
       }
 
-      // Generate session token
-      const sessionToken = generateSessionToken();
-      const expiresAt = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
-
-      // Store session in KV
-      const kv = env.SESSION as KVNamespace;
-      if (kv) {
-        await kv.put(
-          `session:${sessionToken}`,
-          JSON.stringify({ userId: userResult.id, email: userResult.email }),
-          { expirationTtl: SESSION_TTL_SECONDS }
-        );
-      }
-
+// Session stored in D1 only - KV writes removed as they were never read and created inconsistency risk
       // Store session in database (required by better-auth pattern)
       await db
         .prepare(`
@@ -90,7 +77,6 @@ export const lightSignIn = defineAction({
         `)
         .bind(sessionToken, userResult.id, sessionToken, expiresAt, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000))
         .run();
-
       return {
         success: true,
         user: {

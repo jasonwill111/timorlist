@@ -16,7 +16,7 @@ const listSchema = z.object({
 const updateStatusSchema = z.object({
   id: z.string(),
   status: z.enum(['pending', 'paid', 'cancelled', 'refunded']),
-  expiresAt: z.number().optional(),
+  planExpiresAt: z.number().optional(),
 });
 
 const updateSchema = z.object({
@@ -27,7 +27,7 @@ const updateSchema = z.object({
   typeId: z.string().optional(),
   amount: z.number().optional(),
   status: z.enum(['pending', 'paid', 'cancelled', 'refunded']).optional(),
-  expiresAt: z.number().optional(),
+  planExpiresAt: z.number().optional(),
   adminNotes: z.string().optional(),
 });
 
@@ -55,7 +55,7 @@ export const subscriptions = {
         amount: orders.amount,
         paymentMethod: orders.paymentMethod,
         status: orders.status,
-        expiresAt: orders.expiresAt,
+        planExpiresAt: orders.planExpiresAt,
         paidDate: orders.paidDate,
         createdAt: orders.createdAt,
         adminNotes: orders.adminNotes,
@@ -96,8 +96,8 @@ export const subscriptions = {
 
       if (!order) return createErrorResponse(ErrorCode.BUSINESS_NOT_FOUND, 'Order not found');
 
-      // Calculate expiresAt if setting to paid
-      let newExpiresAt = order.expiresAt;
+      // Calculate planExpiresAt if setting to paid
+      let newExpiresAt = order.planExpiresAt;
       let paidDate = order.paidDate;
 
       if (input.status === 'paid' && !order.paidDate) {
@@ -106,8 +106,8 @@ export const subscriptions = {
         const durationValue = variantSnapshot?.durationValue || 30;
         const durationUnit = variantSnapshot?.durationUnit || 'days';
 
-        if (input.expiresAt) {
-          newExpiresAt = input.expiresAt;
+        if (input.planExpiresAt) {
+          newExpiresAt = input.planExpiresAt;
         } else {
           const expiresDate = new Date();
           if (durationUnit === 'months') {
@@ -126,33 +126,16 @@ export const subscriptions = {
         .set({
           status: input.status,
           paidDate,
-          expiresAt: newExpiresAt,
+          planExpiresAt: newExpiresAt,
           updatedAt: Math.floor(Date.now() / 1000),
         })
         .where(eq(orders.id, input.id))
         .run();
 
-      // If payment confirmed, update business
-      if (input.status === 'paid' && order.typeId) {
-        const variantSnapshot = order.variantSnapshot ? JSON.parse(order.variantSnapshot) : null;
-        const limits = variantSnapshot?.limits || {};
-        const planSlug = order.servicePackageId || 'unknown';
+      // Plan info stored in orders table, not on businesses entity
+      // Grace period calculated dynamically: planExpiresAt + 30 days (business) or + 14 days (listing)
 
-        await db.update(businesses)
-          .set({
-            planSlug,
-            limits: JSON.stringify(limits),
-            subscriptionExpiresAt: newExpiresAt ?? null,
-            status: 'live',
-            subscriptionStatus: 'active',
-            gracePeriodEndDate: null,
-            updatedAt: Math.floor(Date.now() / 1000),
-          })
-          .where(eq(businesses.id, order.typeId))
-          .run();
-      }
-
-      return { success: true, data: { id: input.id, status: input.status, expiresAt: newExpiresAt, paidDate } };
+      return { success: true, data: { id: input.id, status: input.status, planExpiresAt: newExpiresAt, paidDate } };
     },
   }),
 
@@ -175,14 +158,14 @@ export const subscriptions = {
 
       if (!order) return createErrorResponse(ErrorCode.BUSINESS_NOT_FOUND, 'Order not found');
 
-      // Calculate expiresAt if setting to paid
-      let newExpiresAt = input.expiresAt ? input.expiresAt : order.expiresAt;
+      // Calculate planExpiresAt if setting to paid
+      let newExpiresAt = input.planExpiresAt ? input.planExpiresAt : order.planExpiresAt;
       let paidDate = order.paidDate;
 
       if (input.status === 'paid' && order.status !== 'paid' && !order.paidDate) {
         paidDate = Math.floor(Date.now() / 1000);
 
-        if (!input.expiresAt) {
+        if (!input.planExpiresAt) {
           const variantSnapshot = (input.variantSnapshot || order.variantSnapshot) ? JSON.parse(input.variantSnapshot || order.variantSnapshot) : null;
           const durationValue = variantSnapshot?.durationValue || 30;
           const durationUnit = variantSnapshot?.durationUnit || 'days';
@@ -209,30 +192,12 @@ export const subscriptions = {
           amount: input.amount ?? order.amount,
           status: input.status || order.status,
           paidDate,
-          expiresAt: newExpiresAt,
+          planExpiresAt: newExpiresAt,
           adminNotes: input.adminNotes !== undefined ? input.adminNotes : order.adminNotes,
           updatedAt: Math.floor(Date.now() / 1000),
         })
         .where(eq(orders.id, input.id))
         .run();
-
-      // If payment confirmed, update business
-      if (input.status === 'paid' && order.typeId) {
-        const variantSnapshot = (input.variantSnapshot || order.variantSnapshot) ? JSON.parse(input.variantSnapshot || order.variantSnapshot) : null;
-        const limits = variantSnapshot?.limits || {};
-        const planSlug = input.servicePackageId || order.servicePackageId || 'unknown';
-
-        await db.update(businesses)
-          .set({
-            planSlug,
-            limits: JSON.stringify(limits),
-            subscriptionExpiresAt: newExpiresAt ?? null,
-            status: order.status === 'draft' ? 'live' : order.status,
-            updatedAt: Math.floor(Date.now() / 1000),
-          })
-          .where(eq(businesses.id, order.typeId))
-          .run();
-      }
 
       return {
         success: true,
@@ -241,7 +206,7 @@ export const subscriptions = {
           servicePackageId: input.servicePackageId || order.servicePackageId,
           amount: input.amount ?? order.amount,
           status: input.status || order.status,
-          expiresAt: newExpiresAt,
+          planExpiresAt: newExpiresAt,
           paidDate,
         },
       };

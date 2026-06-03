@@ -16,18 +16,8 @@ const allCategories = await db
   .from(listingCategories)
   .orderBy(listingCategories.name)
   .all();
-
 const parentCategories = allCategories.filter(c => !c.parentId);
 const getChildren = (parentId: string) => allCategories.filter(c => c.parentId === parentId);
-
-const listingTypes = [
-  { value: 'product', label: 'Product', icon: '📦' },
-  { value: 'vehicle', label: 'Vehicle', icon: '🚗' },
-  { value: 'property', label: 'Property', icon: '🏠' },
-  { value: 'job', label: 'Job', icon: '💼' },
-  { value: 'service', label: 'Service', icon: '🔧' },
-  { value: 'wanted', label: 'Wanted', icon: '🔍' },
-];
 
 const conditions = [
   { value: 'new', label: 'New' },
@@ -48,22 +38,7 @@ const conditions = [
     </div>
 
     <form id="listing-form" class="space-y-6">
-      <!-- Listing Type -->
-      <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold mb-4">Listing Type</h2>
-        <div class="grid grid-cols-3 md:grid-cols-6 gap-2">
-          {listingTypes.map(type => (
-            <label class="type-option cursor-pointer text-center">
-              <input type="radio" name="listingType" value={type.value} class="sr-only peer" required />
-              <div class="p-3 rounded-lg border-2 border-muted peer-checked:border-primary peer-checked:bg-primary/5 transition-all hover:border-muted-foreground/30">
-                <div class="text-2xl mb-1">{type.icon}</div>
-                <div class="text-xs">{type.label}</div>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-
+      <!-- Basic Info -->
       <!-- Basic Info -->
       <div class="bg-card rounded-lg border p-6">
         <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
@@ -209,7 +184,6 @@ const conditions = [
     try {
       const result = await actions.admin.listings.create({
         title: data.get('title') as string,
-        listingType: data.get('listingType') as 'job' | 'product' | 'service' | 'vehicle' | 'property' | 'wanted',
         categoryId: data.get('categoryId') as string || undefined,
         description: data.get('description') as string,
         price: data.get('price') as string || undefined,
@@ -220,7 +194,6 @@ const conditions = [
         email: data.get('email') as string || undefined,
         status: status as 'draft' | 'published',
       });
-
       if (result.success) {
         window.location.href = '/admin/listings';
       } else {

@@ -5,7 +5,7 @@ import { getDb } from '@/lib/db';
 import { initAuth } from '@/lib/auth';
 import { businesses, businessCategories, products, reviews } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
-import { checkRateLimitKV, getRateLimitHeaders } from '@/lib/rate-limit';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -66,7 +66,7 @@ if (!db) throw new Error("Database not available");
 
   // Rate limiting
   const clientIP = getClientIP(request);
-  const rateLimit = await checkRateLimitKV(`biz:${clientIP}`);
+  const rateLimit = await checkRateLimit(`biz:${clientIP}`);
 
   if (!rateLimit.allowed) {
     return new Response(JSON.stringify({

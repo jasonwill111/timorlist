@@ -1,0 +1,250 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import { getRawDb } from '@/lib/db';
+import { Eye, Heart, Bookmark } from '@lucide/astro';
+import ShareDialog from '@/components/ui/ShareDialog.astro';
+import TipTapRenderer from '../../components/ui/TipTapRenderer.astro';
+import { createBreadcrumbSchema } from '@/lib/seo';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
+
+interface Listing {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  price: string | null;
+  condition: string | null;
+  location: string | null;
+  address: string | null;
+  contactName: string | null;
+  contactNumber: string | null;
+  countryCode: string | null;
+  email: string | null;
+  imageIds: string | null;
+  tags: string | null;
+  likes: number | null;
+  saves: number | null;
+  views: number | null;
+  status: string | null;
+  listingType: string | null;
+  categoryId: string | null;
+  createdAt: number | null;
+  updatedAt: number | null;
+}
+
+let listing: Listing | null = null;
+let category: { name: string } | null = null;
+let images: { id: string; r2_key: string; alt: string | null }[] = [];
+
+try {
+  const db = await getRawDb();
+  if (db) {
+    listing = await db.prepare(`
+      SELECT id, title, slug, description, price, condition, location, address,
+             contact_name as contactName, contact_number as contactNumber, country_code as countryCode, email,
+             image_ids as imageIds, tags,
+             likes, saves, views, status, listing_type as listingType, category_id as categoryId,
+             created_at as createdAt, updated_at as updatedAt
+      FROM listings WHERE slug = ? LIMIT 1
+    `).bind(slug).first() as Listing | null;
+
+    if (listing) {
+      if (listing.categoryId) {
+        category = await db.prepare('SELECT name FROM listing_categories WHERE id = ? LIMIT 1')
+          .bind(listing.categoryId).first() as { name: string } | null;
+      }
+      if (listing.imageIds) {
+        try {
+          const ids = typeof listing.imageIds === 'string' ? JSON.parse(listing.imageIds) : listing.imageIds;
+          if (Array.isArray(ids) && ids.length > 0) {
+            const placeholders = ids.map(() => '?').join(',');
+            const imgsResult = await db.prepare(`SELECT id, r2_key, alt FROM media WHERE id IN (${placeholders})`)
+              .bind(...ids).all();
+            images = (imgsResult.results as any) || [];
+          }
+        } catch {}
+      }
+    }
+  }
+} catch (e) {
+  console.error('Listing query failed:', e);
+}
+
+if (!listing) return Astro.redirect('/listings');
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=600');
+
+const listingTypeMap: Record<string, string> = {
+  'job': 'JobPosting',
+  'product': 'Product',
+  'service': 'Service',
+  'property': 'RealEstateAgent',
+  'vehicle': 'Product',
+  'wanted': 'Demand',
+};
+
+const siteUrl = import.meta.env.SITE || 'https://timorup.com';
+const canonicalUrl = `${siteUrl}/listings/${slug}`;
+
+const parsedImages = listing.imageIds ? (typeof listing.imageIds === 'string' ? JSON.parse(listing.imageIds) : listing.imageIds) : [];
+const imageUrls = images.length > 0 ? images.map(i => `${siteUrl}/api/media/${i.id}`) : parsedImages;
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": listingTypeMap[listing.listingType?.toLowerCase() || ''] || 'Product',
+  "name": listing.title,
+  "description": listing.description,
+  "url": canonicalUrl,
+  "image": imageUrls[0] ? [imageUrls[0]] : undefined,
+  "offers": listing.price ? {
+    "@type": "Offer",
+    "price": String(listing.price).replace(/[^0-9.]/g, ''),
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  } : undefined,
+  "category": listing.listingType,
+};
+
+const tags = listing.tags ? (typeof listing.tags === 'string' ? JSON.parse(listing.tags) : listing.tags) : [];
+const waNumber = (listing.contactNumber || '').replace(/\D/g, '');
+const waLink = listing.contactNumber
+  ? `https://wa.me/${(listing.countryCode || '+670').replace('+', '')}${waNumber}?text=${encodeURIComponent('Hi, I saw your listing: ' + listing.title)}`
+  : '';
+const createdAt = listing.createdAt ? new Date(listing.createdAt * 1000) : null;
+---
+
+<Layout title={`${listing.title} - TimorUp`} description={listing.description?.substring(0, 160) || ''} canonical={canonicalUrl}>
+  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <nav class="mb-4 text-sm" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-muted-foreground">
+        <li><a href="/" class="hover:text-primary">Home</a></li>
+        <li class="text-muted-foreground/50">/</li>
+        <li><a href="/listings" class="hover:text-primary">Classified Ads</a></li>
+        <li class="text-muted-foreground/50">/</li>
+        <li class="text-foreground font-medium truncate">{listing.title}</li>
+      </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="rounded-2xl overflow-hidden bg-card border">
+          {imageUrls.length > 0 ? (
+            <img src={imageUrls[0]} alt={listing.title} class="w-full h-[400px] object-cover" />
+          ) : (
+            <div class="w-full h-[400px] bg-muted flex items-center justify-center">
+              <span class="text-muted-foreground text-lg">No image available</span>
+            </div>
+          )}
+        </div>
+
+        <div class="bg-card rounded-2xl border p-6 space-y-6">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2">{listing.title}</h1>
+            <div class="flex gap-2 flex-wrap">
+              {listing.listingType && (
+                <span class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm capitalize">{listing.listingType}</span>
+              )}
+              {category && (
+                <span class="inline-block px-3 py-1 bg-muted text-foreground rounded-full text-sm">{category.name}</span>
+              )}
+            </div>
+          </div>
+
+          {listing.price && (
+            <div class="text-3xl font-bold text-primary">${listing.price}</div>
+          )}
+
+          {listing.description && (
+            <div>
+              <h2 class="text-lg font-semibold mb-2">Description</h2>
+              <TipTapRenderer content={listing.description} class="text-sm" />
+            </div>
+          )}
+
+          {(listing.condition || listing.location || listing.address) && (
+            <div>
+              <h2 class="text-lg font-semibold mb-3">Details</h2>
+              <dl class="grid grid-cols-2 gap-4">
+                {listing.condition && (
+                  <>
+                    <dt class="text-muted-foreground">Condition</dt>
+                    <dd class="text-foreground capitalize">{listing.condition}</dd>
+                  </>
+                )}
+                {listing.location && (
+                  <>
+                    <dt class="text-muted-foreground">Location</dt>
+                    <dd class="text-foreground">{listing.location}</dd>
+                  </>
+                )}
+                {listing.address && (
+                  <>
+                    <dt class="text-muted-foreground">Address</dt>
+                    <dd class="text-foreground">{listing.address}</dd>
+                  </>
+                )}
+              </dl>
+            </div>
+          )}
+
+          {tags.length > 0 && (
+            <div>
+              <h2 class="text-lg font-semibold mb-2">Tags</h2>
+              <div class="flex flex-wrap gap-2">
+                {tags.map((tag: string) => (
+                  <span class="px-2 py-1 bg-muted text-sm rounded-md">{tag}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {createdAt && (
+            <div class="text-sm text-muted-foreground">
+              Posted: {createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-card rounded-2xl border p-6 sticky top-24">
+          <h3 class="text-lg font-semibold mb-4">Contact Seller</h3>
+          {listing.contactName && (
+            <div class="mb-4 pb-4 border-b">
+              <p class="text-sm text-muted-foreground mb-1">Contact</p>
+              <p class="font-medium">{listing.contactName}</p>
+            </div>
+          )}
+          {waLink ? (
+            <a href={waLink} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-xl transition-colors mb-4">
+              Contact on WhatsApp
+            </a>
+          ) : (
+            <div class="text-center text-muted-foreground py-4 mb-4">No contact number available</div>
+          )}
+          {listing.contactNumber && (
+            <div class="flex items-center gap-2 text-sm mb-2">
+              <span class="text-muted-foreground">Phone:</span>
+              <span>{listing.countryCode} {listing.contactNumber}</span>
+            </div>
+          )}
+          {listing.email && (
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-muted-foreground">Email:</span>
+              <a href={`mailto:${listing.email}`} class="text-primary hover:underline">{listing.email}</a>
+            </div>
+          )}
+          <div class="flex items-center gap-4 text-sm text-muted-foreground pt-4 mt-4 border-t">
+            <span class="flex items-center gap-1"><Eye class="w-4 h-4" />{listing.views || 0}</span>
+            <span class="flex items-center gap-1"><Heart class="w-4 h-4" />{listing.likes || 0}</span>
+            <span class="flex items-center gap-1"><Bookmark class="w-4 h-4" />{listing.saves || 0}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

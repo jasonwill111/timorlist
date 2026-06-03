@@ -38,8 +38,8 @@ export function createAuthInstance(env: Record<string, unknown>, _cf?: Record<st
         storeSessionInDatabase: true,
         cookieConfig: {
           name: 'better-auth.session_token',
-          secure: import.meta.env.PROD, // true in production, false in development
-          sameSite: 'strict', // Prevent CSRF
+          secure: import.meta.env.PROD,
+          sameSite: 'strict',
           httpOnly: true,
           path: '/',
         },
@@ -49,6 +49,20 @@ export function createAuthInstance(env: Record<string, unknown>, _cf?: Record<st
       password: {
         minLength: 8,
         maxLength: 100,
+      },
+      // Enable KV-backed rate limiting (better-auth 1.6+)
+      rateLimit: {
+        enabled: true,
+        storage: 'kv',
+        window: 60,
+        max: 100,
+        customRules: {
+          'sign-in/email': { window: 60, max: 5 },
+          'sign-up/email': { window: 60, max: 3 },
+        },
+      },
+      csrf: {
+        checkOriginOnGet: false,
       },
     }
   );

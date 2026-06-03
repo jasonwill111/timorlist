@@ -24,7 +24,7 @@ export type UpdateConfig<T> = {
  * const updateData = buildUpdateData(data, {
  *   tags: 'json',
  *   email: 'emptyToNull',
- *   expiryDate: 'date',
+ *   planExpiresAt: 'date',
  * });
  */
 export function buildUpdateData<T extends Record<string, unknown>>(
@@ -66,9 +66,8 @@ export const FIELD_CONFIGS = {
 
   /** Fields that should convert empty string to null */
   emptyToNull: ['email', 'registrationUrl'] as const,
-
   /** Fields that should be converted to Date */
-  date: ['expiryDate'] as const,
+  date: [] as const,
 } as const;
 
 /**

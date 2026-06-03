@@ -1,77 +1,113 @@
+<!-- specweave:living-doc {"name": "CHANGELOG.md", "version": "1.7.0", "updated": "2026-06-03", "type": "changelog", "domain": "project", "maintainedBy": "team", "lastChange": "architecture-optimization"} -->
 # Changelog
-
 All notable changes to this project will be documented in this file.
-
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-06-03
+
+### Changed
+- **architecture-optimization** (2026-06-03): Architecture improvements:
+  - Unified rate-limit interface: `checkRateLimit()` now KV-first with memory fallback
+  - Updated islands to use `client:visible` for lazy loading (performance)
+  - Created action-helpers.ts with `withAuth`, `withDb`, `withAuthAndDb` utilities
+  - Error codes already well-organized by domain (AUTH_*, DB_*, MEDIA_*, etc.)
+
+### Performance
+- Lazy-loaded ShareDialog components (client:visible instead of client:load)
+- Reduced initial bundle size for product pages
+
+## [1.0.4] - 2026-06-03
 ### Fixed
-- **0100-workers-testing-fix** (2026-05-31): Workers 100% functional testing fixes:
-  - `/listings` page: Converted Server Island to Direct SSR (cards now render)
-  - Auth forms: Added REST API `/api/auth` fallback for Cloudflare Workers
-  - Admin auth: Fixed `getAdminUser` to parse Request cookies (17 admin pages now work)
-- **0099-unified-card-rendering** (2026-05-31): Unified card rendering + container width:
-  - BusinessCard, ListingCard components enhanced with new props
-  - All 4 list pages (businesses, non-profits, public-sectors, listings) use card components
-  - Header/Footer standardized to `max-w-7xl` container width
-- **0098-critical-bug-fixes** (2026-05-31): Workers production bug fixes:
-  - `business/[slug].astro`: Fixed `planStatus` → `subscriptionStatus` (correct schema field)
-  - `business/[slug].astro`: Fixed media query `type`/`typeId` → `entityType`/`entityId`
-  - `HomepageContent.astro`: Added `safeJsonParse()` wrapper for safe JSON parsing
-  - `errorCodes.ts`: Added `USER_NOT_FOUND` error code
-- **0095-code-review-security-fixes**: Critical security improvements:
-  - XSS vulnerability fixed in ai-tools.astro (DOMPurify sanitization)
-  - CSRF protection added to middleware.ts (origin validation)
-  - Window interface declared in global.d.ts
-- **0094-test-coverage**: Enhanced test coverage infrastructure
-- **0093-security-best-practices**: Security best practices documented
-- **0092-frontend-ux-improvements**: Focus trap, reduced motion support
-- **0091-code-arch-refactor**: Unified error handling, removed dead code
-- **0090-db-optimization**: N+1 query fix, database performance
-- **0089-typescript-safety**: Type guards, any removal
-- **0088-xss-sanitization-a11y**: DOMPurify XSS prevention, aria-hidden
-- **0087-auth-security-hardening**: Rate limiting, cookie config
+- **security-fix** (2026-06-03): Security audit and bug fixes:
+  - Fixed src/actions/media/upload.ts: `user` variable was undefined (should be `session?.user`)
+  - Media upload action now correctly validates authentication before processing
 
-### Changed
-- **0058-code-quality-cleanup-p0**: P0 code quality fixes:
-  - Type-safe env wrapper (`src/lib/env.ts`) - replaces `as any` pattern
-  - Empty catch blocks fixed (10 locations) with proper error logging
-  - Production console.log removed (17 locations)
-  - Redundant REST APIs deleted (9 files)
-- **0081-api-migration-completion** (2026-05-31): Complete REST API cleanup:
-  - Added `src/actions/account/` module (4 actions for user private data)
-  - Deleted 5 orphaned REST APIs (account/*, subscriptions)
-  - Updated pages to use Server Actions instead of fetch
-  - Final: 21 REST APIs (keep) / 48 Server Actions
+### Security
+- Rate limiting: Sign in (5/min), Sign up (3/min), Forgot password (3/min)
+- API rate limiting: 100 requests/min per IP via KV
+- CSRF protection via origin header validation
+- CSP, X-Frame-Options, HSTS headers enabled
+- All write operations (media upload/delete/update) require authentication
 
-### Changed
-- `src/mastra/agents/index.ts` - uses env wrapper, removes `as any`
-- `src/actions/admin/aiGenerate.ts` - uses env wrapper, removes debug logs
-- `src/lib/auth-kv-store.ts` - proper error logging in catch blocks
-- `src/lib/subscription.ts` - proper error logging in catch blocks
-- `src/actions/index.ts` - added account module export
+## [1.0.3] - 2026-06-03
 
-## [1.0.0] - 2026-05-07
+### Fixed
+- **seo-geo-optimization** (2026-06-03): SEO and Geo best practices implementation:
+  - Added geo.region=TL, geo.placename=Timor-Leste, geo.position to Layout
+  - Added ICBM tag for geographic coordinates (-8.5569, 125.5603)
+  - Added hreflang tags (en, pt, tl, x-default) for i18n
+  - Added Organization and WebSite JSON-LD schema to Layout
+  - Added BreadcrumbList schema to all detail pages
+  - Added Product schema to product/listing pages
+  - Fixed sitemap.xml: changed expiresAt → planExpiresAt for listings
+  - Fixed actions/account/index.ts: orders.expiresAt → orders.planExpiresAt
+  - Admin pages protected with noindex meta + robots.txt
+  - Render strategy optimization: static prerender, CDN caching, SSR for dynamic pages
+
+## [1.0.2] - 2026-06-03
+
+### Fixed
+- **project-cleanup** (2026-06-03): Complete project cleanup based on latest schema:
+  - Fixed deprecated field references: removed `planType` from global.d.ts, seed.ts, validation.ts
+  - Removed all `businesses.planType`, `businesses.subscriptionStatus`, `businesses.expiryDate` references
+  - Removed all `listings.listingType`, `listings.expiresAt` references
+  - Removed all `orders.variantId` references
+  - Verified `gracePeriodEndDate` is calculated at runtime (not stored)
+  - Verified `subscriptionStatus` derived from orders table (not stored)
+  - Legacy brand names (timorlist, timorbiz) not found in codebase
+  - Old route patterns (/organization/, /ngo/, /gov/) not found
+
+## [1.0.1] - 2026-06-02
 
 ### Added
-- Tech stack modernization (0032-0036):
-  - Zod 4 validation with z.email(), z.url(), z.coerce.*
-  - Drizzle relations (one/many) configured
-  - Mastra AI with unified provider config + Workers AI fallback
-  - Server Actions with defineAction + Zod validation
-  - Type refactor: 84 any usages �?proper types
-- TypeScript strict mode: strict, noUncheckedIndexedAccess, noImplicitReturns
-- Motion animations integrated in Layout.astro
-- XSS prevention with escapeHtml() (10 usages)
+- Migration 0072 executed: Remote D1 schema aligned with local schema
+- businesses/non_profits/public_sectors: Added views, deletedAt; removed 10+ deprecated fields
+- listings: Added shares; removed listingType; renamed expiresAt → planExpiresAt
+- products: Added deletedAt for soft-delete
+- orders: Renamed expiresAt → planExpiresAt; removed variantId; added servicePackageId NOT NULL
+- ad_banners: Removed endDate; added planExpiresAt
+- blog_posts: Added featured DEFAULT 0
+- saved_items: Renamed itemType → type, itemId → typeId
 
 ### Fixed
-- dev script --local flag for proper D1 dev
-- wrangler.toml compatibility_date 2025-04-01
+- **0104-schema-sync** (2026-06-02): Query layer migration to orders-based model
+- Frontend pages: Updated business/[slug].astro, business/[slug]/edit, business/[slug]/products
 
 ### Changed
-- All 30 increments completed and archived
-- Feature catalog with 36 features (6 active, 30 archived)
+- Service packages: now managed in admin service-packages page
+- Subscription status: dynamically calculated from orders table
+- Grace period: dynamically calculated (30 days for businesses, 14 days for listings)
 
-[1.0.0]: https://github.com/jasonwill111/timorup/compare/v0.0.0...v1.0.0
+## [1.0.0] - 2026-05-XX
 
+### Added
+- Initial project setup with Astro + Cloudflare Workers
+- D1 database with 36 tables for businesses, non-profits, public sectors, listings, products
+- Better Auth for authentication with Google/Facebook OAuth
+- R2 object storage for media files
+- Cloudflare KV for sessions
+- Admin dashboard with CRUD operations
+- AI-powered content generation (MiniMax API)
+- SEO optimization with sitemap, robots.txt, JSON-LD schemas
+- Responsive UI with Tailwind CSS
+- Local SEO with geo tags for Timor-Leste
+
+### Features
+- Business directory with categories and search
+- Classified listings with media uploads
+- Product/Service management
+- Blog with categories
+- Subscription plans (Starter, Pro, Max)
+- Media limits based on subscription tier
+- Soft delete with deletedAt timestamps
+- Featured content and ad banners
+
+### Infrastructure
+- Cloudflare Workers for SSR
+- D1 for database
+- R2 for media storage
+- KV for sessions
+- CDN caching with intelligent TTLs
+- Scheduled cleanup jobs for expired subscriptions

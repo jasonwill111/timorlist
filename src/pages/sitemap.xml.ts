@@ -121,7 +121,7 @@ if (!db) throw new Error("Database not available");
     // Query listings (active and not expired)
     const listings = await db.all<DbRow>(`
       SELECT slug, updatedAt FROM listings
-      WHERE status = 'active' AND (expiresAt IS NULL OR expiresAt > datetime('now'))
+      WHERE status = 'active' AND (planExpiresAt IS NULL OR planExpiresAt > unixepoch())
       LIMIT 50000
     `);
     for (const listing of listings) {

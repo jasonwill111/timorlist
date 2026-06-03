@@ -76,8 +76,7 @@ export const getMyBusinesses = defineAction({
         createdAt: businesses.createdAt,
         ratingAverage: businesses.ratingAverage,
         views: businesses.views,
-        planSlug: businesses.planSlug,
-        limits: businesses.limits,
+        planExpiresAt: businesses.planExpiresAt,
         categoryName: businessCategories.name,
       })
       .from(businesses)
@@ -126,7 +125,7 @@ export const getMySubscriptions = defineAction({
         amount: orders.amount,
         status: orders.status,
         paymentMethod: orders.paymentMethod,
-        expiresAt: orders.expiresAt,
+        planExpiresAt: orders.planExpiresAt,
         paidDate: orders.paidDate,
         createdAt: orders.createdAt,
       })
@@ -170,7 +169,7 @@ export const getMySubscriptions = defineAction({
 
       // Calculate subscription summary
       const activeSubscription = userOrders.find(o =>
-        o.status === 'paid' && o.expiresAt && new Date(o.expiresAt * 1000) > new Date()
+        o.status === 'paid' && o.planExpiresAt && new Date(o.planExpiresAt * 1000) > new Date()
       );
 
       return {
@@ -213,9 +212,7 @@ export const getBusinessSubscription = defineAction({
       const business = await db.select({
         id: businesses.id,
         ownerId: businesses.ownerId,
-        planSlug: businesses.planSlug,
-        subscriptionStatus: businesses.subscriptionStatus,
-        subscriptionExpiresAt: businesses.subscriptionExpiresAt,
+        planExpiresAt: businesses.planExpiresAt,
       })
       .from(businesses)
       .where(eq(businesses.id, input.businessId))
@@ -231,21 +228,39 @@ export const getBusinessSubscription = defineAction({
         return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Access denied');
       }
 
-      // Parse limits from plan
-      let limits = {};
-      if (business.planSlug) {
-        // Get service package to parse limits
-        // For now, return basic status
+      // Get active subscription from orders table
+      const activeOrder = await db.select({
+        servicePackageId: orders.servicePackageId,
+        planExpiresAt: orders.planExpiresAt,
+        paidDate: orders.paidDate,
+        variantSnapshot: orders.variantSnapshot,
+      })
+      .from(orders)
+      .where(eq(orders.typeId, input.businessId))
+      .where(eq(orders.type, 'business'))
+      .where(eq(orders.status, 'paid'))
+      .orderBy(desc(orders.planExpiresAt))
+      .limit(1)
+      .get();
+
+      const now = Math.floor(Date.now() / 1000);
+      let status: 'trial' | 'active' | 'expired' | 'none' = 'none';
+      if (activeOrder) {
+        const gracePeriod = 30 * 24 * 60 * 60; // 30 days
+        if (activeOrder.planExpiresAt && activeOrder.planExpiresAt + gracePeriod > now) {
+          status = 'active';
+        } else {
+          status = 'expired';
+        }
       }
 
       return {
         success: true,
         data: {
           businessId: business.id,
-          status: business.subscriptionStatus || 'trial',
-          expiresAt: business.subscriptionExpiresAt,
-          planSlug: business.planSlug,
-          limits,
+          status,
+          planExpiresAt: activeOrder?.planExpiresAt ?? null,
+          servicePackageId: activeOrder?.servicePackageId ?? null,
         },
       };
     } catch (error) {

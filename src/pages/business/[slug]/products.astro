@@ -142,7 +142,7 @@ import CardContent from '../../../components/ui/CardContent.astro'
 
   let currentUser: ProductData = null;
   let currentBusiness: ProductData = null;
-  let subscriptionStatus: ProductData = null;
+  let subscriptionStatus = null;
 
   function escapeHtml(str: string | null | undefined): string {
     if (str == null) return '';
@@ -192,9 +192,10 @@ import CardContent from '../../../components/ui/CardContent.astro'
   // Load subscription status
   async function loadSubscription(businessId: string) {
     try {
-      const result = await actions.account.getBusinessSubscription({ businessId });
-      if (result.success) {
-        return result.data;
+      const res = await fetch(`/api/subscriptions/dashboard?businessId=${businessId}`);
+      const data = await res.json();
+      if (data.success && data.data) {
+        return data.data;
       }
     } catch (err) {
       console.error('Error loading subscription:', err);
@@ -273,12 +274,11 @@ import CardContent from '../../../components/ui/CardContent.astro'
     displayProducts(products);
 
     // Show usage indicator
-    const limits = subscriptionStatus?.limits;
-    if (limits && limits.skuLimit) {
+    if (subscriptionStatus?.skuLimit) {
       const usageEl = document.getElementById('usage-indicator');
       if (usageEl) {
         const used = products.length;
-        const total = limits.skuLimit;
+        const total = subscriptionStatus.skuLimit;
         const percent = Math.round((used / total) * 100);
         usageEl.innerHTML = `
           <div class="flex items-center gap-2 text-sm text-muted-foreground">

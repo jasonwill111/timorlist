@@ -9,8 +9,9 @@ import CardHeader from '../components/ui/CardHeader.astro';
 import CardTitle from '../components/ui/CardTitle.astro';
 import CardDescription from '../components/ui/CardDescription.astro';
 import CardContent from '../components/ui/CardContent.astro';
+import { getRawDb } from '@/lib/db';
 
-// Check auth via session cookie
+// Check auth via session cookie using raw SQL (avoids Drizzle schema mismatches)
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 let user: { id: string; name: string; email: string } | null = null;
 
@@ -18,30 +19,32 @@ try {
   const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
 
   if (tokenMatch) {
-    const db = await getDb();
-    const { sessions, users } = await import('@/db/schema');
-    const { eq } = await import('drizzle-orm');
+    const db = await getRawDb();
+    if (db) {
+      const session = await db.prepare('SELECT userId, expiresAt FROM session WHERE token = ? LIMIT 1')
+        .bind(tokenMatch[1])
+        .first() as { userId: string; expiresAt: number | string } | null;
 
-    const session = await db.select()
-      .from(sessions)
-      .where(eq(sessions.token, tokenMatch[1]))
-      .limit(1)
-      .get();
+      if (session) {
+        // Handle both seconds (number < 1e12) and milliseconds
+        const expiresAtMs = typeof session.expiresAt === 'number'
+          ? (session.expiresAt < 1e12 ? session.expiresAt * 1000 : session.expiresAt)
+          : new Date(session.expiresAt).getTime();
 
-    if (session && session.expiresAt && new Date(session.expiresAt) > new Date()) {
-      const userRecord = await db.select()
-        .from(users)
-        .where(eq(users.id, session.userId))
-        .limit(1)
-        .get();
+        if (expiresAtMs > Date.now()) {
+          const userRecord = await db.prepare('SELECT id, name, email FROM user WHERE id = ? LIMIT 1')
+            .bind(session.userId)
+            .first() as { id: string; name: string; email: string } | null;
 
-      if (userRecord) {
-        user = { id: userRecord.id, name: userRecord.name || '', email: userRecord.email };
+          if (userRecord) {
+            user = { id: userRecord.id, name: userRecord.name || '', email: userRecord.email };
+          }
+        }
       }
     }
   }
 } catch (e) {
-  console.error('Auth check failed:', e);
+  console.error('Dashboard auth check failed:', e);
 }
 
 // Redirect if not logged in
@@ -57,7 +60,7 @@ if (!user) {
       <p class="text-muted-foreground">Welcome back, {user.name}</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-col-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <Card>
         <CardHeader class="pb-2">
           <CardTitle class="text-sm text-muted-foreground">Quick Actions</CardTitle>
@@ -74,4 +77,3 @@ if (!user) {
     </div>
   </div>
 </Layout>
-

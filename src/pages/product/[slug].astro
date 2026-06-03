@@ -1,0 +1,335 @@
+---
+import TipTapRenderer from '@/components/ui/TipTapRenderer.astro';
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import OptimizedImage from '@/components/ui/OptimizedImage.astro';
+import { getRawDb } from '@/lib/db';
+import { createBreadcrumbSchema } from '@/lib/seo';
+
+// Fetch product with business and category info
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
+
+// Cache: Product detail - 2min browser, 10min CDN
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=120, s-maxage=600, stale-while-revalidate=1200'
+);
+
+const db = await getRawDb();
+if (!db) return Astro.redirect('/404');
+
+interface ProductRow {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  price: string | number | null;
+  priceUnit: string | null;
+  specifications: string | null;
+  stock: number | null;
+  unit: string | null;
+  location: string | null;
+  contactNumber: string | null;
+  countryCode: string | null;
+  email: string | null;
+  imageIds: string | null;
+  price_fields: string | null;
+  businessId: string | null;
+  categoryId: string | null;
+}
+interface BusinessRow {
+  id: string;
+  title: string;
+  slug: string;
+}
+interface CategoryRow {
+  id: string;
+  name: string;
+}
+interface MediaRow {
+  id: string;
+  url: string;
+}
+
+// Fetch product with raw SQL
+let product: ProductRow | null = null;
+let business: BusinessRow | null = null;
+let category: CategoryRow | null = null;
+let productImages: MediaRow[] = [];
+
+try {
+  product = await db
+    .prepare('SELECT * FROM products WHERE slug = ? LIMIT 1')
+    .bind(slug)
+    .first() as ProductRow | null;
+
+  if (product) {
+    if (product.businessId) {
+      business = await db
+        .prepare('SELECT id, title, slug FROM businesses WHERE id = ? LIMIT 1')
+        .bind(product.businessId)
+        .first() as BusinessRow | null;
+    }
+
+    if (product.categoryId) {
+      category = await db
+        .prepare('SELECT id, name FROM product_categories WHERE id = ? LIMIT 1')
+        .bind(product.categoryId)
+        .first() as CategoryRow | null;
+    }
+
+    if (product.imageIds) {
+      try {
+        const imageIds: string[] = typeof product.imageIds === 'string'
+          ? JSON.parse(product.imageIds)
+          : (Array.isArray(product.imageIds) ? product.imageIds : []);
+
+        if (imageIds.length > 0) {
+          const placeholders = imageIds.map(() => '?').join(',');
+          const imagesResult = await db
+            .prepare(`SELECT id, url FROM media WHERE id IN (${placeholders}) AND active = 1`)
+            .bind(...imageIds)
+            .all();
+          productImages = (imagesResult.results as unknown as MediaRow[]) || [];
+        }
+      } catch (e) {
+        console.error('Failed to parse imageIds:', e);
+      }
+    }
+  }
+} catch (e) {
+  console.error('Product query failed:', e instanceof Error ? e.message : String(e));
+}
+
+if (!product) return Astro.redirect('/404');
+
+// Parse images from product.imageIds
+let parsedImages: string[] = [];
+if (product.imageIds) {
+  try {
+    parsedImages = typeof product.imageIds === 'string'
+      ? JSON.parse(product.imageIds)
+      : (Array.isArray(product.imageIds) ? (product.imageIds as unknown as string[]) : []);
+  } catch {
+    parsedImages = [];
+  }
+}
+
+// Build meta info
+const siteUrl = import.meta.env.SITE || 'https://timorup.com';
+const canonicalUrl = `${siteUrl}/product/${slug}`;
+
+// Schema.org Product markup
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": product.title,
+  "description": product.description,
+  "url": canonicalUrl,
+  "image": productImages[0]?.url ? [productImages[0].url] : undefined,
+  "offers": product.price ? {
+    "@type": "Offer",
+    "price": priceData?.price || '0',
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  } : undefined,
+  "category": category?.name,
+};
+
+// WhatsApp contact link
+const waNumber = (product.contactNumber || '').replace(/\D/g, '');
+const waLink = product.contactNumber
+  ? `https://wa.me/${(product.countryCode || '+670').replace('+', '')}${waNumber}?text=${encodeURIComponent('Hi, I saw your product: ' + product.title)}`
+  : '';
+
+// Breadcrumb schema for SEO
+const breadcrumbSchema = createBreadcrumbSchema([
+  { name: 'Home', url: siteUrl },
+  { name: 'Products & Services', url: `${siteUrl}/products-services` },
+  { name: product.title, url: canonicalUrl }
+]);
+
+interface PriceData { price: string; currency?: string; unit?: string; }
+let priceData: PriceData | null = null;
+try {
+  if (product.price_fields && typeof product.price_fields === 'string') {
+    priceData = JSON.parse(product.price_fields);
+  }
+} catch {}
+
+const productTitle = product.title;
+const pageTitle = `${productTitle} - TimorUp`;
+const pageDesc = product.description?.substring(0, 160) || `${product.title} - Product in Timor-Leste`;
+
+// Get all images for gallery
+const allImages = productImages.length > 0
+  ? productImages.map(img => img.url)
+  : parsedImages.length > 0
+    ? parsedImages
+    : [];
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
+  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Breadcrumb -->
+    <nav class="mb-4 text-sm" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-muted-foreground">
+        <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+        <li class="text-muted-foreground/50">/</li>
+        <li><a href="/products-services" class="hover:text-primary transition-colors">Products & Services</a></li>
+        <li class="text-muted-foreground/50">/</li>
+        <li class="text-foreground font-medium truncate">{product.title}</li>
+      </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column - Images & Details -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Main Image -->
+        <div class="rounded-2xl overflow-hidden bg-card border">
+          {allImages.length > 0 ? (
+            <img
+              src={allImages[0]}
+              alt={product.title}
+              class="w-full h-[400px] object-cover"
+            />
+          ) : (
+            <div class="w-full h-[400px] bg-muted flex items-center justify-center">
+              <span class="text-muted-foreground text-lg">No image available</span>
+            </div>
+          )}
+        </div>
+
+        <!-- Product Info -->
+        <div class="bg-card rounded-2xl border p-6 space-y-6">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2">{product.title}</h1>
+            {category && (
+              <span class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                {category.name}
+              </span>
+            )}
+          </div>
+
+          <!-- Price -->
+          {product.price && (
+            <div class="text-3xl font-bold text-primary">
+              {priceData?.currency || 'CNY'}
+            </div>
+          )}
+
+          <!-- Description -->
+          {product.description && (
+            <div>
+              <h2 class="text-lg font-semibold mb-2">Description</h2>
+              <TipTapRenderer content={product.description} class="text-sm" />
+            </div>
+          )}
+
+          <!-- Specifications -->
+          {(product.specifications || product.stock || product.unit) && (
+            <div>
+              <h2 class="text-lg font-semibold mb-3">Specifications</h2>
+              <dl class="grid grid-cols-2 gap-4">
+                {product.specifications && (
+                  <>
+                    <dt class="text-muted-foreground">Details</dt>
+                    <dd class="text-foreground">{product.specifications}</dd>
+                  </>
+                )}
+                {product.stock && (
+                  <>
+                    <dt class="text-muted-foreground">Stock</dt>
+                    <dd class="text-foreground">{product.stock} units</dd>
+                  </>
+                )}
+                {product.unit && (
+                  <>
+                    <dt class="text-muted-foreground">Unit</dt>
+                    <dd class="text-foreground">{product.unit}</dd>
+                  </>
+                )}
+              </dl>
+            </div>
+          )}
+
+          <!-- Location -->
+          {product.location && (
+            <div>
+              <h2 class="text-lg font-semibold mb-2">Location</h2>
+              <p class="text-muted-foreground">{product.location}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Right Column - Contact Card -->
+      <div class="space-y-6">
+        <!-- Contact Card -->
+        <div class="bg-card rounded-2xl border p-6 sticky top-24">
+          <h3 class="text-lg font-semibold mb-4">Contact Seller</h3>
+
+          <!-- Seller Business -->
+          {business && (
+            <div class="mb-4 pb-4 border-b">
+              <p class="text-sm text-muted-foreground mb-1">Sold by</p>
+              <a href={`/business/${business.slug}`} class="font-medium text-primary hover:underline">
+                {business.title}
+              </a>
+            </div>
+          )}
+
+          <!-- WhatsApp Button -->
+          {waLink ? (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-xl transition-colors mb-4"
+            >
+              Contact on WhatsApp
+            </a>
+          ) : (
+            <div class="text-center text-muted-foreground py-4 mb-4">
+              No contact number available
+            </div>
+          )}
+
+          <!-- Contact Info -->
+          {product.contactNumber && (
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-muted-foreground">Phone:</span>
+              <span>{product.countryCode} {product.contactNumber}</span>
+            </div>
+          )}
+
+          {product.email && (
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-muted-foreground">Email:</span>
+              <a href={`mailto:${product.email}`} class="text-primary hover:underline">
+                {product.email}
+              </a>
+            </div>
+          )}
+
+          <!-- Share -->
+          <div class="pt-4 border-t mt-4">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(product.title + ' - ' + canonicalUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              Share this product
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

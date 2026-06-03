@@ -3,11 +3,9 @@ export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import CarouselBanner from '../../components/ui/CarouselBanner.astro';
 import BusinessCard from '../../components/business/BusinessCard.astro';
-import { getDb } from '@/lib/db';
-import { nonProfits, nonProfitCategories } from '@/db/schema';
-import { desc } from 'drizzle-orm';
+import { getRawDb } from '@/lib/db';
 
-const db = await getDb();
+const db = await getRawDb();
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('q') || '';
 const parentCat = searchParams.get('parent') || '';
@@ -17,7 +15,9 @@ const LIMIT = 12;
 const offset = (page - 1) * LIMIT;
 
 const hasSearchParams = search || parentCat || childCat;
-Astro.response.headers.set('Cache-Control', hasSearchParams ? 'public, max-age=30, s-maxage=60, stale-while-revalidate=120' : 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
+Astro.response.headers.set('Cache-Control', hasSearchParams 
+  ? 'public, max-age=30, s-maxage=60, stale-while-revalidate=120'
+  : 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
 
 interface CategoryRecord {
   id: string;
@@ -25,13 +25,21 @@ interface CategoryRecord {
   parentId: string | null;
 }
 let parentCats: CategoryRecord[] = [];
-let getChildCategories = (_pid: string): CategoryRecord[] => [];
 const categoryMap: Record<string, string> = {};
+let childMap: Record<string, string[]> = {};
+
 try {
-  const allCats = await db.select().from(nonProfitCategories).all();
-  parentCats = allCats.filter((c: CategoryRecord) => !c.parentId);
-  getChildCategories = (pid: string) => allCats.filter((c: CategoryRecord) => c.parentId === pid);
-  allCats.forEach((c: CategoryRecord) => { categoryMap[c.id] = c.name; });
+  if (db) {
+    const allCats = (await db.prepare('SELECT id, name, parent_id as parentId FROM non_profit_categories').all()).results as CategoryRecord[];
+    parentCats = allCats.filter(c => !c.parentId);
+    allCats.forEach(c => {
+      categoryMap[c.id] = c.name;
+      if (c.parentId) {
+        if (!childMap[c.parentId]) childMap[c.parentId] = [];
+        childMap[c.parentId].push(c.id);
+      }
+    });
+  }
 } catch (e) { console.log('Categories error:', e); }
 
 interface NonProfitRecord {
@@ -40,132 +48,159 @@ interface NonProfitRecord {
   slug: string;
   categoryId: string | null;
   address: string | null;
-  profileImageId: string | null;
-  tags: string[];
-  likes: number;
-  saves: number;
-  views: number;
-  ratingAverage: number;
-  ratingCount: number;
-  status: string;
-  aboutUs: string | null;
-  createdAt: number;
+  profile_image_id: string | null;
+  tags: string | null;
+  likes: number | null;
+  saves: number | null;
+  views: number | null;
+  status: string | null;
+  about_us: string | null;
+  createdAt: number | null;
 }
-let allEntities: NonProfitRecord[] = [];
+
+// Build WHERE clause dynamically
+const conditions: string[] = ["status IN ('live', 'published', 'active')"];
+const params: (string | number)[] = [];
+
+// Search filter
+if (search) {
+  conditions.push("(LOWER(title) LIKE ? OR LOWER(about_us) LIKE ?)");
+  const searchPattern = `%${search.toLowerCase()}%`;
+  params.push(searchPattern, searchPattern);
+}
+
+// Category filter - handle both parent and child
+if (childCat) {
+  conditions.push("category_id = ?");
+  params.push(childCat);
+} else if (parentCat) {
+  const childIds = childMap[parentCat] || [];
+  if (childIds.length > 0) {
+    const placeholders = childIds.map(() => '?').join(', ');
+    conditions.push(`category_id IN (${placeholders})`);
+    params.push(...childIds);
+  }
+}
+
+const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+// Count total (without LIMIT/OFFSET)
+let total = 0;
 try {
-  const searchLower = search.toLowerCase();
-  allEntities = await db.select()
-    .from(nonProfits)
-    .orderBy(desc(nonProfits.createdAt))
-    .all();
+  if (db) {
+    const countResult = await db.prepare(`SELECT COUNT(*) as count FROM non_profits ${whereClause}`).bind(...params).first() as { count: number } | undefined;
+    total = countResult?.count || 0;
+  }
+} catch (e) { console.log('Count error:', e); }
 
-  allEntities = allEntities.filter((e: NonProfitRecord) => {
-    const statusOk = e.status === 'live' || e.status === 'published';
-    const searchMatch = !search ||
-      e.title.toLowerCase().includes(searchLower) ||
-      e.aboutUs.toLowerCase().includes(searchLower);
-    const catMatch = !childCat || e.categoryId === childCat;
-    if (parentCat && !childCat) {
-      const childIds = getChildCategories(parentCat).map((c: CategoryRecord) => c.id);
-      if (childIds.length > 0 && !childIds.includes(e.categoryId)) return false;
-    }
-    return statusOk && searchMatch && catMatch;
-  });
-} catch (e) { console.log('Query error:', e); allEntities = []; }
+// Fetch paginated results (with OFFSET/LIMIT)
+const entities: NonProfitRecord[] = [];
+try {
+  if (db) {
+    const dataResult = await db.prepare(`
+      SELECT id, title, slug, category_id as categoryId, address, profile_image_id,
+             tags, likes, saves, views, status, about_us as aboutUs, created_at as createdAt
+      FROM non_profits
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(...params, LIMIT, offset).all();
+    entities.push(...(dataResult.results as NonProfitRecord[]));
+  }
+} catch (e) { console.log('Nonprofits query error:', e); }
 
-const total = allEntities.length;
 const totalPages = Math.ceil(total / LIMIT);
-const entities = allEntities.slice(offset, offset + LIMIT);
 
-const buildUrl = (params: Record<string, string>) => {
+// Build pagination URL helper
+const buildUrl = (pageNum: number) => {
   const p = new URLSearchParams();
   if (search) p.set('q', search);
   if (parentCat) p.set('parent', parentCat);
   if (childCat) p.set('child', childCat);
-  Object.entries(params).forEach(([k, v]) => {
-    if (v) p.set(k, v);
-  });
+  if (pageNum > 1) p.set('page', pageNum.toString());
   return `/non-profits?${p.toString()}`;
 };
 ---
 
 <Layout title="Non-Profits - TimorUp">
   <div class="max-w-7xl mx-auto px-4" data-page-content>
-    <CarouselBanner position="businesses" class="mb-6" />
+    <CarouselBanner position="nonprofits" class="mb-6" />
 
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl sm:text-3xl font-bold">Non-Profits</h1>
-      <span class="text-sm text-muted-foreground">{total} total</span>
+      <span class="text-sm text-muted-foreground">{total} organizations</span>
     </div>
 
-    <form method="GET" action="/non-profits" class="bg-card rounded-2xl border border-border/50 p-4 mb-6 shadow-sm">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="relative flex-1">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input name="q" type="search" placeholder="Search non-profits..." value={search}
-            class="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" />
-        </div>
-        <div class="flex gap-2">
-          <select name="parent" onchange="this.form.submit()"
-            class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
-            <option value="">All Categories</option>
-            {parentCats.map(p => <option value={p.id} selected={parentCat===p.id}>{p.name}</option>)}
-          </select>
-          <select name="child" onchange="this.form.submit()"
-            class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
-            <option value="">Subcategory</option>
-            {getChildCategories(parentCat).map(c => <option value={c.id} selected={childCat===c.id}>{c.name}</option>)}
-          </select>
-        </div>
-      </div>
-    </form>
-
-    {entities.length > 0 ? (
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {entities.map(e => (
-          <BusinessCard
-            title={e.title}
-            slug={e.slug}
-            category={categoryMap[e.categoryId || ''] || ''}
-            profileImageId={e.profileImageId}
-            likes={e.likes}
-            reviews={e.ratingCount}
-            views={e.views}
-            location={e.address?.split(',')[0] || ''}
-            entityType="nonprofit"
-          />
+    {parentCats.length > 0 && (
+      <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <a href="/non-profits" class={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${!parentCat ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>All</a>
+        {parentCats.map(c => (
+          <a href={`/non-profits?parent=${c.id}`} class={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${parentCat === c.id ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>{c.name}</a>
         ))}
-      </div>
-    ) : (
-      <div class="text-center py-16">
-        <svg class="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.682l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-        </svg>
-        <h3 class="text-lg font-medium mb-2">No non-profits found</h3>
-        <p class="text-muted-foreground">Try adjusting your search or filters</p>
       </div>
     )}
 
-    {totalPages > 1 ? (
-      <nav class="flex items-center justify-center gap-2 mt-8" aria-label="Pagination">
-        <a href={buildUrl({ page: String(page - 1) })}
-           class={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${page > 1 ? 'hover:border-primary hover:text-primary cursor-pointer' : 'opacity-50 pointer-events-none text-muted-foreground'}`}>
-          &larr; Prev
+    {entities.length > 0 ? (
+      <>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {entities.map(n => (
+            <BusinessCard
+              title={n.title}
+              slug={n.slug}
+              category={n.categoryId ? categoryMap[n.categoryId] || '' : ''}
+              address={n.address || ''}
+              tags={n.tags ? (n.tags.startsWith('[') ? JSON.parse(n.tags) : n.tags.split(',').map(t => t.trim())) : []}
+              likes={n.likes || 0}
+              saves={n.saves || 0}
+              views={n.views || 0}
+              ratingAverage={0}
+              ratingCount={0}
+              imageId={n.profile_image_id}
+              entityType="nonprofit"
+              aboutUs={n.about_us}
+            />
+          ))}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
+            {page > 1 && (
+              <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+                ← Previous
+              </a>
+            )}
+            
+            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+              const pageNum = i + 1;
+              const isActive = pageNum === page;
+              return (
+                <a 
+                  href={buildUrl(pageNum)} 
+                  class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {pageNum}
+                </a>
+              );
+            })}
+            
+            {page < totalPages && (
+              <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+                Next →
+              </a>
+            )}
+          </nav>
+        )}
+      </>
+    ) : (
+      <div class="text-center py-16">
+        <h3 class="text-lg font-medium mb-2">No non-profits found</h3>
+        <p class="text-muted-foreground">Try a different category or search term</p>
+        <a href="/non-profits" class="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md">
+          View all non-profits
         </a>
-        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-          const p = i + 1;
-          return (
-            <a href={buildUrl({ page: String(p) })}
-               class={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${p === page ? 'bg-primary text-primary-foreground border-primary' : 'hover:border-primary hover:text-primary cursor-pointer'}`}>
-              {p}
-            </a>
-          );
-        })}
-        <a href={buildUrl({ page: String(page + 1) })}
-           class={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${page < totalPages ? 'hover:border-primary hover:text-primary cursor-pointer' : 'opacity-50 pointer-events-none text-muted-foreground'}`}>
-          Next &rarr;
-        </a>
-      </nav>
-    ) : null}
+      </div>
+    )}
   </div>
 </Layout>

@@ -1,10 +1,12 @@
-// Scheduled job - Mark expired subscriptions and set grace period
+// Scheduled job - Check for expired subscriptions
+// NOTE: Subscription status is now derived from orders table, not cached on businesses.
+// This job is kept for monitoring purposes but no longer updates business records.
 export const prerender = false;
 
 import { getDb } from '@/lib/db';
-import { businesses } from '@/db/schema';
-import { eq, lt, and } from 'drizzle-orm';
-import { calculateGracePeriodEnd } from '@/lib/subscription';
+import { businesses, orders } from '@/db/schema';
+import { eq, desc } from 'drizzle-orm';
+import { GRACE_PERIOD_DAYS } from '@/lib/subscription';
 
 export async function GET({ request }: { params: Record<string, string>; request: Request }) {
   // Verify this is an internal/scheduled call
@@ -19,60 +21,44 @@ export async function GET({ request }: { params: Record<string, string>; request
   }
 
   const db = await getDb();
-if (!db) throw new Error("Database not available");
-  const now = new Date();
-  const nowTimestamp = Math.floor(now.getTime() / 1000);
+  if (!db) throw new Error("Database not available");
+  const now = Date.now();
 
   try {
-    // Find active subscriptions that have passed expiry date (businesses only)
-    const expiredSubscriptions = await db.select()
+    // Count businesses with expired subscriptions (those past grace period)
+    const allBusinesses = await db.select({ id: businesses.id })
       .from(businesses)
-      .where(and(
-        eq(businesses.subscriptionStatus, 'active'),
-        lt(businesses.expiryDate, nowTimestamp)
-      ))
       .all();
 
-    const results: {
-      markedExpired: string[];
-      failed: { id: string; error: string }[];
-    } = {
-      markedExpired: [],
-      failed: [],
-    };
+    let expiredCount = 0;
 
-    for (const listing of expiredSubscriptions) {
-      try {
-        const expiryTimestamp = listing.expiryDate as number;
-        const gracePeriodEnd = calculateGracePeriodEnd(expiryTimestamp);
+    for (const business of allBusinesses) {
+      const activeOrder = await db.select({
+        planExpiresAt: orders.planExpiresAt,
+      })
+        .from(orders)
+        .where(eq(orders.typeId, business.id))
+        .where(eq(orders.type, 'business'))
+        .where(eq(orders.status, 'paid'))
+        .orderBy(desc(orders.planExpiresAt))
+        .limit(1)
+        .get();
 
-        await db.update(businesses)
-          .set({
-            subscriptionStatus: 'expired',
-            gracePeriodEndDate: gracePeriodEnd,
-            updatedAt: Math.floor(Date.now() / 1000),
-          })
-          .where(eq(businesses.id, listing.id))
-          .run();
-
-        results.markedExpired.push(listing.id);
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err);
-        results.failed.push({ id: listing.id, error });
-        console.error(`[Mark Expired] Failed to update listing ${listing.id}:`, error);
+      if (activeOrder?.planExpiresAt) {
+        const graceEnd = activeOrder.planExpiresAt + (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
+        if (graceEnd < now) {
+          expiredCount++;
+        }
       }
     }
 
-    // Summary logged internally for debugging if needed, not needed in production output
     return new Response(JSON.stringify({
       success: true,
       data: {
-        executedAt: now.toISOString(),
-        found: expiredSubscriptions.length,
-        markedExpired: results.markedExpired.length,
-        failed: results.failed.length,
-        expiredIds: results.markedExpired,
-        failedIds: results.failed,
+        executedAt: new Date().toISOString(),
+        note: 'Subscription status is now derived from orders table',
+        totalBusinesses: allBusinesses.length,
+        expiredPastGracePeriod: expiredCount,
       }
     }), {
       status: 200,

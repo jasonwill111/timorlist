@@ -1,7 +1,8 @@
 // Subscription and SKU limit helper functions
+// Uses orders table for subscription state (not cached on businesses)
 import { getDb } from './db';
-import { businesses, products, servicePackages } from '@/db/schema';
-import { eq, count } from 'drizzle-orm';
+import { businesses, products, servicePackages, orders } from '@/db/schema';
+import { eq, count, desc } from 'drizzle-orm';
 
 export interface PlanLimits {
   skuLimit: number;
@@ -19,7 +20,7 @@ export async function getPlanLimits(planSlug: string | null): Promise<PlanLimits
   if (!planSlug) return null;
 
   const db = await getDb();
-if (!db) throw new Error("Database not available");
+  if (!db) throw new Error("Database not available");
 
   const plan = await db.select()
     .from(servicePackages)
@@ -50,29 +51,14 @@ if (!db) throw new Error("Database not available");
 
 export type SubscriptionStatus = 'none' | 'active' | 'expired' | 'cancelled';
 
-// Grace period in days
-export const GRACE_PERIOD_DAYS = 60;
+// Grace period in days for businesses
+export const GRACE_PERIOD_DAYS = 30;
 
 export interface SubscriptionInfo {
   status: SubscriptionStatus;
   planSlug: string | null;
   skuLimit: number;
   skuCount: number;
-  expiresAt: Date | null;
-  gracePeriodEndDate: Date | null;
-  isInGracePeriod: boolean;
-  isActive: boolean;
-}
-
-// Dashboard interface - same as SubscriptionInfo but grouped
-export interface SubscriptionDashboard {
-  businessId: string;
-  status: SubscriptionStatus;
-  planSlug: string | null;
-  skuLimit: number;
-  skuCount: number;
-  maxImages: number;
-  maxVideos: number;
   expiresAt: Date | null;
   gracePeriodEndDate: Date | null;
   isInGracePeriod: boolean;
@@ -176,10 +162,6 @@ export async function getGracePeriodDaysRemaining(businessId: string): Promise<n
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-/**
- * Get subscription dashboard - BATCHED VERSION
- * Reduces 3+ DB calls to fewer calls for complete subscription info
- */
 export interface SubscriptionDashboard {
   businessId: string;
   status: SubscriptionStatus;
@@ -196,23 +178,16 @@ export interface SubscriptionDashboard {
 
 /**
  * Get full subscription dashboard for a business
- * Batched: 1 business query + 1 SKU count + 1 plan lookup (if needed)
+ * Batched: 1 business query + 1 order query + 1 SKU count + 1 plan lookup (if needed)
  *
- * Use this for any operation requiring full subscription context
+ * Subscription state now comes from orders table, not cached on businesses
  */
 export async function getSubscriptionDashboard(businessId: string): Promise<SubscriptionDashboard | null> {
   const db = await getDb();
-if (!db) throw new Error("Database not available");
-  if (!db) return null;
+  if (!db) throw new Error("Database not available");
 
-  // Query 1: Get business with subscription info
-  const business = await db.select({
-    id: businesses.id,
-    planSlug: businesses.planSlug,
-    subscriptionStatus: businesses.subscriptionStatus,
-    subscriptionExpiresAt: businesses.subscriptionExpiresAt,
-    gracePeriodEndDate: businesses.gracePeriodEndDate,
-  })
+  // Query 1: Verify business exists
+  const business = await db.select({ id: businesses.id })
     .from(businesses)
     .where(eq(businesses.id, businessId))
     .limit(1)
@@ -220,16 +195,66 @@ if (!db) throw new Error("Database not available");
 
   if (!business) return null;
 
-  // Query 2: Count SKUs
+  // Query 2: Get active subscription from orders table (most recent paid order)
+  const activeOrder = await db.select({
+    servicePackageId: orders.servicePackageId,
+    planExpiresAt: orders.planExpiresAt,
+    paidDate: orders.paidDate,
+    variantSnapshot: orders.variantSnapshot,
+    status: orders.status,
+  })
+    .from(orders)
+    .where(eq(orders.typeId, businessId))
+    .where(eq(orders.type, 'business'))
+    .where(eq(orders.status, 'paid'))
+    .orderBy(desc(orders.planExpiresAt))
+    .limit(1)
+    .get() ?? undefined;
+
+  // Query 3: Count SKUs
   const skuResult = await db.select({ count: count() })
     .from(products)
     .where(eq(products.businessId, businessId))
     .get() ?? undefined;
 
   const skuCount = skuResult?.count ?? 0;
-  const planSlug = business.planSlug || null;
+  const now = Date.now();
 
-  // Query 3: Get plan limits (only if plan exists)
+  // Determine status from orders table
+  let status: SubscriptionStatus = 'none';
+  let planSlug: string | null = null;
+  let expiresAt: Date | null = null;
+  let gracePeriodEndDate: Date | null = null;
+  let isInGracePeriod = false;
+
+  if (activeOrder) {
+    // servicePackageId is the id (e.g., "sp-business-basic"), need to look up the slug
+    const servicePackage = await db.select({ slug: servicePackages.slug })
+      .from(servicePackages)
+      .where(eq(servicePackages.id, activeOrder.servicePackageId))
+      .limit(1)
+      .get() ?? undefined;
+    planSlug = servicePackage?.slug || null;
+    expiresAt = activeOrder.planExpiresAt ? new Date(activeOrder.planExpiresAt) : null;
+    
+    // Grace period = planExpiresAt + 30 days
+    const gracePeriodEnd = activeOrder.planExpiresAt 
+      ? (activeOrder.planExpiresAt + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000)
+      : null;
+    gracePeriodEndDate = gracePeriodEnd ? new Date(gracePeriodEnd) : null;
+
+    // Status logic
+    if (now <= activeOrder.planExpiresAt!) {
+      status = 'active';
+    } else if (gracePeriodEnd && now <= gracePeriodEnd) {
+      status = 'active'; // Still in grace period
+      isInGracePeriod = true;
+    } else {
+      status = 'expired';
+    }
+  }
+
+  // Query 4: Get plan limits (only if plan exists)
   let skuLimit = 0;
   let maxImages = 0;
   let maxVideos = 0;
@@ -255,31 +280,18 @@ if (!db) throw new Error("Database not available");
     }
   }
 
-  // Calculate grace period status
-  const now = new Date();
-  const gracePeriodEnd = business.gracePeriodEndDate
-    ? new Date(business.gracePeriodEndDate)
-    : null;
-  const expiresAt = business.subscriptionExpiresAt
-    ? new Date(business.subscriptionExpiresAt)
-    : null;
-
-  const isInGracePeriod = gracePeriodEnd
-    ? now < gracePeriodEnd && expiresAt && now > expiresAt
-    : false;
-
   return {
     businessId,
-    status: (business.subscriptionStatus as SubscriptionStatus) || 'none',
+    status,
     planSlug,
     skuLimit,
     skuCount,
     maxImages,
     maxVideos,
     expiresAt,
-    gracePeriodEndDate: gracePeriodEnd,
+    gracePeriodEndDate,
     isInGracePeriod,
-    isActive: business.subscriptionStatus === 'active',
+    isActive: status === 'active' && !isInGracePeriod,
   };
 }
 

@@ -2,10 +2,20 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'zod';
 import { getDb } from '@/lib/db';
-import { servicePackages, businesses } from '@/db/schema';
+import { servicePackages, businesses, orders } from '@/db/schema';
 import { eq, asc, count } from 'drizzle-orm';
 import { getAdminUser } from '@/lib/admin-auth';
 import { createErrorResponse, ErrorCode } from '@/lib/errors';
+// Cache purge helper - invalidates pricing page cache via Cloudflare Cache API
+async function purgePricingCache(): Promise<void> {
+  try {
+    const cache = (caches as unknown as { default: Cache }).default;
+    await cache.delete('https://timorup.com/pricing');
+    await cache.delete('https://timorup.com/pricing/');
+  } catch {
+    // Cache API not available in some environments
+  }
+}
 
 // Variant schema for pricing tiers
 const VariantSchema = z.object({
@@ -113,7 +123,8 @@ export const servicePackagesAdmin = {
         isActive: input.isActive ? 1 : 0,
         sortOrder: input.sortOrder || 0,
       });
-
+      // Purge pricing page cache so changes appear immediately
+      await purgePricingCache();
       return {
         success: true,
         data: {
@@ -174,8 +185,9 @@ export const servicePackagesAdmin = {
         .from(servicePackages)
         .where(eq(servicePackages.id, id))
         .limit(1)
-        .get();
-
+      .get();
+      // Purge pricing page cache so changes appear immediately
+      await purgePricingCache();
       return {
         success: true,
         data: updated ? {
@@ -206,18 +218,18 @@ export const servicePackagesAdmin = {
 
       if (!existing) return createErrorResponse(ErrorCode.BUSINESS_NOT_FOUND, 'Package not found');
 
-      // Check if any businesses are using this package
-      const businessesUsing = await db.select({ count: count() })
-        .from(businesses)
-        .where(eq(businesses.planSlug, existing.slug))
+      // Check if any orders are using this package
+      const ordersUsing = await db.select({ count: count() })
+        .from(orders)
+        .where(eq(orders.servicePackageId, existing.slug))
         .get();
 
-      if (businessesUsing && businessesUsing.count > 0) {
-        return createErrorResponse(ErrorCode.VALIDATION_INVALID_INPUT, `Cannot delete package. ${businessesUsing.count} business(es) currently using this package.`);
+      if (ordersUsing && ordersUsing.count > 0) {
+        return createErrorResponse(ErrorCode.VALIDATION_INVALID_INPUT, `Cannot delete package. ${ordersUsing.count} order(s) currently using this package.`);
       }
-
       await db.delete(servicePackages).where(eq(servicePackages.id, input.id)).run();
-
+      // Purge pricing page cache so changes appear immediately
+      await purgePricingCache();
       return { success: true, message: 'Package deleted' };
     },
   }),

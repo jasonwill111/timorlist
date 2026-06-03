@@ -1,0 +1,18 @@
+{
+  "id": "0100-comprehensive-e2e-testing-bug-fixes",
+  "status": "completed",
+  "type": "hotfix",
+  "priority": "P1",
+  "created": "2026-06-02T03:51:44.323Z",
+  "lastActivity": "2026-06-02T04:00:00.000Z",
+  "completed": "2026-06-02T04:00:00.000Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp"
+}

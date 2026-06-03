@@ -2,10 +2,8 @@
 // Server Island: Fetches dynamic content on the homepage
 // This runs on the server and caches results
 import { getDb } from '@/lib/db';
-import { businesses, listings, nonProfits, publicSectors } from '@/db/schema';
-import { eq, desc, or } from 'drizzle-orm';
-import BusinessCard from '@/components/business/BusinessCard.astro';
-import ListingCard from '@/components/business/ListingCard.astro';
+import { businesses, listings, nonProfits, publicSectors, listingCategories } from '@/db/schema';
+import { eq, desc, or, inArray } from 'drizzle-orm';
 
 // Safe JSON parser
 function safeJsonParse<T>(str: unknown, fallback: T): T {
@@ -106,26 +104,50 @@ try {
     };
   });
 
-  // Featured Listings (classified ads)
-  const allListings = await db.select().from(listings).limit(12).all();
+  // Featured Listings (classified ads) - derive listing type from category parent
+  const allListings = await db.select({
+    listing: listings,
+    category: listingCategories,
+  })
+  .from(listings)
+  .leftJoin(listingCategories, eq(listings.categoryId, listingCategories.id))
+  .limit(12)
+  .all();
+
   const listingsResult = allListings.filter(l =>
-    l.status === 'active' || l.status === 'published'
+    l.listing.status === 'active' || l.listing.status === 'published'
   );
 
   featuredListings = listingsResult.map(l => {
-    const imageIds = safeJsonParse(l.imageIds, [] as string[]);
+    const listing = l.listing;
+    const category = l.category;
+    const imageIds = safeJsonParse(listing.imageIds, [] as string[]);
+    // Derive listing type from category parent slug
+    const categoryParentSlug = category?.slug || 'for-sale';
+    const typeMap: Record<string, string> = {
+      'vehicles': 'vehicle',
+      'property-sale': 'property',
+      'for-sale': 'product',
+      'jobs': 'job',
+      'services': 'service',
+      'rentals': 'rental',
+      'wanted': 'wanted',
+      'community': 'community',
+      'pets-animals': 'pet',
+      'agriculture': 'agriculture',
+    };
+    const listingType = typeMap[categoryParentSlug] || 'product';
     return {
-      id: l.id,
-      title: l.title,
-      slug: l.slug,
-      price: l.price || '',
-      listingType: l.listingType || 'product',
-      location: l.location || '',
+      id: listing.id,
+      title: listing.title,
+      slug: listing.slug,
+      price: listing.price || '',
+      listingType,
+      location: listing.location || '',
       imageIds,
-      likes: l.likes || 0,
+      likes: listing.likes || 0,
     };
   });
-
   // Featured Public Sectors (active/live/published, limit 12)
   const publicSectorsResult = await db.select({
     id: publicSectors.id,
@@ -162,7 +184,7 @@ try {
       tag: tags[0] || '',
       tags,
       profileImageId: b.profileImageId,
-      entityType: 'public-sector',
+      entityType: 'publicsector',
       entityTypeDisplay: 'Public Sector',
       isNew: false,
     };
@@ -204,7 +226,7 @@ try {
       tag: tags[0] || '',
       tags,
       profileImageId: b.profileImageId,
-      entityType: 'non-profit',
+      entityType: 'nonprofit',
       entityTypeDisplay: 'Non-Profit',
       isNew: false,
     };
@@ -279,7 +301,7 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
                   reviews={business.reviews}
                   location={business.location}
                   tag={business.tag}
-                  type={business.entityType}
+                  entityType={business.entityType}
                 />
               ))}
             </div>
@@ -344,10 +366,8 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
                   thumbnail={null}
                   rating={sector.rating}
                   likes={sector.likes}
-                  reviews={sector.reviews}
                   location={sector.location}
-                  tag={sector.tag}
-                  type={sector.entityType}
+                  entityType={sector.entityType}
                 />
               ))}
             </div>
@@ -382,7 +402,7 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
                   reviews={nonprofit.reviews}
                   location={nonprofit.location}
                   tag={nonprofit.tag}
-                  type={nonprofit.entityType}
+                  entityType={nonprofit.entityType}
                 />
               ))}
             </div>

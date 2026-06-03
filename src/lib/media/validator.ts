@@ -91,6 +91,10 @@ export function validateMediaFile(
 /**
  * Build R2 key for media storage
  */
+/**
+ * Build R2 key for media storage
+ * Sanitizes type to prevent path traversal attacks
+ */
 export function buildR2Key(params: {
   type: string;
   filename: string;
@@ -98,9 +102,21 @@ export function buildR2Key(params: {
   id: string;
 }): string {
   const { type, filename, timestamp, id } = params;
+
+  // Sanitize entity type: take only first segment, reject path traversal
+  // Expected format: 'businesses', 'blogs', 'products', etc.
+  const typeSegments = type.split('/');
+  const sanitizedType = typeSegments[0];
+
+  // Validate: must be alphanumeric + dash/underscore only, no special chars
+  // This prevents path traversal attempts like '../../../etc/malicious'
+  if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(sanitizedType)) {
+    throw new Error('Invalid entity type');
+  }
+
   const ext = filename.split('.').pop() || 'webp';
   const safeFilename = `${timestamp}-${id}.${ext}`;
-  return `${type}/${safeFilename}`;
+  return `${sanitizedType}/${safeFilename}`;
 }
 
 /**

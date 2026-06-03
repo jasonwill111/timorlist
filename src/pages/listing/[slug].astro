@@ -2,19 +2,35 @@
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import { getDb } from '@/lib/db';
-import { listings } from '@/db/schema';
+import { listings, listingCategories } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { Eye, Heart, Bookmark } from '@lucide/astro';
 import ShareDialog from '@/components/ui/ShareDialog.astro';
+import TipTapRenderer from '../../components/ui/TipTapRenderer.astro';
 import { createBreadcrumbSchema } from '@/lib/seo';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/404');
 
 let listing;
+let categoryParentSlug = 'for-sale';
+
 try {
   const db = await getDb();
-  listing = await db.select().from(listings).where(eq(listings.slug, slug)).get();
+  // Get listing with category to derive listing type
+  const result = await db.select({
+    listing: listings,
+    category: listingCategories,
+  })
+  .from(listings)
+  .where(eq(listings.slug, slug))
+  .limit(1)
+  .get();
+
+  if (result) {
+    listing = result.listing;
+    categoryParentSlug = result.category?.slug || 'for-sale';
+  }
 } catch (e) {
   console.error('Listing query failed:', e instanceof Error ? e.message : String(e));
 }
@@ -22,7 +38,28 @@ if (!listing) return Astro.redirect('/listings');
 
 Astro.response.headers.set('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=600');
 
-const listingTypeMap: Record<string, string> = {
+// Derive listing type from category parent slug
+const typeMap: Record<string, string> = {
+  'vehicles': 'vehicle',
+  'property-sale': 'property',
+  'for-sale': 'product',
+  'jobs': 'job',
+  'services': 'service',
+  'rentals': 'rental',
+  'wanted': 'wanted',
+  'community': 'community',
+  'pets-animals': 'pet',
+  'agriculture': 'agriculture',
+};
+const listingType = typeMap[categoryParentSlug] || 'product';
+
+const siteUrl = import.meta.env.SITE || 'https://timorup.com';
+const canonicalUrl = `${siteUrl}/listing/${slug}`;
+
+const parsedImages = listing.imageIds ? (typeof listing.imageIds === 'string' ? JSON.parse(listing.imageIds) : listing.imageIds) : [];
+
+// Schema.org type mapping
+const schemaTypeMap: Record<string, string> = {
   'job': 'JobPosting',
   'product': 'Product',
   'service': 'Service',
@@ -31,14 +68,9 @@ const listingTypeMap: Record<string, string> = {
   'wanted': 'Demand',
 };
 
-const siteUrl = import.meta.env.SITE || 'https://timorup.com';
-const canonicalUrl = `${siteUrl}/listing/${slug}`;
-
-const parsedImages = listing.imageIds ? (typeof listing.imageIds === 'string' ? JSON.parse(listing.imageIds) : listing.imageIds) : [];
-
 const productSchema = {
   "@context": "https://schema.org",
-  "@type": listingTypeMap[listing.listingType?.toLowerCase()] || 'Product',
+  "@type": schemaTypeMap[listingType] || 'Product',
   "name": listing.title,
   "description": listing.description,
   "url": canonicalUrl,
@@ -49,7 +81,7 @@ const productSchema = {
     "priceCurrency": "USD",
     "availability": "https://schema.org/InStock"
   } : undefined,
-  "category": listing.listingType,
+  "category": listingType,
 };
 
 const tags = listing.tags ? (typeof listing.tags === 'string' ? JSON.parse(listing.tags) : listing.tags) : [];
@@ -70,13 +102,10 @@ const createdAt = listing.createdAt ? new Date(listing.createdAt as unknown as n
   ]))} />
 
   <div class="bg-background min-h-screen">
-    <div class="container py-8 max-w-4xl mx-auto">
       <div class="flex items-center gap-2 mb-2">
-        {listing.listingType && (
-          <span class="text-sm px-3 py-1 rounded-full bg-primary/10 text-primary capitalize">
-            {listing.listingType}
-          </span>
-        )}
+        <span class="text-sm px-3 py-1 rounded-full bg-primary/10 text-primary capitalize">
+          {listingType}
+        </span>
         {listing.condition && (
           <span class="text-sm px-3 py-1 rounded-full bg-muted capitalize">
             {listing.condition}
@@ -134,8 +163,7 @@ const createdAt = listing.createdAt ? new Date(listing.createdAt as unknown as n
 
       {listing.description && (
         <div class="mb-8">
-          <h2 class="text-xl font-semibold mb-3">Description</h2>
-          <p class="whitespace-pre-wrap">{listing.description}</p>
+          <TipTapRenderer content={listing.description} class="text-sm" />
         </div>
       )}
 

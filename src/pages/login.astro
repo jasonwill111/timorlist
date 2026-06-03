@@ -14,7 +14,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
     footerText="Don't have an account?"
     footerLink={{ href: '/register', text: 'Sign up' }}
   >
-    <form id="login-form" class="space-y-4" novalidate>
+    <form id="login-form" class="space-y-4" method="post" action="/api/auth" novalidate>
       <FormMessage id="form-message" type="error" />
 
       <div>
@@ -251,10 +251,16 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       }
 
       if (result.success && result.token) {
-        // Set session cookie
-        const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
-        document.cookie = `better-auth.session_token=${result.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
-        window.location.assign('/account');
+        // If the response includes Set-Cookie, the browser already set it via the header
+        const setCookie = response.headers.get('set-cookie');
+        if (setCookie) {
+          window.location.assign('/account');
+        } else {
+          // Fallback: manually set cookie if header wasn't present
+          const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
+          document.cookie = `better-auth.session_token=${result.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
+          window.location.assign('/account');
+        }
         return;
       }
     } catch (fetchError) {

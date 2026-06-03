@@ -11,8 +11,7 @@ export interface CreateReviewInput {
   businessId: string;
   userId: string;
   rating: number;
-  comment: string;
-  authorName?: string;
+  content: string;
 }
 
 export interface ReviewStats {
@@ -35,8 +34,7 @@ export async function createReview(input: CreateReviewInput): Promise<{ id: stri
     businessId: input.businessId,
     userId: input.userId,
     rating: input.rating,
-    comment: input.comment,
-    authorName: input.authorName || null,
+    content: input.content,
     createdAt: now,
     updatedAt: now,
   }).run();
@@ -50,8 +48,7 @@ export async function createReview(input: CreateReviewInput): Promise<{ id: stri
 export async function getReviewsByBusiness(businessId: string): Promise<Array<{
   id: string;
   rating: number;
-  comment: string;
-  authorName: string | null;
+  content: string;
   createdAt: number;
 }>> {
   const db = await getDb();
@@ -61,8 +58,7 @@ export async function getReviewsByBusiness(businessId: string): Promise<Array<{
     .select({
       id: reviews.id,
       rating: reviews.rating,
-      comment: reviews.comment,
-      authorName: reviews.authorName,
+      content: reviews.content,
       createdAt: reviews.createdAt,
     })
     .from(reviews)

@@ -8,7 +8,6 @@ import { listListings, createListing, updateListing, deleteListing } from '@/lib
 const createSchema = z.object({
   title: z.string().min(1),
   slug: z.string().optional(),
-  listingType: z.enum(['job', 'product', 'service', 'vehicle', 'property', 'wanted']),
   categoryId: z.string().optional().nullable(),
   description: z.string().min(1),
   price: z.string().optional().nullable(),
@@ -31,7 +30,6 @@ const updateSchema = createSchema.partial().extend({
 });
 
 const listSchema = z.object({
-  listingType: z.enum(['job', 'product', 'service', 'vehicle', 'property', 'wanted']).optional(),
   status: z.enum(['draft', 'published']).optional(),
   search: z.string().optional(),
 });
@@ -45,7 +43,6 @@ export const listings = {
       if ('error' in authResult) return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Authentication required');
 
       const listings = await listListings({
-        listingType: input?.listingType,
         status: input?.status,
         search: input?.search,
       });
@@ -64,7 +61,6 @@ export const listings = {
       const result = await createListing({
         title: input.title,
         slug: input.slug,
-        listingType: input.listingType,
         categoryId: input.categoryId,
         description: input.description,
         price: input.price,

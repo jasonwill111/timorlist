@@ -29,6 +29,13 @@
   font-display: swap;
   src: url('/fonts/plus-jakarta-sans-latin-700-normal.woff2') format('woff2');
 }
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2');
+}
 
 /* Sora (heading font) */
 @font-face {
@@ -59,6 +66,13 @@
   font-display: swap;
   src: url('/fonts/sora-latin-700-normal.woff2') format('woff2');
 }
+@font-face {
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/sora-latin-800-normal.woff2') format('woff2');
+}
 
 /* Custom Theme Colors - YELLOW THEME */
 @theme {
@@ -72,7 +86,7 @@
   --color-secondary: #f5f5f4;
   --color-secondary-foreground: #1a1a1a;
   --color-muted: #f5f5f4;
-  --color-muted-foreground: #52525b; /* 4.8:1 contrast - zinc-600 for readability */
+  --color-muted-foreground: #52525b;
   --color-accent: #f5f5f4;
   --color-accent-foreground: #1a1a1a;
   --color-destructive: #ef4444;
@@ -80,6 +94,10 @@
   --color-border: #e5e5e5;
   --color-input: #e5e5e5;
   --color-ring: #FFD150;
+
+  /* WhatsApp brand color */
+  --color-whatsapp: #25D366;
+  --color-whatsapp-hover: #20BD5A;
 
   /* Brand colors */
   --color-brand-50: #fffbeb;
@@ -94,6 +112,13 @@
   --color-brand-900: #996e29;
   --color-brand-950: #4d3715;
 
+  /* Tertiary text - metadata, timestamps, hints */
+  --color-tertiary: #78716c;
+
+  /* Surface variants for card depth */
+  --color-surface-light: #fffdf8;
+  --color-surface-warm: #fefcf4;
+
   /* Font families */
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-heading: 'Sora', sans-serif;
@@ -101,23 +126,30 @@
 
 /* Dark mode - Deep blue-black for better readability */
 .dark {
-  --color-background: #0c1222;       /* Deep blue-black, easier on eyes than pure black */
-  --color-foreground: #f1f5f9;       /* Slate 100, softer than pure white */
-  --color-card: #0f172a;             /* Slate 900, slight blue tint */
+  --color-background: #090c14;
+  --color-foreground: #f1f5f9;
+  --color-card: #0f172a;
   --color-card-foreground: #f1f5f9;
   --color-primary: #FFD150;
   --color-primary-foreground: #0f172a;
-  --color-secondary: #1e293b;       /* Slate 800 */
+  --color-secondary: #1e293b;
   --color-secondary-foreground: #f1f5f9;
   --color-muted: #1e293b;
-  --color-muted-foreground: #94a3b8;  /* Slate 400, good contrast on dark bg */
+  --color-muted-foreground: #94a3b8;
   --color-accent: #1e293b;
   --color-accent-foreground: #f1f5f9;
   --color-destructive: #dc2626;
   --color-destructive-foreground: #ffffff;
-  --color-border: #334155;           /* Slate 700 */
+  --color-border: #334155;
   --color-input: #334155;
   --color-ring: #FFD150;
+
+  /* Dark mode tertiary - warm blue-gray for better readability */
+  --color-tertiary: #9bb3d7;
+
+  /* Dark mode surface variants */
+  --color-surface-light: #0f1b2d;
+  --color-surface-warm: #111827;
 }
 
 @layer base {
@@ -129,36 +161,38 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-size: 16px; /* Mobile: minimum 16px for inputs */
-    -webkit-text-size-adjust: 100%; /* Prevent iOS zoom on input focus */
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
   }
 
-  /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
   }
 
-  /* Focus visible for keyboard navigation */
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
   }
 
-  /* Remove default focus outline, use :focus-visible instead */
   :focus:not(:focus-visible) {
     outline: none;
   }
 
-  /* Improved touch targets for mobile */
+  /* Touch targets for mobile */
   button, a, [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
 
-  /* Better tap highlight for mobile */
+  /* Tap highlight - subtle, not distracting */
   button, a, [role="button"] {
-    -webkit-tap-highlight-color: var(--color-primary);
-    tap-highlight-color: var(--color-primary);
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+  }
+
+  /* Headings use heading font */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
@@ -174,9 +208,22 @@
   }
 }
 
-/* Container utility */
-@utility container {
+/* Container utility - responsive padding */
+.container {
+  width: 100%;
+  max-width: 80rem;
   margin-inline: auto;
   padding-inline: 1rem;
-  max-width: 72rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-inline: 2rem;
+  }
 }

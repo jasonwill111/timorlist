@@ -38,7 +38,6 @@ export const update = defineAction({
     latitude: z.number().optional(),
     longitude: z.number().optional(),
     yearOfEstablishment: z.number().optional(),
-    latestUpdates: z.string().optional(),
     registrationUrl: z.string().optional(),
     bannerImageId: z.string().optional(),
     profileImageId: z.string().optional(),

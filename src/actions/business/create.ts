@@ -114,7 +114,6 @@ export const create = defineAction({
         yearOfEstablishment: input.yearOfEstablishment || null,
         socialLinks: parsedSocialLinks ? JSON.stringify(parsedSocialLinks) : null,
         status: 'pending_payment',  // requires subscription
-        subscriptionStatus: 'none',
       });
 
       return { success: true, data: result };

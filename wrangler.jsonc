@@ -8,13 +8,10 @@
     "nodejs_compat_populate_process_env",
     "global_fetch_strictly_public"
   ],
-
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist/client"
   },
-
-  // D1 - local dev
   "d1_databases": [
     {
       "binding": "DB",
@@ -23,7 +20,6 @@
       "remote": true
     }
   ],
-
   "kv_namespaces": [
     {
       "binding": "SESSION",
@@ -31,12 +27,20 @@
       "preview_id": "3e9ae14a105b4aa48316eaa029f5bc5f"
     }
   ],
-
   "r2_buckets": [
     {
       "binding": "MEDIA_BUCKET",
       "bucket_name": "timorup-media",
       "preview_bucket_name": "timorup-media"
     }
-  ]
+  ],
+  "// --- Secret / Environment Variables ---": "Add as vars here for local dev + type safety. For PRODUCTION, use `wrangler secret put <name>` to set real values. Workers secrets override these vars at runtime.",
+  "vars": {
+    "MINIMAX_API_KEY": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
+    "CLEANUP_SECRET": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
+    "CRON_SECRET": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
+    "APP_URL": "https://timorup.jasonwill.workers.dev",
+    "BETTER_AUTH_URL": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
+    "R2_PUBLIC_URL": "https://pub-timorup.jasonwill.workers.dev"
+  }
 }

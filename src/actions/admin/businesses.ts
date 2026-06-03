@@ -32,7 +32,7 @@ export const adminBusinesses = {
         email: businesses.email,
         contactNumber: businesses.contactNumber,
         status: businesses.status,
-        planSlug: businesses.planSlug,
+        planExpiresAt: businesses.planExpiresAt,
         createdAt: businesses.createdAt,
         updatedAt: businesses.updatedAt,
       })
@@ -68,17 +68,13 @@ export const adminBusinesses = {
       email: z.email().optional().nullable(),
       contactNumber: z.string().optional().nullable(),
       aboutUs: z.string().optional().nullable(),
-      latestUpdates: z.string().optional().nullable(),
     }),
     handler: async (input) => {
       const user = await getAdminUser();
       if (!user) return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Authentication required');
-
       const db = await getDb();
       if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, 'Database not available');
-
       const now = Math.floor(Date.now() / 1000);
-
       const newBusiness = {
         id: `biz-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         title: input.title,
@@ -86,7 +82,6 @@ export const adminBusinesses = {
         email: input.email || null,
         contactNumber: input.contactNumber || null,
         aboutUs: input.aboutUs || null,
-        latestUpdates: input.latestUpdates || null,
         status: 'draft' as const,
         createdAt: now,
         updatedAt: now,

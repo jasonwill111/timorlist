@@ -1,5 +1,5 @@
+<!-- specweave:living-doc {"name": "WEEKLY-SUMMARY-2026-05-14-15.md", "version": "1.1.0", "updated": "2026-06-03", "type": "report", "domain": "project", "maintainedBy": "team", "lastChange": "project-cleanup"} -->
 # Weekly Summary: 2026-05-14 ~ 2026-05-15
-
 ## 主要工作
 
 ### 1. Schema 同步与数据修�?- 从远�?D1 导出完整数据到本�?- 修复 businesses 表中的数据污�?(gov-*, ngo-* 移至正确�?

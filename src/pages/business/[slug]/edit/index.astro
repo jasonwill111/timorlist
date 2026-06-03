@@ -352,6 +352,7 @@ import CardContent from '@/components/ui/CardContent.astro';
 
 <script>
   import { geocodeAddress } from '@/lib/geo';
+  import { getSubscriptionDashboard } from '@/lib/subscription';
 
   // ── TipTap Editor Helper ─────────────────────────────────────────────────────
   async function initTipTapEditor(element: HTMLElement, options: { placeholder?: string; content?: string } = {}) {
@@ -607,34 +608,42 @@ import CardContent from '@/components/ui/CardContent.astro';
     }
   }
 
-  // Check if business is in grace period
-  function checkGracePeriod(business: BusinessFormData): boolean {
-    const subscriptionStatus = business.subscriptionStatus || 'none';
-    const gracePeriodEndDate = business.gracePeriodEndDate;
-
+  // Check if business is in grace period (fetches from orders table via getSubscriptionDashboard)
+  async function checkGracePeriod(businessId: string, entityType?: string): Promise<boolean> {
     // Skip for nonprofits and businesses without subscriptions
-    if (business.entityType === 'nonprofit' || subscriptionStatus === 'none' || subscriptionStatus === 'active') {
+    if (entityType === 'nonprofit') {
       return false;
     }
 
-    // Check if in grace period
-    if (gracePeriodEndDate && subscriptionStatus === 'expired') {
-      const graceEnd = new Date(gracePeriodEndDate * 1000);
-      const now = new Date();
+    try {
+      const subscription = await getSubscriptionDashboard(businessId);
 
-      if (now < graceEnd) {
-        // Calculate days remaining
-        const daysRemaining = Math.ceil((graceEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-        // Show grace period modal and block form
-        const modal = document.getElementById('grace-period-modal');
-        const daysText = document.getElementById('grace-days-remaining');
-        if (modal) modal.classList.remove('hidden');
-        if (daysText) daysText.textContent = `剩余 ${daysRemaining} 天`;
-
-        document.getElementById('loading-state')?.classList.add('hidden');
-        return true;
+      // Skip if no subscription or active
+      if (!subscription || subscription.status === 'none' || subscription.status === 'active') {
+        return false;
       }
+
+      // Check if in grace period
+      if (subscription.isInGracePeriod && subscription.gracePeriodEndDate) {
+        const graceEnd = subscription.gracePeriodEndDate;
+        const now = new Date();
+
+        if (now < graceEnd) {
+          // Calculate days remaining
+          const daysRemaining = Math.ceil((graceEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+          // Show grace period modal and block form
+          const modal = document.getElementById('grace-period-modal');
+          const daysText = document.getElementById('grace-days-remaining');
+          if (modal) modal.classList.remove('hidden');
+          if (daysText) daysText.textContent = `剩余 ${daysRemaining} 天`;
+
+          document.getElementById('loading-state')?.classList.add('hidden');
+          return true;
+        }
+      }
+    } catch (err) {
+      console.error('Error checking subscription status:', err);
     }
 
     return false;
@@ -671,7 +680,7 @@ import CardContent from '@/components/ui/CardContent.astro';
       }
 
       // Check grace period - block editing if expired
-      if (checkGracePeriod(data.data)) {
+      if (await checkGracePeriod(data.data.id, data.data.entityType)) {
         return; // Modal shown, form blocked
       }
 

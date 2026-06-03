@@ -1,0 +1,12 @@
+{
+  "name": "TimorUp",
+  "description": "Business Directory Platform for Timor-Leste - A comprehensive platform for businesses, non-profits, public sectors, and classified listings with AI-powered tools, media management, and admin dashboard.",
+  "languages": ["css", "javascript", "json", "jsonc", "markdown", "python", "sql", "text", "typescript"],
+  "frameworks": ["Astro", "BetterAuth", "CloudflareWorkers", "Drizzle", "GitHub Actions", "Leaflet", "Mastra", "Playwright", "Sentry", "Sharp", "Tailwindcss", "Tiptap", "Typescript", "Vitest", "Zod"],
+  "files": [],
+  "totalFiles": 449,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "large",
+  "importMap": {},
+  "stalePatterns": []
+}

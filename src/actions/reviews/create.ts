@@ -1,9 +1,12 @@
+import { getDb } from '@/lib/db';
+import { reviews, businesses } from '@/db/schema';
+import { eq, avg, count } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
 import { getErrorMessage } from '@/lib/errors';
 // Reviews Create Server Action
 import { defineAction } from 'astro:actions';
 import { z } from 'zod';
-import { createReview as createReviewQuery, getReviewStats } from '@/lib/db/queries/reviews';
-import { verifyBusinessExists, updateBusinessRating } from '@/lib/db/queries/businesses';
+import { verifyBusinessExists } from '@/lib/db/queries/businesses';
 import { sanitizeText } from '@/lib/sanitize';
 
 
@@ -27,18 +30,46 @@ export const createReview = defineAction({
       // Sanitize comment to prevent XSS
       const sanitizedComment = sanitizeText(input.content || '');
 
-      // Create review via query layer
-      const result = await createReviewQuery({
-        businessId: input.businessId,
-        userId: input.userId,
-        rating: input.rating,
-        comment: sanitizedComment,
+      const db = await getDb();
+      if (!db) return { success: false, error: { message: 'Database not available' } };
+
+      const now = Math.floor(Date.now() / 1000);
+      const reviewId = nanoid();
+
+      // Atomic: insert review + update business rating in one transaction
+      await db.transaction(async (tx) => {
+        // Step 1: Insert the review
+        await tx.insert(reviews).values({
+          id: reviewId,
+          businessId: input.businessId,
+          userId: input.userId,
+          rating: input.rating,
+          content: sanitizedComment,
+          createdAt: now,
+          updatedAt: now,
+        }).run();
+
+        // Step 2: Recalculate and update business rating
+        const stats = await tx
+          .select({
+            avgRating: avg(reviews.rating),
+            reviewCount: count(),
+          })
+          .from(reviews)
+          .where(eq(reviews.businessId, input.businessId))
+          .get();
+
+        await tx.update(businesses)
+          .set({
+            ratingAverage: (stats?.avgRating as number | null) || null,
+            ratingCount: (stats?.reviewCount as number) || 0,
+            updatedAt: now,
+          })
+          .where(eq(businesses.id, input.businessId))
+          .run();
       });
 
-      // Update business rating via query layer
-      await updateBusinessRating(input.businessId);
-
-      return { success: true, data: { id: result.id } };
+      return { success: true, data: { id: reviewId } };
     } catch (error) {
       return { success: false, error: { message: getErrorMessage(error) } };
     }

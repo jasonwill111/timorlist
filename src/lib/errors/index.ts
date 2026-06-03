@@ -12,4 +12,3 @@ export {
   wrapError,
   type ErrorResponse,
 } from './errorUtils';
-export { createAppError } from './errorUtils';

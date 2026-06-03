@@ -14,7 +14,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
     footerText="Already have an account"
     footerLink={{ href: '/login', text: 'Sign in' }}
   >
-    <form id="register-form" class="space-y-4" novalidate>
+    <form id="register-form" class="space-y-4" method="post" action="/api/auth" novalidate>
       <FormMessage id="form-message" type="error" />
 
       <div>

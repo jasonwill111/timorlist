@@ -5,6 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import type { RateLimitResult } from '@/lib/rate-limit';
+
 // Mock cloudflare:workers for KV access - use factory to avoid hoisting issues
 vi.mock('cloudflare:workers', () => ({
   env: {
@@ -16,14 +18,14 @@ vi.mock('cloudflare:workers', () => ({
 }));
 
 // Import after mock
-import { checkRateLimitKV, checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, checkRateLimitInMemory } from '@/lib/rate-limit';
 
 describe('signIn action - GREEN tests (rate limiting)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('TC-01: checkRateLimitKV should use KV namespace', () => {
+  describe('TC-01: checkRateLimit should use KV namespace', () => {
     it('should store rate limit in KV when available', async () => {
       // Arrange
       const { env } = await import('cloudflare:workers');
@@ -35,7 +37,7 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
       (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
 
       // Act
-      const result = await checkRateLimitKV(identifier);
+      const result = await checkRateLimit(identifier);
 
       // Assert - after 6th request, remaining = 100 - 6 = 94
       expect(env.SESSION.get).toHaveBeenCalledWith(`ratelimit:${identifier}`);
@@ -53,7 +55,7 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
       (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(JSON.stringify(stored));
 
       // Act
-      const result = await checkRateLimitKV(identifier);
+      const result = await checkRateLimit(identifier);
 
       // Assert
       expect(result.allowed).toBe(false);
@@ -68,7 +70,7 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
       (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
 
       // Act
-      const result = await checkRateLimitKV(identifier);
+      const result = await checkRateLimit(identifier);
 
       // Assert
       expect(env.SESSION.put).toHaveBeenCalled();
@@ -86,7 +88,7 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
       (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
 
       // Act
-      const result = await checkRateLimitKV(identifier);
+      const result = await checkRateLimit(identifier);
 
       // Assert - resetIn should be ~60 seconds
       expect(result.resetIn).toBe(60);
@@ -103,7 +105,7 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
       (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
 
       // Act
-      const result = await checkRateLimitKV(identifier);
+      const result = await checkRateLimit(identifier);
 
       // Assert - after 51st request, remaining = 100 - 51 = 49
       expect(result.remaining).toBe(49);
@@ -119,27 +121,45 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
       (env.SESSION.put as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('KV unavailable'));
 
       // Act
-      const result = await checkRateLimitKV(identifier);
+      const result = await checkRateLimit(identifier);
 
       // Assert - should still return allowed (fallback works)
       expect(result.allowed).toBe(true);
     });
 
-    it('should fall back to in-memory when KV returns undefined', async () => {
-      // Arrange - reset module to clear in-memory store
-      vi.resetModules();
-
+    it('should use in-memory when KV is not available', async () => {
+      // Arrange - KV returns undefined (not available)
       const { env } = await import('cloudflare:workers');
       (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
 
       // Act - first request on fresh in-memory store: remaining = 100 - 1 = 99
-      const { checkRateLimit } = await import('@/lib/rate-limit');
-      const result = checkRateLimit('signin:new@example.com');
+      const result = await checkRateLimit('signin:new@example.com');
 
       // Assert
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(99);
     });
+  });
+});
+
+describe('checkRateLimitInMemory for testing', () => {
+  it('should return allowed:true for first request', () => {
+    const result = checkRateLimitInMemory('test:memory@example.com');
+    expect(result.allowed).toBe(true);
+    expect(result.remaining).toBe(99);
+  });
+
+  it('should track requests in memory', () => {
+    const identifier = 'test:memory2@example.com';
+    // First request
+    const first = checkRateLimitInMemory(identifier);
+    expect(first.allowed).toBe(true);
+    expect(first.remaining).toBe(99);
+
+    // Second request
+    const second = checkRateLimitInMemory(identifier);
+    expect(second.allowed).toBe(true);
+    expect(second.remaining).toBe(98);
   });
 });
 

@@ -1,6 +1,5 @@
 ---
-// Products & Services page - Astro 6 Server Islands pattern
-// Banner renders immediately, products load async via is:defer
+// Products & Services page - Full SSR for SEO
 export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
@@ -15,6 +14,12 @@ const structuredData = {
   "description": "Browse products and services from businesses in Timor-Leste",
   "url": "https://timorup.com/products-services",
 };
+
+// Cache: Products page - 2min browser, 10min CDN
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=120, s-maxage=600, stale-while-revalidate=1200'
+);
 ---
 
 <Layout
@@ -23,10 +28,10 @@ const structuredData = {
   structuredData={structuredData}
 >
   <div class="container py-4 sm:py-8">
-    <!-- Banner - renders immediately, no DB dependency -->
+    <!-- Banner -->
     <CarouselBanner position="products-services" class="mb-6" />
 
-    <!-- Products Island - loads async from D1 -->
-    <ProductsIsland is:defer />
+    <!-- Full SSR for SEO -->
+    <ProductsIsland></ProductsIsland>
   </div>
 </Layout>

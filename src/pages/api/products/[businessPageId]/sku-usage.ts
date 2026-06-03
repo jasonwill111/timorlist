@@ -2,28 +2,24 @@
 export const prerender = false;
 
 import { getDb } from '@/lib/db';
-import { products, businesses } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
-import { getPlanLimits } from '@/lib/subscription';
+import { products, businesses, orders } from '@/db/schema';
+import { eq, sql, desc } from 'drizzle-orm';
+import { getPlanLimits, GRACE_PERIOD_DAYS } from '@/lib/subscription';
 
 export async function GET({ params }: { params: Record<string, string> }) {
   const db = await getDb();
-if (!db) throw new Error("Database not available");
+  if (!db) throw new Error("Database not available");
   try {
     const { businessPageId } = params;
 
     // Get business with plan info
     const business = await db.select({
-      planSlug: businesses.planSlug,
-      limits: businesses.limits,
-      subscriptionStatus: businesses.subscriptionStatus,
-      subscriptionExpiresAt: businesses.subscriptionExpiresAt,
       status: businesses.status,
     })
-    .from(businesses)
-    .where(eq(businesses.id, businessPageId!))
-    .limit(1)
-    .get() ?? undefined;
+      .from(businesses)
+      .where(eq(businesses.id, businessPageId!))
+      .limit(1)
+      .get() ?? undefined;
 
     if (!business) {
       return new Response(JSON.stringify({
@@ -35,13 +31,38 @@ if (!db) throw new Error("Database not available");
       });
     }
 
-    // Check if subscription expired
-    let effectivePlan = business.planSlug || null;
-    if (business.subscriptionExpiresAt && new Date(business.subscriptionExpiresAt) < new Date()) {
-      effectivePlan = 'expired';
+    // Get active subscription from orders table
+    const activeOrder = await db.select({
+      servicePackageId: orders.servicePackageId,
+      planExpiresAt: orders.planExpiresAt,
+      status: orders.status,
+    })
+      .from(orders)
+      .where(eq(orders.typeId, businessPageId!))
+      .where(eq(orders.type, 'business'))
+      .where(eq(orders.status, 'paid'))
+      .orderBy(desc(orders.planExpiresAt))
+      .limit(1)
+      .get() ?? undefined;
+
+    const now = Date.now();
+    let effectivePlan: string | null = null;
+    let isExpired = false;
+
+    if (activeOrder?.planExpiresAt) {
+      const gracePeriodEnd = activeOrder.planExpiresAt + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000;
+      if (now > gracePeriodEnd) {
+        effectivePlan = 'expired';
+        isExpired = true;
+      } else if (now > activeOrder.planExpiresAt) {
+        // In grace period - still works but showing expiry
+        effectivePlan = activeOrder.servicePackageId || null;
+      } else {
+        effectivePlan = activeOrder.servicePackageId || null;
+      }
     }
 
-    const planData = effectivePlan ? await getPlanLimits(effectivePlan) : null;
+    const planData = effectivePlan && !isExpired ? await getPlanLimits(effectivePlan) : null;
     const limit = planData?.skuLimit || 0;
 
     // Count current products
@@ -60,8 +81,8 @@ if (!db) throw new Error("Database not available");
         current,
         remaining,
         canAdd: remaining > 0,
-        isExpired: effectivePlan === 'expired',
-        expiresAt: business.subscriptionExpiresAt,
+        isExpired,
+        expiresAt: activeOrder?.planExpiresAt ? new Date(activeOrder.planExpiresAt).toISOString() : null,
       }
     }), {
       status: 200,

@@ -35,22 +35,16 @@ const updateSchema = z.object({
     instagram: z.string().optional(),
     tiktok: z.string().optional(),
   }).optional().nullable(),
-  photoGallery: z.array(z.string()).optional().nullable(),
   latestUpdate: z.string().optional().nullable(),
   latestUpdateImages: z.array(z.string()).optional().nullable(),
   latestUpdateDate: z.number().optional().nullable(),
-  planType: z.string().optional().nullable(),
-  expiryDate: z.number().optional().nullable(),
 });
-
-// Field transform config for listing updates
 const LISTING_FIELD_CONFIG = {
   tags: 'json',
   openingHours: 'json',
   socialLinks: 'json',
   email: 'emptyToNull',
   registrationUrl: 'emptyToNull',
-  expiryDate: 'date',
 } as const;
 
 export const listing = {

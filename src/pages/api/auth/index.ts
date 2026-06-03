@@ -114,7 +114,6 @@ export async function POST({ request }: { request: Request }) {
         .prepare('SELECT id FROM user WHERE email = ?')
         .bind(email.toLowerCase())
         .first();
-
       if (existingUser) {
         return new Response(JSON.stringify({ error: 'Email already registered' }), {
           status: 400,
@@ -126,7 +125,6 @@ export async function POST({ request }: { request: Request }) {
       const passwordHash = await bcryptHash(password, 10);
       const userId = generateId();
       const now = Math.floor(Date.now() / 1000);
-
       // Create user
       await db
         .prepare(`
@@ -135,7 +133,6 @@ export async function POST({ request }: { request: Request }) {
         `)
         .bind(userId, email.toLowerCase(), name, now, now)
         .run();
-
       // Create account
       const accountId = generateId();
       await db
@@ -157,12 +154,10 @@ export async function POST({ request }: { request: Request }) {
     } else {
       // === SIGN IN ===
 
-      // Find user
       const userResult = await db
         .prepare('SELECT id, email, name, role FROM user WHERE email = ?')
         .bind(email.toLowerCase())
         .first();
-
       if (!userResult) {
         return new Response(JSON.stringify({ error: 'Invalid email or password' }), {
           status: 401,
@@ -170,12 +165,10 @@ export async function POST({ request }: { request: Request }) {
         });
       }
 
-      // Find account with password
       const accountResult = await db
         .prepare('SELECT password FROM account WHERE userId = ? AND providerId = ?')
         .bind(userResult.id, 'email')
         .first();
-
       if (!accountResult) {
         return new Response(JSON.stringify({ error: 'Invalid email or password' }), {
           status: 401,
@@ -205,7 +198,6 @@ export async function POST({ request }: { request: Request }) {
           { expirationTtl: SESSION_TTL_SECONDS }
         );
       }
-
       // Store in database
       await db
         .prepare(`
@@ -214,6 +206,9 @@ export async function POST({ request }: { request: Request }) {
         `)
         .bind(sessionToken, userResult.id, sessionToken, expiresAt, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000))
         .run();
+      // Build cookie - omit Secure flag on localhost/127.0.0.1 (HTTP)
+      const isLocalhost = host?.includes('localhost') || host?.includes('127.0.0.1') || !host?.startsWith('https');
+      const cookieStr = `better-auth.session_token=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_SECONDS}${!isLocalhost ? '; Secure' : ''}`;
 
       return new Response(JSON.stringify({
         success: true,
@@ -228,11 +223,10 @@ export async function POST({ request }: { request: Request }) {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Set-Cookie': `better-auth.session_token=${sessionToken}; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL_SECONDS}`
+          'Set-Cookie': cookieStr
         }
       });
     }
-
   } catch (error) {
     console.error('[Auth API] Error:', error);
     return new Response(JSON.stringify({ error: 'Authentication failed' }), {

@@ -1,5 +1,8 @@
 // Node.js async_hooks shim for Cloudflare Workers (without nodejs_compat)
 // Provides a minimal AsyncLocalStorage implementation using globalThis
+// Note: This shim is intentionally applied unconditionally when AsyncLocalStorage
+// is undefined. In CF Workers, this provides the needed AsyncLocalStorage API.
+// better-auth internally depends on this shim for proper context propagation.
 
 interface AsyncLocalStorageOptions<T> {
   specific?: T;

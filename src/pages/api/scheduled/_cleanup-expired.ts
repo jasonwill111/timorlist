@@ -2,11 +2,12 @@
 export const prerender = false;
 
 import { getDb } from '@/lib/db';
-import { businesses, products } from '@/db/schema';
-import { eq, lt, and, sql } from 'drizzle-orm';
+import { businesses, products, orders } from '@/db/schema';
+import { eq, lt, and, sql, desc } from 'drizzle-orm';
+import { GRACE_PERIOD_DAYS } from '@/lib/subscription';
 
 export async function GET({ request }: { params: Record<string, string>; request: Request }) {
-  // Verify this is an internal/scheduled call (could add secret key check)
+  // Verify this is an internal/scheduled call
   const authHeader = request.headers.get('authorization');
   const expectedToken = import.meta.env.CLEANUP_SECRET;
 
@@ -18,19 +19,42 @@ export async function GET({ request }: { params: Record<string, string>; request
   }
 
   const db = await getDb();
-if (!db) throw new Error("Database not available");
+  if (!db) throw new Error("Database not available");
   const now = new Date();
   const nowTimestamp = Math.floor(now.getTime() / 1000);
+  // Grace period = 30 days after planExpiresAt
+  const gracePeriodEndThreshold = nowTimestamp - (GRACE_PERIOD_DAYS * 24 * 60 * 60);
 
   try {
-    // Find businesses past grace period (businesses only)
-    const expiredBusinesses = await db.select()
+    // Find all businesses
+    const allBusinesses = await db.select({ id: businesses.id })
       .from(businesses)
-      .where(and(
-        eq(businesses.subscriptionStatus, 'expired'),
-        lt(businesses.gracePeriodEndDate, nowTimestamp)
-      ))
       .all();
+
+    // Filter those past grace period by checking orders
+    const expiredBusinesses: { id: string }[] = [];
+
+    for (const business of allBusinesses) {
+      // Get most recent paid order
+      const activeOrder = await db.select({
+        planExpiresAt: orders.planExpiresAt,
+      })
+        .from(orders)
+        .where(eq(orders.typeId, business.id))
+        .where(eq(orders.type, 'business'))
+        .where(eq(orders.status, 'paid'))
+        .orderBy(desc(orders.planExpiresAt))
+        .limit(1)
+        .get();
+
+      if (activeOrder?.planExpiresAt) {
+        // Grace period = planExpiresAt + 30 days (all in milliseconds)
+        const graceEnd = activeOrder.planExpiresAt + (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
+        if (graceEnd < now.getTime()) {
+          expiredBusinesses.push(business);
+        }
+      }
+    }
 
     const results: {
       deleted: string[];
@@ -58,8 +82,9 @@ if (!db) throw new Error("Database not available");
 
         results.totalSkusDeleted += skuCount;
 
-        // Delete the business
-        await db.delete(businesses)
+        // Soft delete the business (set deleted_at) instead of hard delete
+        await db.update(businesses)
+          .set({ deletedAt: nowTimestamp })
           .where(eq(businesses.id, business.id))
           .run();
 

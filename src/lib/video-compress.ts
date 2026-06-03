@@ -4,6 +4,8 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
+// NOTE: FFmpeg WASM caching across isolate lifetime is intentional for performance
+// Caching avoids reloading ~30MB WASM binary on each video upload
 let ffmpeg: FFmpeg | null = null;
 let loading = false;
 let preloaded = false;

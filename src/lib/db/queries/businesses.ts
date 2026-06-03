@@ -81,7 +81,7 @@ export async function createBusiness(data: {
   yearOfEstablishment?: number | null;
   socialLinks?: string | null;
   status: string;
-  subscriptionStatus: string;
+  status: string;
 }): Promise<{ id: string; title: string; slug: string }> {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
@@ -110,7 +110,6 @@ export async function createBusiness(data: {
     profileImageId: null,
     socialLinks: data.socialLinks || null,
     status: data.status,
-    subscriptionStatus: data.subscriptionStatus,
   }).run();
 
   return { id, title: data.title, slug: data.slug };

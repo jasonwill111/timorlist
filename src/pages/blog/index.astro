@@ -2,39 +2,119 @@
 import Layout from '@/layouts/Layout.astro';
 import { getDb } from '@/lib/db';
 import { blogPosts, blogCategories } from '@/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc, and, like, sql } from 'drizzle-orm';
 
 export const prerender = false;
 
+const searchParams = Astro.url.searchParams;
+const categorySlug = searchParams.get('category') || '';
+const page = parseInt(searchParams.get('page') || '1', 10);
+const LIMIT = 12;
+const offset = (page - 1) * LIMIT;
+
+// Cache: Blog changes less often - 5min browser, 30min CDN
+Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=3600');
+
 const db = await getDb();
 
-// Fetch all published posts
-const posts = await db
-  .select({
-    id: blogPosts.id,
-    title: blogPosts.title,
-    slug: blogPosts.slug,
-    excerpt: blogPosts.excerpt,
-    coverImageId: blogPosts.coverImageId,
-    authorName: blogPosts.authorName,
-    status: blogPosts.status,
-    tags: blogPosts.tags,
-    publishedAt: blogPosts.publishedAt,
-    createdAt: blogPosts.createdAt,
-  })
-  .from(blogPosts)
-  .where(eq(blogPosts.status, 'published'))
-  .orderBy(desc(blogPosts.publishedAt))
-  .all();
+let posts: Awaited<ReturnType<typeof db.select>> = [];
+let categories: Awaited<ReturnType<typeof db.select>> = [];
+let total = 0;
 
-// Fetch categories
-const categories = await db
-  .select()
-  .from(blogCategories)
-  .all();
+try {
+  if (db) {
+    // Find category ID from slug
+    let categoryId: string | null = null;
+    if (categorySlug) {
+      const foundCategory = db
+        .select()
+        .from(blogCategories)
+        .where(eq(blogCategories.slug, categorySlug))
+        .get();
+      if (foundCategory) {
+        categoryId = (foundCategory as { id: string }).id;
+      }
+    }
+
+    // Fetch categories for filter pills
+    categories = await db
+      .select()
+      .from(blogCategories)
+      .where(eq(blogCategories.isActive, true))
+      .all();
+
+    // Build WHERE conditions
+    const conditions = [eq(blogPosts.status, 'published')];
+    
+    if (categoryId) {
+      conditions.push(eq(blogPosts.categoryId, categoryId));
+    }
+
+    // Count total matching posts
+    const countResult = db
+      .select({ count: sql<number>`count(*)` })
+      .from(blogPosts)
+      .where(and(...conditions))
+      .get();
+    total = countResult?.count || 0;
+
+    // Fetch paginated posts
+    posts = await db
+      .select({
+        id: blogPosts.id,
+        title: blogPosts.title,
+        slug: blogPosts.slug,
+        excerpt: blogPosts.excerpt,
+        coverImageId: blogPosts.coverImageId,
+        authorName: blogPosts.authorName,
+        status: blogPosts.status,
+        tags: blogPosts.tags,
+        publishedAt: blogPosts.publishedAt,
+        createdAt: blogPosts.createdAt,
+      })
+      .from(blogPosts)
+      .where(and(...conditions))
+      .orderBy(desc(blogPosts.publishedAt))
+      .limit(LIMIT)
+      .offset(offset)
+      .all();
+  }
+} catch (e) {
+  console.error('[blog] DB error:', e);
+  posts = [];
+  categories = [];
+}
+
+const totalPages = Math.ceil(total / LIMIT);
+
+// Build pagination URL helper
+const buildUrl = (pageNum: number) => {
+  const p = new URLSearchParams();
+  if (categorySlug) p.set('category', categorySlug);
+  if (pageNum > 1) p.set('page', pageNum.toString());
+  return `/blog?${p.toString()}`;
+};
+
+// Blog structured data for SEO
+const blogSchema = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Timor-Leste Blog",
+  "description": "Travel guides, local insights, and news about Timor-Leste",
+  "url": "https://timorup.com/blog",
+  "publisher": {
+    "@type": "Organization",
+    "name": "TimorUp",
+    "url": "https://timorup.com"
+  }
+};
 ---
 
-<Layout title="Blog - TimorUp" description="Travel guides, local insights, and news about Timor-Leste">
+<Layout 
+  title="Blog - TimorUp" 
+  description="Travel guides, local insights, and news about Timor-Leste"
+  structuredData={blogSchema}
+>
   <main class="container mx-auto px-4 py-8 max-w-6xl">
     <!-- Header -->
     <div class="text-center mb-12">
@@ -42,6 +122,7 @@ const categories = await db
       <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
         Discover travel guides, local insights, and the latest news about Timor-Leste
       </p>
+      <span class="text-sm text-muted-foreground mt-2">{total} articles</span>
     </div>
 
     <!-- Category Pills -->
@@ -49,16 +130,16 @@ const categories = await db
       <div class="flex flex-wrap gap-2 justify-center mb-8">
         <a
           href="/blog"
-          class="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium transition-colors"
+          class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${!categorySlug ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-primary/10'}`}
         >
           All
         </a>
-        {categories.filter(c => c.isActive).map((category) => (
+        {categories.map((category) => (
           <a
-            href={`/blog?category=${category.slug}`}
-            class="px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm font-medium hover:bg-primary/10 transition-colors"
+            href={`/blog?category=${(category as { slug: string }).slug}`}
+            class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${categorySlug === (category as { slug: string }).slug ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-primary/10'}`}
           >
-            {category.name}
+            {(category as { name: string }).name}
           </a>
         ))}
       </div>
@@ -66,82 +147,124 @@ const categories = await db
 
     <!-- Blog Grid -->
     {posts.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => {
-          const postTags = post.tags ? JSON.parse(post.tags as string) : [];
-          const publishDate = post.publishedAt
-            ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })
-            : new Date(post.createdAt!).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              });
+      <>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => {
+            const postTags = (post as { tags?: string }).tags ? JSON.parse((post as { tags: string }).tags) : [];
+            const publishedAt = (post as { publishedAt?: string | Date }).publishedAt;
+            const createdAt = (post as { createdAt?: string | Date }).createdAt;
+            const publishDate = publishedAt
+              ? new Date(publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : createdAt
+                ? new Date(createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                : '';
 
-          return (
-            <a
-              href={`/blog/${post.slug}`}
-              class="group block bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/40 hover:shadow-lg transition-all duration-300"
-            >
-              {/* Cover Image Placeholder */}
-              <div class="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                {post.coverImageId ? (
-                  <div class="w-full h-full bg-muted animate-pulse" />
-                ) : (
-                  <svg
-                    class="w-16 h-16 text-primary/40"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+            return (
+              <a
+                href={`/blog/${(post as { slug: string }).slug}`}
+                class="group block bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/40 hover:shadow-lg transition-all duration-300"
+              >
+                {/* Cover Image */}
+                <div class="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center overflow-hidden">
+                  {(post as { coverImageId: string | null }).coverImageId ? (
+                    <img 
+                      src={`/api/media/${(post as { coverImageId: string }).coverImageId}`}
+                      alt={(post as { title: string }).title}
+                      class="w-full h-full object-cover"
+                      loading="lazy"
                     />
-                  </svg>
-                )}
-              </div>
-
-              {/* Content */}
-              <div class="p-5">
-                {/* Tags */}
-                {postTags.length > 0 && (
-                  <div class="flex flex-wrap gap-1 mb-3">
-                    {postTags.slice(0, 2).map((tag: string) => (
-                      <span class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Title */}
-                <h2 class="text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                  {post.title}
-                </h2>
-
-                {/* Excerpt */}
-                {post.excerpt && (
-                  <p class="text-muted-foreground text-sm mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                )}
-
-                {/* Meta */}
-                <div class="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{post.authorName || 'TimorUp'}</span>
-                  <span>{publishDate}</span>
+                  ) : (
+                    <svg
+                      class="w-16 h-16 text-primary/40"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                      />
+                    </svg>
+                  )}
                 </div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
+
+                {/* Content */}
+                <div class="p-5">
+                  {/* Tags */}
+                  {postTags.length > 0 && (
+                    <div class="flex flex-wrap gap-1 mb-3">
+                      {postTags.slice(0, 2).map((tag: string) => (
+                        <span class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Title */}
+                  <h2 class="text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                    {(post as { title: string }).title}
+                  </h2>
+
+                  {/* Excerpt */}
+                  {(post as { excerpt?: string }).excerpt && (
+                    <p class="text-muted-foreground text-sm mb-4 line-clamp-3">
+                      {(post as { excerpt: string }).excerpt}
+                    </p>
+                  )}
+
+                  {/* Meta */}
+                  <div class="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>{(post as { authorName?: string }).authorName || 'TimorUp'}</span>
+                    <span>{publishDate}</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
+            {page > 1 && (
+              <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+                ← Previous
+              </a>
+            )}
+            
+            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+              const pageNum = i + 1;
+              const isActive = pageNum === page;
+              return (
+                <a 
+                  href={buildUrl(pageNum)} 
+                  class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {pageNum}
+                </a>
+              );
+            })}
+            
+            {page < totalPages && (
+              <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+                Next →
+              </a>
+            )}
+          </nav>
+        )}
+      </>
     ) : (
       <div class="text-center py-16">
         <svg
@@ -157,12 +280,14 @@ const categories = await db
             d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
           />
         </svg>
-        <h3 class="text-xl font-semibold text-foreground mb-2">No blog posts yet</h3>
+        <h3 class="text-xl font-semibold text-foreground mb-2">No blog posts found</h3>
         <p class="text-muted-foreground">
-          Check back soon for travel guides and local insights about Timor-Leste.
+          {categorySlug ? 'Try a different category or browse all posts.' : 'Check back soon for travel guides and local insights about Timor-Leste.'}
         </p>
+        <a href="/blog" class="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md">
+          View all posts
+        </a>
       </div>
     )}
   </main>
 </Layout>
-

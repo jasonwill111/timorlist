@@ -6,9 +6,9 @@ import { getDb } from '@/lib/db';
 import { listings as listingsTable } from '@/db/schema';
 import { eq, and, like, desc } from 'drizzle-orm';
 import { generateUniqueSlug } from '@/lib/utils';
+import { nanoid } from 'nanoid';
 
 export interface ListingFilters {
-  listingType?: 'job' | 'product' | 'service' | 'vehicle' | 'property' | 'wanted';
   status?: 'draft' | 'published';
   search?: string;
 }
@@ -16,7 +16,6 @@ export interface ListingFilters {
 export interface CreateListingInput {
   title: string;
   slug?: string;
-  listingType: 'job' | 'product' | 'service' | 'vehicle' | 'property' | 'wanted';
   categoryId?: string | null;
   description: string;
   price?: string | null;
@@ -34,12 +33,17 @@ export interface CreateListingInput {
   ownerId: string;
 }
 
-export interface UpdateListingInput extends Partial<CreateListingInput> {
+export interface UpdateListingInput extends Partial<Omit<CreateListingInput, 'title' | 'description' | 'status' | 'ownerId'>> {
   id: string;
+  title?: string;
+  description?: string;
+  status?: 'draft' | 'published';
+  ownerId?: string;
 }
 
 /**
  * List listings with optional filters
+ * Note: listingType removed - type derived from category hierarchy
  */
 export async function listListings(filters?: ListingFilters) {
   const db = await getDb();
@@ -48,9 +52,6 @@ export async function listListings(filters?: ListingFilters) {
   let query = db.select().from(listingsTable);
   const conditions = [];
 
-  if (filters?.listingType) {
-    conditions.push(eq(listingsTable.listingType, filters.listingType));
-  }
   if (filters?.status) {
     conditions.push(eq(listingsTable.status, filters.status));
   }
@@ -65,6 +66,7 @@ export async function listListings(filters?: ListingFilters) {
 
 /**
  * Create a new listing
+ * Plan expiry comes from orders table, not embedded in listings
  */
 export async function createListing(input: CreateListingInput): Promise<{ id: string; slug: string }> {
   const db = await getDb();
@@ -74,15 +76,11 @@ export async function createListing(input: CreateListingInput): Promise<{ id: st
   const id = nanoid();
   const now = Math.floor(Date.now() / 1000);
 
-  // Calculate expiresAt (3 days from now for listings)
-  const expiresAt = now + 3 * 24 * 60 * 60;
-
   const newListing = {
     id,
     title: input.title,
     slug,
     ownerId: input.ownerId,
-    listingType: input.listingType,
     categoryId: input.categoryId || null,
     description: input.description,
     price: input.price || null,
@@ -102,7 +100,6 @@ export async function createListing(input: CreateListingInput): Promise<{ id: st
     views: 0,
     createdAt: now,
     updatedAt: now,
-    expiresAt,
     lastRenewedAt: now,
   };
 
@@ -123,7 +120,6 @@ export async function updateListing(input: UpdateListingInput): Promise<void> {
   // Only update provided fields
   if (data.title !== undefined) updateData.title = data.title;
   if (data.slug !== undefined) updateData.slug = data.slug;
-  if (data.listingType !== undefined) updateData.listingType = data.listingType;
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
   if (data.description !== undefined) updateData.description = data.description;
   if (data.price !== undefined) updateData.price = data.price;

@@ -78,10 +78,6 @@ import Button from '@components/ui/Button.astro';
           <label for="biz-about" class="block text-sm font-medium mb-1">About Us</label>
           <div id="about-editor-container" class="min-h-[150px] border rounded-md overflow-hidden"></div>
         </div>
-        <div>
-          <label for="biz-updates" class="block text-sm font-medium mb-1">Latest Updates</label>
-          <div id="updates-editor-container" class="min-h-[150px] border rounded-md overflow-hidden"></div>
-        </div>
         <div class="flex gap-2 justify-end">
           <Button type="button" id="cancel-btn" variant="outline" class="text-xs py-1 h-8">Cancel</Button>
           <Button type="submit" class="text-xs py-1 h-8">Create</Button>
@@ -279,7 +275,6 @@ import Button from '@components/ui/Button.astro';
           email: String(formData.get('email') || '') || undefined,
           contactNumber: String(formData.get('phone') || '') || undefined,
           aboutUs: aboutContent || undefined,
-          latestUpdates: updatesContent || undefined,
         });
       }
 

@@ -1,13 +1,11 @@
 // Auth API - Session (Get current user)
-// Reads session from database (compatible with light-auth)
+// Reads session from database using raw SQL
+// Note: 'cloudflare:workers' is a runtime virtual module; static import is not possible
 export const prerender = false;
-
-import { drizzle } from 'drizzle-orm/d1';
-import { users, sessions } from '@/db/schema';
-import { eq, and, gt } from 'drizzle-orm';
 
 export async function GET({ request }: { request: Request }) {
   try {
+    // eslint-disable-next-line ts-import-type, ts-no-dynamic-import
     const { env } = await import('cloudflare:workers');
 
     if (!env.DB) {
@@ -16,6 +14,8 @@ export async function GET({ request }: { request: Request }) {
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    const db = env.DB as D1Database;
 
     // Get token from cookie
     const cookieHeader = request.headers.get('cookie');
@@ -31,15 +31,11 @@ export async function GET({ request }: { request: Request }) {
     const token = match[1];
     const now = Math.floor(Date.now() / 1000);
 
-    // Query session from database
-    const db = drizzle(env.DB as D1Database);
-
+    // Query session from database - uses camelCase columns
     const session = await db
-      .select()
-      .from(sessions)
-      .where(eq(sessions.token, token))
-      .limit(1)
-      .get();
+      .prepare('SELECT id, userId, token, expiresAt, createdAt, updatedAt FROM session WHERE token = ? LIMIT 1')
+      .bind(token)
+      .first() as { id: string; userId: string; token: string; expiresAt: number; createdAt: number; updatedAt: number } | null;
 
     if (!session) {
       return new Response(JSON.stringify({ user: null, session: null }), {
@@ -48,26 +44,23 @@ export async function GET({ request }: { request: Request }) {
       });
     }
 
-    // Check if session is expired
-    if (session.expiresAt < now) {
+    // Check if session is expired (handle both number and string)
+    const expiresAtMs = typeof session.expiresAt === 'number'
+      ? (session.expiresAt < 1e12 ? session.expiresAt * 1000 : session.expiresAt)
+      : new Date(session.expiresAt).getTime();
+
+    if (expiresAtMs < Date.now()) {
       return new Response(JSON.stringify({ user: null, session: null }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Get user info
+    // Get user info - try with 'user' table (singular)
     const user = await db
-      .select({
-        id: users.id,
-        email: users.email,
-        name: users.name,
-        role: users.role,
-      })
-      .from(users)
-      .where(eq(users.id, session.userId))
-      .limit(1)
-      .get();
+      .prepare('SELECT id, email, name, role, image FROM user WHERE id = ? LIMIT 1')
+      .bind(session.userId)
+      .first() as { id: string; email: string; name: string; role: string; image: string | null } | null;
 
     if (!user) {
       return new Response(JSON.stringify({ user: null, session: null }), {
@@ -82,10 +75,11 @@ export async function GET({ request }: { request: Request }) {
         email: user.email,
         name: user.name || '',
         role: user.role || 'user',
+        image: user.image,
       },
       session: {
         id: session.id,
-        expiresAt: new Date(session.expiresAt * 1000).toISOString(),
+        expiresAt: new Date(expiresAtMs).toISOString(),
         token: session.token,
         userId: session.userId,
       }

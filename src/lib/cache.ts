@@ -4,34 +4,28 @@
  * Provides caching layer for D1 queries to reduce database load.
  * Note: KV TTL minimum is 60 seconds.
  */
-
 interface CacheOptions {
   /** Time to live in seconds (minimum 60) */
   ttl: number;
   /** Custom KV namespace binding */
   namespace?: KVNamespace;
 }
-
-interface CacheStats {
-  hits: number;
-  misses: number;
-  hitRate: number;
-}
-
-let cacheStats: CacheStats = { hits: 0, misses: 0, hitRate: 0 };
-
+// Cached KV namespace (module-level, initialized once)
+let _kv: KVNamespace | null = null;
 /**
- * Get KV namespace from environment
+ * Get KV namespace - cached after first call
  */
 async function getKVNamespace(): Promise<KVNamespace | null> {
+  if (_kv) return _kv;
   try {
     const { env } = await import('cloudflare:workers');
-    return (env as Record<string, unknown>).SESSION as KVNamespace;
+    const session = (env as Record<string, unknown>).SESSION as KVNamespace;
+    _kv = session;
+    return _kv;
   } catch {
     return null;
   }
 }
-
 /**
  * Get cached value from KV
  */
@@ -41,30 +35,28 @@ async function getFromKV<T>(key: string, kv: KVNamespace): Promise<T | null> {
     try {
       return JSON.parse(value) as T;
     } catch {
+      console.warn(`[Cache] JSON parse failed for key ${key}, discarding corrupt entry`);
       return null;
     }
   }
   return null;
 }
-
 /**
  * Set cached value to KV
  */
+// KV TTL minimum is 60 seconds - floor prevents silent failures on short TTLs
 async function setToKV<T>(key: string, value: T, kv: KVNamespace, ttl: number): Promise<void> {
-  // KV TTL minimum is 60 seconds
   const effectiveTtl = Math.max(ttl, 60);
   await kv.put(key, JSON.stringify(value), {
     expirationTtl: effectiveTtl,
   });
 }
-
 /**
  * Invalidate cache key
  */
 async function invalidateKV(key: string, kv: KVNamespace): Promise<void> {
   await kv.delete(key);
 }
-
 /**
  * Get cached data or fetch and cache it
  *
@@ -85,58 +77,27 @@ export async function cachedGet<T>(
     // No KV available, fetch directly
     return fetcher();
   }
-
-  try {
-    // Try cache first
-    const cached = await getFromKV<T>(key, kv);
-    if (cached !== null) {
-      cacheStats.hits++;
-      cacheStats.hitRate = cacheStats.hits / (cacheStats.hits + cacheStats.misses);
-      return cached;
-    }
-  } catch (e) {
-    console.warn(`[Cache] KV read failed for ${key}:`, e);
+  // Try cache first
+  const cached = await getFromKV<T>(key, kv);
+  if (cached !== null) {
+    return cached;
   }
-
-  // Cache miss
-  cacheStats.misses++;
-  cacheStats.hitRate = cacheStats.hits / (cacheStats.hits + cacheStats.misses);
-
   // Fetch fresh data
   const data = await fetcher();
-
   // Store in cache (fire and forget)
   setToKV(key, data, kv, options.ttl).catch((e) => {
     console.warn(`[Cache] KV write failed for ${key}:`, e);
   });
-
   return data;
 }
-
-/**
- * Get cache stats
- */
-export function getCacheStats(): CacheStats {
-  return { ...cacheStats };
-}
-
-/**
- * Reset cache stats
- */
-export function resetCacheStats(): void {
-  cacheStats = { hits: 0, misses: 0, hitRate: 0 };
-}
-
 /**
  * Invalidate specific cache keys
  */
 export async function invalidateCache(...keys: string[]): Promise<void> {
   const kv = await getKVNamespace();
   if (!kv) return;
-
   await Promise.all(keys.map((key) => invalidateKV(key, kv)));
 }
-
 /**
  * Invalidate cache keys by pattern (prefix matching)
  * Note: This requires listing all keys which can be slow
@@ -144,7 +105,6 @@ export async function invalidateCache(...keys: string[]): Promise<void> {
 export async function invalidateCachePattern(pattern: string): Promise<void> {
   const kv = await getKVNamespace();
   if (!kv) return;
-
   try {
     const list = await kv.list({ prefix: pattern });
     await Promise.all(list.keys.map((key) => kv.delete(key.name)));
@@ -152,7 +112,6 @@ export async function invalidateCachePattern(pattern: string): Promise<void> {
     console.warn(`[Cache] Pattern invalidation failed for ${pattern}:`, e);
   }
 }
-
 // Cache key builders for consistent naming
 export const cacheKeys = {
   categories: (type: string) => `categories:${type}`,

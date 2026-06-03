@@ -1,15 +1,19 @@
 // Subscription batching tests
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
 import { getSubscriptionDashboard } from './subscription';
+import * as dbModule from './db';
 
-// Mock the DB module
 vi.mock('./db', () => ({
   getDb: vi.fn()
 }));
 
 describe('getSubscriptionDashboard', () => {
+  let getDbMock: Mock;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    getDbMock = dbModule.getDb as Mock;
   });
 
   it('should return null for non-existent business', async () => {
@@ -20,14 +24,16 @@ describe('getSubscriptionDashboard', () => {
       limit: vi.fn().mockReturnThis(),
       get: vi.fn().mockResolvedValue(null)
     };
-    vi.mocked(await import('./db')).getDb.mockResolvedValue(mockDb as any);
+    getDbMock.mockResolvedValue(mockDb);
 
     const result = await getSubscriptionDashboard('non-existent-id');
     expect(result).toBeNull();
   });
 
   it('should return subscription dashboard with all data in single call', async () => {
-    // This test verifies the batching behavior
+    const now = Date.now();
+    const futureExpiry = now + 86400000;
+
     const mockDb = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
@@ -36,25 +42,27 @@ describe('getSubscriptionDashboard', () => {
       get: vi.fn()
     };
 
-    // First call returns business
-    // Second call returns SKU count
-    // Third call returns plan
+    // Business exists query
     mockDb.get
+      .mockResolvedValueOnce({ id: 'biz-123' })
+      // Order query - active paid order
       .mockResolvedValueOnce({
-        id: 'biz-123',
-        planSlug: 'basic-monthly',
-        subscriptionStatus: 'active',
-        subscriptionExpiresAt: Date.now() + 86400000,
-        gracePeriodEndDate: null
+        servicePackageId: 'basic-monthly',
+        planExpiresAt: futureExpiry,
+        paidDate: now,
+        variantSnapshot: null,
+        status: 'paid'
       })
+      // SKU count
       .mockResolvedValueOnce({ count: 5 })
+      // Plan limits
       .mockResolvedValueOnce({
         variants: JSON.stringify([{
           limits: { skuLimit: 10, maxImages: 16, maxVideos: 2 }
         }])
       });
 
-    vi.mocked(await import('./db')).getDb.mockResolvedValue(mockDb as any);
+    getDbMock.mockResolvedValue(mockDb);
 
     const result = await getSubscriptionDashboard('biz-123');
 
@@ -74,17 +82,14 @@ describe('getSubscriptionDashboard', () => {
     };
 
     mockDb.get
-      .mockResolvedValueOnce({
-        id: 'biz-no-sub',
-        planSlug: null,
-        subscriptionStatus: null,
-        subscriptionExpiresAt: null,
-        gracePeriodEndDate: null
-      })
-      .mockResolvedValueOnce({ count: 0 })
-      .mockResolvedValueOnce(null);
+      // Business exists
+      .mockResolvedValueOnce({ id: 'biz-no-sub' })
+      // No orders
+      .mockResolvedValueOnce(null)
+      // SKU count
+      .mockResolvedValueOnce({ count: 0 });
 
-    vi.mocked(await import('./db')).getDb.mockResolvedValue(mockDb as any);
+    getDbMock.mockResolvedValue(mockDb);
 
     const result = await getSubscriptionDashboard('biz-no-sub');
 
@@ -92,5 +97,38 @@ describe('getSubscriptionDashboard', () => {
     expect(result?.status).toBe('none');
     expect(result?.planSlug).toBeNull();
     expect(result?.skuLimit).toBe(0);
+  });
+
+  it('should handle expired subscription', async () => {
+    const now = Date.now();
+    const pastExpiry = now - 86400000; // 1 day ago
+
+    const mockDb = {
+      select: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      get: vi.fn()
+    };
+
+    mockDb.get
+      .mockResolvedValueOnce({ id: 'biz-expired' })
+      .mockResolvedValueOnce({
+        servicePackageId: 'basic-monthly',
+        planExpiresAt: pastExpiry,
+        paidDate: pastExpiry - 86400000,
+        variantSnapshot: null,
+        status: 'paid'
+      })
+      .mockResolvedValueOnce({ count: 3 })
+      .mockResolvedValueOnce(null);
+
+    getDbMock.mockResolvedValue(mockDb);
+
+    const result = await getSubscriptionDashboard('biz-expired');
+
+    expect(result).not.toBeNull();
+    expect(result?.status).toBe('expired');
+    expect(result?.isActive).toBe(false);
   });
 });

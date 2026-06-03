@@ -4,7 +4,7 @@ export const prerender = false;
 import { getDb } from '@/lib/db';
 import { nonProfits, nonProfitCategories as categories } from '@/db/schema';
 import { eq, desc, like, and, or, type SQL } from 'drizzle-orm';
-import { checkRateLimitKV, getRateLimitHeaders } from '@/lib/rate-limit';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import { PaginationSchema } from '@/lib/validation';
 
 function getErrorMessage(error: unknown): string {
@@ -24,7 +24,7 @@ if (!db) throw new Error("Database not available");
 
   // Rate limiting
   const clientIP = getClientIP(request);
-  const rateLimit = await checkRateLimitKV(`nonprofits:${clientIP}`);
+    const rateLimit = await checkRateLimit(`nonprofits:${clientIP}`);
 
   if (!rateLimit.allowed) {
     return new Response(JSON.stringify({
