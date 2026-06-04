@@ -1,0 +1,39 @@
+{
+  "id": "0101-critical-testing-issues-fix",
+  "title": "Critical Testing Issues Fix",
+  "status": "completed",
+  "type": "hotfix",
+  "priority": "P1",
+  "created": "2026-06-04T02:30:00.000Z",
+  "lastActivity": "2026-06-04T02:45:00.000Z",
+  "completed": "2026-06-04T02:45:00.000Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {
+    "production": "https://timorup.jasonwill.workers.dev",
+    "d1Database": "timorup-db (45346e9c-d19c-4acb-85f1-ebf6cb581fc5)"
+  },
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "fixes": [
+    "CSRF middleware blocks local auth (Origin check fails for localhost)",
+    "/listings route conflict (redirects to /admin/login)",
+    "ProductsSection generates wrong URL (nested /business/slug/product/id instead of /product/slug)",
+    "Products admin API missing endpoints (Error loading SKUs)"
+  ],
+  "testResults": {
+    "publicPages": "12/15 passed",
+    "adminPages": "8/13 passed",
+    "keyIssues": [
+      "/business/health-clinic blank - Miniflare streaming bug (known, prod OK)",
+      "/listings -> /admin/login - FIXED",
+      "CSRF blocks local auth - FIXED",
+      "ProductsSection wrong URL - FIXED",
+      "Products admin API - FIXED"
+    ]
+  }
+}

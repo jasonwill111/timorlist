@@ -56,7 +56,7 @@ if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not ava
         .from(latestUpdates)
         .where(and(
           eq(latestUpdates.typeId, business.id),
-          eq(latestUpdates.type, 'businesses')
+          eq(latestUpdates.type, 'business')
         ))
         .all();
 
@@ -74,7 +74,7 @@ if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not ava
 
       await db.insert(latestUpdates).values({
         id,
-        type: 'businesses',
+        type: 'business',
         typeId: business.id,
         content: sanitizedContent,
         imageIds: input.images ? JSON.stringify(input.images) : null,
@@ -110,7 +110,7 @@ if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not ava
         .from(latestUpdates)
         .where(and(
           eq(latestUpdates.typeId, business.id),
-          eq(latestUpdates.type, 'businesses')
+          eq(latestUpdates.type, 'business')
         ))
         .orderBy(desc(latestUpdates.createdAt))
         .limit(4)

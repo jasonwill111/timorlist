@@ -100,7 +100,7 @@ try {
   if (db) {
     const dataResult = await db.prepare(`
       SELECT id, title, slug, category_id as categoryId, address, profile_image_id,
-             tags, likes, saves, views, status, about_us as aboutUs, created_at as createdAt
+             tags, likes, saves, views, status, aboutUs, created_at as createdAt
       FROM public_sectors
       ${whereClause}
       ORDER BY created_at DESC
@@ -158,7 +158,7 @@ const buildUrl = (pageNum: number) => {
               ratingCount={0}
               imageId={p.profile_image_id}
               entityType="publicsector"
-              aboutUs={p.about_us}
+              aboutUs={p.aboutUs}
             />
           ))}
         </div>

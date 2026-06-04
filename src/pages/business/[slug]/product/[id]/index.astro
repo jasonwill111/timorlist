@@ -3,17 +3,11 @@
 export const prerender = false;
 
 import Layout from '@layouts/Layout.astro';
-import Button from '@components/ui/Button.astro';
-import Card from '@components/ui/Card.astro';
-import CardContent from '@components/ui/CardContent.astro';
-import { ArrowLeft, ChevronLeft, ChevronRight, ArrowRight } from '@lucide/astro';
-import ShareDialog from '@/components/ui/ShareDialog.astro';
-import { getDb } from '@/lib/db';
+import { getRawDb } from '@/lib/db';
 import { createBreadcrumbSchema } from '@/lib/seo';
-import { products, businesses, businessCategories as categories } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 
-const db = await getDb();
+const siteUrl = import.meta.env.SITE || 'https://timorup.com';
+const db = await getRawDb();
 const { slug } = Astro.params;
 
 // Extract product ID from path: /business/[slug]/product/[id]
@@ -21,33 +15,65 @@ const pathParts = Astro.url.pathname.split('/').filter(Boolean);
 const productIdIndex = pathParts.indexOf('product');
 const productId = productIdIndex >= 0 ? pathParts[productIdIndex + 1] : '';
 
-const siteUrl = import.meta.env.SITE || 'https://timorup.com';
+if (!productId || !db) {
+  return Astro.redirect('/businesses');
+}
 
-// SSR: Load product
-const product = productId
-  ? await db.select().from(products).where(eq(products.id, productId)).get()
-  : null;
+// SSR: Load product with raw SQL
+interface ProductRow {
+  id: string; title: string; description: string | null;
+  productType: string | null; priceFields: string | null;
+  specifications: string | null; businessId: string; categoryId: string;
+}
+interface BusinessRow {
+  id: string; title: string; slug: string;
+  contactNumber: string | null; countryCode: string | null;
+  profileImageId: string | null;
+}
+interface CategoryRow { id: string; name: string; }
+
+let product: ProductRow | null = null;
+let business: BusinessRow | null = null;
+let category: CategoryRow | null = null;
+
+try {
+  product = await db
+    .prepare('SELECT id, title, description, product_type as productType, price_fields as priceFields, specifications, business_id as businessId, category_id as categoryId FROM products WHERE id = ? AND (deleted_at IS NULL OR deleted_at = 0) LIMIT 1')
+    .bind(productId)
+    .first() as ProductRow | null;
+} catch (e) {
+  console.error('[product detail] product query failed:', e instanceof Error ? e.message : String(e));
+}
 
 // Redirect if not found
 if (!product) {
   return Astro.redirect('/businesses');
 }
 
-// Load business info from businesses table
-const business = await db.select().from(businesses).where(eq(businesses.id, product.businessId)).get();
+try {
+  business = await db
+    .prepare('SELECT id, title, slug, contact_number as contactNumber, country_code as countryCode, profile_image_id as profileImageId FROM businesses WHERE id = ? LIMIT 1')
+    .bind(product.businessId)
+    .first() as BusinessRow | null;
+} catch (e) {
+  console.error('[product detail] business query failed:', e instanceof Error ? e.message : String(e));
+}
 
 // Redirect if business slug mismatch
 if (!business || business.slug !== slug) {
   return Astro.redirect(`/business/${business?.slug || ''}`);
 }
 
-// Product images now stored via media table (entityType: 'products')
-const images: string[] = [];
-
-// Load category
-const category = business.categoryId
-  ? await db.select().from(categories).where(eq(categories.id, business.categoryId)).get()
-  : null;
+try {
+  if (product.categoryId) {
+    category = await db
+      .prepare('SELECT id, name FROM business_categories WHERE id = ? LIMIT 1')
+      .bind(product.categoryId)
+      .first() as CategoryRow | null;
+  }
+} catch (e) {
+  console.error('[product detail] category query failed:', e instanceof Error ? e.message : String(e));
+}
 
 // Canonical URL
 const canonicalUrl = `${siteUrl}/business/${slug}/product/${productId}`;
@@ -408,4 +434,23 @@ const productTypeLabels: Record<string, string> = {
   document.getElementById('scroll-right')?.addEventListener('click', () => {
     thumbnailContainer?.scrollBy({ left: 160, behavior: 'smooth' });
   });
+</script>
+
+<script define:vars={{ siteUrl: siteUrl, canonicalUrl: canonicalUrl, pageTitle: pageTitle }}>
+  // Set Cache-Control header for CDN caching
+  if (typeof Astro !== 'undefined' && Astro.response) {
+    Astro.response.headers.set('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=1200');
+  }
+  // Share to WhatsApp
+  window.openBusinessMap = function(lat, lng) {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      const url = navigator.userAgent.includes('iPhone')
+        ? `http://maps.apple.com/?daddr=${lat},${lng}`
+        : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+      window.open(url, '_blank');
+    } else {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+    }
+  };
 </script>

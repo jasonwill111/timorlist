@@ -9,8 +9,8 @@ import LocationMap from '../../components/ui/LocationMap.astro';
 import MediaGallery from '../../components/ui/MediaGallery.astro';
 import UpdatesSection from '../../components/UpdatesSection.astro';
 import ProductsSection from '../../components/islands/ProductsSection.astro';
-import BusinessSidebar from '../../components/islands/BusinessSidebar.astro';
 import TipTapRenderer from '../../components/ui/TipTapRenderer.astro';
+import ShareDialog from '../../components/ui/ShareDialog.astro';
 import { Eye, Heart, Bookmark, Globe, MapPin, Tag, Clock } from '@lucide/astro';
 import { getSubscriptionDashboard } from '@/lib/subscription';
 import { getDb } from '@/lib/db';
@@ -21,6 +21,7 @@ if (!db) {
 }
 import { businesses, businessCategories, reviews, media, latestUpdates } from '@/db/schema';
 import { eq, desc, inArray } from 'drizzle-orm';
+import { createBreadcrumbSchema } from '@/lib/seo';
 
 const { slug } = Astro.params;
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
@@ -44,12 +45,12 @@ if (!business) {
 // Get subscription status from orders table (not from business.subscriptionStatus)
 const subscriptionInfo = await getSubscriptionDashboard(business.id);
 const subscriptionStatus = subscriptionInfo?.status || 'none';
-const planExpiresAt = subscriptionInfo?.planExpiresAt || null;
+const planExpiresAt = subscriptionInfo?.expiresAt || null;
 
 // Calculate grace period end date from planExpiresAt
 const GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const gracePeriodEndDate = planExpiresAt
-  ? new Date(planExpiresAt + GRACE_PERIOD_MS)
+  ? new Date(planExpiresAt.getTime() + GRACE_PERIOD_MS)
   : null;
 
 const now = new Date();
@@ -164,7 +165,7 @@ try {
   const latestUpdatesData = await db.select()
     .from(latestUpdates)
     .where(eq(latestUpdates.typeId, business.id))
-    .where(eq(latestUpdates.type, 'businesses'))
+    .where(eq(latestUpdates.type, 'business'))
     .orderBy(desc(latestUpdates.createdAt))
     .limit(4)
     .all();
@@ -178,6 +179,7 @@ try {
 
 const pageTitle = `${business.title} - TimorUp`;
 const pageDesc = business.aboutUs?.substring(0, 160) || `${business.title} - ${category?.name || 'Business'} in Timor-Leste`;
+Astro.response.headers.set('Cache-Control', cacheControl);
 ---
 
 <Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
@@ -564,9 +566,6 @@ const pageDesc = business.aboutUs?.substring(0, 160) || `${business.title} - ${c
   </div>
 
 </Layout>
-
-// Set Cache-Control header for CDN caching
-Astro.response.headers.set('Cache-Control', cacheControl);
 
 <script>
   // Save

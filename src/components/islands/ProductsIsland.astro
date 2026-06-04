@@ -1,9 +1,9 @@
 ---
 // Server-rendered Products list with proper pagination
 // All filtering, sorting, and pagination happens on the server
-import { getDb } from '@/lib/db';
+import { getDb, getRawDb } from '@/lib/db';
 import { products, businesses } from '@/db/schema';
-import { desc, eq, like, asc, sql, and } from 'drizzle-orm';
+import { desc, eq, like, asc, and } from 'drizzle-orm';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('search') || '';
@@ -51,22 +51,19 @@ if (businessId) {
   conditions.push(eq(products.businessId, businessId));
 }
 
-// Count total matching products
+// Count total matching products - use raw D1Database.prepare()
 let total = 0;
 try {
-  const db = await getDb();
-  if (db) {
-    const countResult = db
-      .select({ count: sql<number>`count(*)` })
-      .from(products)
-      .where(and(...conditions))
-      .get();
-    total = countResult?.count || 0;
+  const rawDb = await getRawDb();
+  console.log('[Products] rawDb available:', !!rawDb);
+  if (rawDb) {
+    const stmt = rawDb.prepare('SELECT COUNT(*) as count FROM products WHERE active = 1 AND deleted_at IS NULL');
+    const result = await stmt.first();
+    console.log('[Products] count result:', JSON.stringify(result));
+    total = (result as any)?.count ?? 0;
+    console.log('[Products] total set to:', total);
   }
-} catch (e) {
-  console.error('Count error:', e);
-}
-
+} catch (e) { console.error('Count error:', e); }
 // Fetch paginated products
 let paginatedProducts: {
   id: string;

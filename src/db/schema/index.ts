@@ -295,7 +295,7 @@ export const nonProfits = sqliteTable("non_profits", {
   countryCode: text("country_code").default("+670"),
   yearOfEstablishment: integer("year_of_establishment"),
   email: text(),
-  aboutUs: text(),
+  aboutUs: text("aboutUs"),
   address: text(),
   locationLat: real("location_lat"),
   locationLng: real("location_lng"),
@@ -351,7 +351,7 @@ export const publicSectors = sqliteTable("public_sectors", {
   locationLat: real("location_lat"),
   locationLng: real("location_lng"),
   openingHours: text("opening_hours"),
-  aboutUs: text(),
+  aboutUs: text("aboutUs"),
   tags: text(),
   // 统计
   likes: integer().default(0),

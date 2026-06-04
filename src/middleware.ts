@@ -8,8 +8,14 @@
 
 import { defineMiddleware } from 'astro:middleware';
 
-// Site URL for CSRF validation (must match astro.config.mjs site)
 const SITE_URL = 'https://timorup.com';
+// Production trust set: the configured site host + any Cloudflare Workers preview/staging domains
+const PRODUCTION_TRUSTED_HOSTS = new Set<string>([
+  new URL(SITE_URL).host,
+  'timorup.jasonwill.workers.dev', // Staging deployment
+  'timorup.pages.dev', // Cloudflare Pages staging
+]);
+const DEV_TRUSTED_HOSTS = new Set<string>(['localhost', '127.0.0.1']);
 
 const STATIC_CACHE = {
   'Cache-Control': 'public, max-age=31536000, immutable',
@@ -25,22 +31,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const mutationMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
 
   // === P1-B: CSRF Protection ===
-  // Compare origin against configured SITE_URL, not the Host header
-  // This prevents Host header injection bypass
+  // Compare origin host against the configured site host (production) or
+  // any localhost/127.0.0.1 host (dev). This prevents Host header injection
+  // bypass while still allowing local auth and API calls during development.
   if (mutationMethods.includes(context.request.method)) {
     const origin = context.request.headers.get('origin');
     if (origin) {
       try {
         const originUrl = new URL(origin);
-        const siteUrlObj = new URL(SITE_URL);
-        const isLocalhost = originUrl.hostname === 'localhost' || originUrl.hostname === '127.0.0.1';
-        const siteIsLocalhost = siteUrlObj.hostname === 'localhost' || siteUrlObj.hostname === '127.0.0.1';
+        const host = originUrl.host; // e.g. "localhost:4321" or "timorup.com"
+        const hostname = originUrl.hostname;
 
-        const hostsMatch = isLocalhost && siteIsLocalhost
-          ? originUrl.host === siteUrlObj.host
-          : originUrl.host === siteUrlObj.host;
+        const isTrusted =
+          PRODUCTION_TRUSTED_HOSTS.has(host) || DEV_TRUSTED_HOSTS.has(hostname);
 
-        if (!hostsMatch) {
+        if (!isTrusted) {
           return new Response('CSRF validation failed', {
             status: 403,
             statusText: 'Forbidden',

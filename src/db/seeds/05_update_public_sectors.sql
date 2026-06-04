@@ -3,7 +3,7 @@
 -- ========================================
 
 UPDATE public_sectors SET 
-  about_us = 'Ministry of Finance is responsible for fiscal policy, state budget management, taxation, and public financial management. We ensure transparent and efficient use of public resources.',
+  aboutUs = 'Ministry of Finance is responsible for fiscal policy, state budget management, taxation, and public financial management. We ensure transparent and efficient use of public resources.',
   contact_name = 'Sara til',
   contact_number = '77020001',
   country_code = '+670',
@@ -23,7 +23,7 @@ UPDATE public_sectors SET
 WHERE id = 'gov-001';
 
 UPDATE public_sectors SET 
-  about_us = 'Policia Nasional Timor-Leste (PNTL) maintains law and order, protects citizens, and ensures public safety. Operating 24/7 across all municipalities.',
+  aboutUs = 'Policia Nasional Timor-Leste (PNTL) maintains law and order, protects citizens, and ensures public safety. Operating 24/7 across all municipalities.',
   contact_name = 'Komandante til',
   contact_number = '77020002',
   country_code = '+670',
@@ -43,7 +43,7 @@ UPDATE public_sectors SET
 WHERE id = 'gov-002';
 
 UPDATE public_sectors SET 
-  about_us = 'Ministry of Health provides healthcare services, manages hospitals and health centers, and develops health policies for the well-being of all Timorese people.',
+  aboutUs = 'Ministry of Health provides healthcare services, manages hospitals and health centers, and develops health policies for the well-being of all Timorese people.',
   contact_name = 'Dr. Tilman',
   contact_number = '77020003',
   country_code = '+670',
@@ -63,7 +63,7 @@ UPDATE public_sectors SET
 WHERE id = 'gov-003';
 
 UPDATE public_sectors SET 
-  about_us = 'Ministry of Education promotes quality education for all, from early childhood to higher education. We oversee schools, teacher training, and curriculum development.',
+  aboutUs = 'Ministry of Education promotes quality education for all, from early childhood to higher education. We oversee schools, teacher training, and curriculum development.',
   contact_name = 'Dr. til',
   contact_number = '77020004',
   country_code = '+670',
@@ -81,7 +81,7 @@ UPDATE public_sectors SET
 WHERE id = 'gov-004';
 
 UPDATE public_sectors SET 
-  about_us = 'Secretaria de Estado da Reforma e Emprego - State Secretary for Reform and Employment. Responsible for labor policies, employment services, and workforce development.',
+  aboutUs = 'Secretaria de Estado da Reforma e Emprego - State Secretary for Reform and Employment. Responsible for labor policies, employment services, and workforce development.',
   contact_name = 'Sekretariu',
   contact_number = '77020005',
   country_code = '+670',

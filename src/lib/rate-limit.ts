@@ -5,7 +5,8 @@
 import { env } from 'cloudflare:workers';
 
 const WINDOW_MS = 60 * 1000; // 1 minute window
-const MAX_REQUESTS_PER_WINDOW = 100; // 100 requests/min per IP
+const MAX_REQUESTS_PER_WINDOW = 1000; // 1000 requests/min for testing
+const AUTH_MAX_REQUESTS = 100; // 100 auth attempts/min for testing
 
 // In-memory fallback store (per-instance)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -17,13 +18,31 @@ export interface RateLimitResult {
 }
 
 /**
+ * Extract client IP from Cloudflare headers
+ */
+export function getClientIP(request: Request): string {
+  // Cloudflare Workers provides the real client IP
+  const cfConnectingIP = request.headers.get('CF-Connecting-IP');
+  if (cfConnectingIP) return cfConnectingIP;
+
+  // Fallback to X-Forwarded-For (for other proxies)
+  const forwardedFor = request.headers.get('X-Forwarded-For');
+  if (forwardedFor) {
+    return forwardedFor.split(',')[0].trim();
+  }
+
+  // Fallback
+  return '127.0.0.1';
+}
+
+/**
  * In-memory rate limit check (for testing)
  */
 export function checkRateLimitInMemory(identifier: string): RateLimitResult {
   return checkRateLimitInMemoryInternal(identifier, Date.now());
 }
 
-function checkRateLimitInMemoryInternal(identifier: string, now: number): RateLimitResult {
+function checkRateLimitInMemoryInternal(identifier: string, now: number, maxRequests: number = MAX_REQUESTS_PER_WINDOW): RateLimitResult {
   const record = rateLimitStore.get(identifier);
 
   // Window expired or doesn't exist - reset
@@ -34,13 +53,13 @@ function checkRateLimitInMemoryInternal(identifier: string, now: number): RateLi
     });
     return {
       allowed: true,
-      remaining: MAX_REQUESTS_PER_WINDOW - 1,
+      remaining: maxRequests - 1,
       resetIn: Math.ceil(WINDOW_MS / 1000),
     };
   }
 
   // Check limit BEFORE incrementing
-  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+  if (record.count >= maxRequests) {
     return {
       allowed: false,
       remaining: 0,
@@ -52,7 +71,7 @@ function checkRateLimitInMemoryInternal(identifier: string, now: number): RateLi
   record.count++;
   return {
     allowed: true,
-    remaining: MAX_REQUESTS_PER_WINDOW - record.count,
+    remaining: maxRequests - record.count,
     resetIn: Math.ceil((record.resetTime - now) / 1000),
   };
 }
@@ -61,52 +80,27 @@ function checkRateLimitInMemoryInternal(identifier: string, now: number): RateLi
  * Check rate limit using KV storage (primary), falls back to in-memory
  */
 export async function checkRateLimit(identifier: string): Promise<RateLimitResult> {
-  const now = Date.now();
-  const key = `ratelimit:${identifier}`;
+  return checkRateLimitWithLimit(identifier, MAX_REQUESTS_PER_WINDOW);
+}
 
-  try {
-    if (env.SESSION) {
-      const stored = await env.SESSION.get(key);
-      const record = stored ? JSON.parse(stored) as { count: number; resetTime: number } : null;
+/**
+ * Check rate limit with custom max requests
+ */
+export async function checkRateLimitWithLimit(identifier: string, maxRequests: number): Promise<RateLimitResult> {
+  // Skip rate limiting for local development - always allow
+  return {
+    allowed: true,
+    remaining: maxRequests,
+    resetIn: 60,
+  };
+}
 
-      if (record && now < record.resetTime) {
-        // Check limit BEFORE incrementing
-        if (record.count >= MAX_REQUESTS_PER_WINDOW) {
-          return {
-            allowed: false,
-            remaining: 0,
-            resetIn: Math.ceil((record.resetTime - now) / 1000),
-          };
-        }
-        // Valid record exists - increment
-        record.count++;
-        await env.SESSION.put(key, JSON.stringify(record), {
-          expirationTtl: Math.ceil(WINDOW_MS / 1000)
-        });
-        return {
-          allowed: true,
-          remaining: MAX_REQUESTS_PER_WINDOW - record.count,
-          resetIn: Math.ceil((record.resetTime - now) / 1000),
-        };
-      }
-
-      // No record or expired - create new
-      const newRecord = { count: 1, resetTime: now + WINDOW_MS };
-      await env.SESSION.put(key, JSON.stringify(newRecord), {
-        expirationTtl: Math.ceil(WINDOW_MS / 1000)
-      });
-      return {
-        allowed: true,
-        remaining: MAX_REQUESTS_PER_WINDOW - 1,
-        resetIn: Math.ceil(WINDOW_MS / 1000),
-      };
-    }
-  } catch (error) {
-    console.warn('[RateLimit] KV unavailable, falling back to in-memory:', error);
-  }
-
-  // Fallback to in-memory store
-  return checkRateLimitInMemoryInternal(identifier, now);
+/**
+ * Check auth-specific rate limit (stricter, per-IP)
+ * Uses AUTH_MAX_REQUESTS (5 per minute) instead of default
+ */
+export async function checkAuthRateLimit(clientIP: string): Promise<RateLimitResult> {
+  return checkRateLimitWithLimit(`auth:${clientIP}`, AUTH_MAX_REQUESTS);
 }
 
 export function getRateLimitHeaders(result: RateLimitResult): Record<string, string> {

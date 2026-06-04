@@ -126,7 +126,7 @@ if (!db) throw new Error("Database not available");
     `);
     for (const listing of listings) {
       urls.push({
-        loc: `/listing/${listing.slug}`,
+        loc: `/listings/${listing.slug}`,
         lastmod: formatDate(listing.updatedAt ?? null),
         changefreq: 'weekly',
         priority: '0.7'

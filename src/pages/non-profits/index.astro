@@ -99,7 +99,7 @@ try {
   if (db) {
     const dataResult = await db.prepare(`
       SELECT id, title, slug, category_id as categoryId, address, profile_image_id,
-             tags, likes, saves, views, status, about_us as aboutUs, created_at as createdAt
+             tags, likes, saves, views, status, aboutUs, created_at as createdAt
       FROM non_profits
       ${whereClause}
       ORDER BY created_at DESC
@@ -157,7 +157,7 @@ const buildUrl = (pageNum: number) => {
               ratingCount={0}
               imageId={n.profile_image_id}
               entityType="nonprofit"
-              aboutUs={n.about_us}
+              aboutUs={n.aboutUs}
             />
           ))}
         </div>

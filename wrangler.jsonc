@@ -6,7 +6,9 @@
   "compatibility_flags": [
     "nodejs_compat_v2",
     "nodejs_compat_populate_process_env",
-    "global_fetch_strictly_public"
+    "global_fetch_strictly_public",
+    "enable_nodejs_os_module",
+    "enable_nodejs_fs_module"
   ],
   "assets": {
     "binding": "ASSETS",
@@ -34,7 +36,7 @@
       "preview_bucket_name": "timorup-media"
     }
   ],
-  "// --- Secret / Environment Variables ---": "Add as vars here for local dev + type safety. For PRODUCTION, use `wrangler secret put <name>` to set real values. Workers secrets override these vars at runtime.",
+  // --- Secret / Environment Variables ---
   "vars": {
     "MINIMAX_API_KEY": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
     "CLEANUP_SECRET": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",

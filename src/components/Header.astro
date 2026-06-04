@@ -42,7 +42,7 @@ const urlParams = new URL(Astro.request.url).searchParams;
           href="/listings"
           class:list={[
             "text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded px-1.5 py-1 flex items-center",
-            currentPath.startsWith('/listings') || currentPath.startsWith('/listing/') ? "text-primary" : "text-muted-foreground"
+            currentPath.startsWith('/listings') ? "text-primary" : "text-muted-foreground"
           ]}
         >
           Classified Ads

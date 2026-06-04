@@ -1,0 +1,109 @@
+{
+  "id": "0103-fulldev-migration-refactor",
+  "title": "Full-Stack Migration: @fulldev Integration + Separation of Concerns",
+  "status": "in-progress",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-04T15:30:00.000Z",
+  "lastActivity": "2026-06-04T15:30:00.000Z",
+  "completed": null,
+  "testMode": "manual-e2e",
+  "coverageTarget": 0,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {
+    "analysisReport": "docs/FULL-STACK-MIGRATION-ANALYSIS.md",
+    "fulldevDocs": "https://ui.full.dev/docs/installation/",
+    "shadcnCli": "npx shadcn@latest"
+  },
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "scope": {
+    "uiComponents": {
+      "total": 45,
+      "replaceable": 13,
+      "keepCustom": 1,
+      "deprecate": 1,
+      "needsWrapping": 1
+    },
+    "libUtilities": {
+      "totalFiles": 108,
+      "totalLoC": 13871,
+      "duplicationTargets": 15,
+      "estimatedReduction": 800
+    },
+    "actionsLayer": {
+      "totalActions": 47,
+      "duplicationGroups": 7,
+      "estimatedReduction": 400
+    },
+    "apiLayer": {
+      "totalEndpoints": 21,
+      "securityIssues": 3,
+      "consolidationTargets": 5
+    }
+  },
+  "phases": {
+    "phase1": {
+      "name": "Foundation",
+      "duration": "Week 1-2",
+      "tasks": 17,
+      "focus": "Install @fulldev, fix security issues, consolidate lib utilities"
+    },
+    "phase2": {
+      "name": "Component Migration",
+      "duration": "Week 3-4",
+      "tasks": 17,
+      "focus": "Replace UI components, extract domain logic"
+    },
+    "phase3": {
+      "name": "Backend Consolidation",
+      "duration": "Week 5-6",
+      "tasks": 17,
+      "focus": "Fix action duplications, create API helpers"
+    },
+    "phase4": {
+      "name": "Advanced Migration",
+      "duration": "Week 7-8",
+      "tasks": 15,
+      "focus": "DB templating, Modal migration, final audits"
+    }
+  },
+  "expectedOutcomes": {
+    "uiComponentsLoC": {
+      "before": 800,
+      "after": 250,
+      "reduction": "69%"
+    },
+    "libDuplications": {
+      "before": 15,
+      "after": 0,
+      "reduction": "100%"
+    },
+    "actionDuplications": {
+      "before": 7,
+      "after": 0,
+      "reduction": "100%"
+    },
+    "securityIssues": {
+      "before": 3,
+      "after": 0,
+      "reduction": "100%"
+    },
+    "totalLoCReduction": 1500,
+    "maintainabilityImprovement": "60-70%"
+  },
+  "riskLevel": "MEDIUM",
+  "blockingRisks": [
+    {
+      "risk": "Modal migration requires API change from global showModal/hideModal to reactive state",
+      "mitigation": "Phase 4 with dedicated testing, no deadline pressure"
+    },
+    {
+      "risk": "Security fixes may break existing auth flows",
+      "mitigation": "Test each endpoint after fix, keep backup deployment"
+    }
+  ]
+}

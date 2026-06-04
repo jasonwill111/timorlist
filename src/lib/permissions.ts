@@ -76,17 +76,17 @@ export function can(role: Role, permission: keyof typeof PERMISSIONS): boolean {
 export const ADMIN_NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: 'dashboard', minRole: 'editor' as Role },
   { href: '/admin/listings', label: 'Listings', icon: 'building', minRole: 'editor' as Role },
-  { href: '/admin/skus', label: 'SKUs', icon: 'tag', minRole: 'editor' as Role },
+  { href: '/admin/products', label: 'Products/SKUs', icon: 'tag', minRole: 'editor' as Role },
   { href: '/admin/blogs', label: 'Blogs', icon: 'newspaper', minRole: 'editor' as Role },
-  { href: '/admin/subscriptions', label: 'Subscriptions', icon: 'document', minRole: 'admin' as Role },
+  { href: '/admin/orders', label: 'Subscriptions', icon: 'document', minRole: 'admin' as Role },
   { href: '/admin/categories', label: 'Categories', icon: 'folder', minRole: 'admin' as Role },
-  { href: '/admin/heroes', label: 'Heroes', icon: 'image', minRole: 'admin' as Role },
+  { href: '/admin/ad-banners', label: 'Heroes', icon: 'image', minRole: 'admin' as Role },
+  { href: '/admin/service-packages', label: 'Plans', icon: 'credit-card', minRole: 'admin' as Role },
   { href: '/admin/media', label: 'Media', icon: 'photo', minRole: 'admin' as Role },
   { href: '/admin/reviews', label: 'Reviews', icon: 'star', minRole: 'admin' as Role },
   { href: '/admin/users', label: 'Users', icon: 'users', minRole: 'admin' as Role },
   { href: '/admin/ai-tools', label: 'AI Tools', icon: 'lightning', minRole: 'admin' as Role },
 ] as const;
-
 // Role display names
 export const ROLE_DISPLAY_NAMES: Record<Role, string> = {
   user: 'User',

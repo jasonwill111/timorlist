@@ -15,7 +15,7 @@ interface PSRecord {
   id: string;
   title: string;
   slug: string;
-  about_us: string | null;
+  aboutUs: string | null;
   contact_name: string | null;
   contact_number: string | null;
   country_code: string | null;
@@ -45,7 +45,7 @@ try {
   const db = await getRawDb();
   if (db) {
     entity = await db.prepare(`
-      SELECT id, title, slug, about_us, contact_name, contact_number, country_code, email,
+      SELECT id, title, slug, aboutUs, contact_name, contact_number, country_code, email,
              address, year_of_establishment, opening_hours, tags, social_links,
              likes, saves, views, category_id, status, profile_image_id, photo_gallery
       FROM public_sectors WHERE slug = ? LIMIT 1
@@ -97,7 +97,7 @@ const breadcrumbSchema = createBreadcrumbSchema([
 ]);
 ---
 
-<Layout title={`${entity.title} - TimorUp`} description={entity.about_us?.substring(0, 160) || entity.title} canonical={canonicalUrl}>
+<Layout title={`${entity.title} - TimorUp`} description={entity.aboutUs?.substring(0, 160) || entity.title} canonical={canonicalUrl}>
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
   <main class="max-w-7xl mx-auto px-4 py-6">
@@ -131,10 +131,10 @@ const breadcrumbSchema = createBreadcrumbSchema([
             )}
           </div>
 
-          {entity.about_us && (
+          {entity.aboutUs && (
             <div>
               <h2 class="text-lg font-semibold mb-2">About</h2>
-              <TipTapRenderer content={entity.about_us} class="text-sm" />
+              <TipTapRenderer content={entity.aboutUs} class="text-sm" />
             </div>
           )}
 

@@ -1,0 +1,25 @@
+﻿node.exe : [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mProxy environment variables detected. We'll use your proxy 
+for fetch requests.[0m
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.exe" "C:\Node22\node-global/node_modules/npm/ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33m▲ [43;33m...h requests.[0m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+
+
+ ⛅️ wrangler 4.97.0
+───────────────────
+Cloudflare agent skills are available for: Claude Code, OpenCode, Codex, Continue, GitHub Copilot, AiderDesk, Roo, Augment Code, Goose, Kilo Code, Qwen Code, Crush, OpenHands, Kiro CLI, Tabnine CLI, AiderDesk, IBM Bob, OpenClaw, CodeArts Agent, CodeBuddy, Codemaker, Code Studio, Command Code, Droid (Factory), ForgeCode, Hermes Agent, iFlow CLI, Junie, Kode, MCPJam, Mistral Vibe, Mux, Neovate, Pi, Pochi, Qoder, Rovo Dev, Trae, Trae CN, Zencoder, AdaL. Run wrangler in an interactive terminal to install them, or use `--install-skills` to install without prompting.
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mThe entry-point file at "@astrojs\cloudflare\entrypoints\server" was not
+ found.[0m
+
+  
+  This might mean that your entry-point file needs to be generated (which is the general case when a framework is being
+ used).
+  If that's the case please run your project's build command and try again.
+
+
+🪵  Logs were written to "C:\Users\Nick\AppData\Roaming\xdg.config\.wrangler\logs\wrangler-2026-06-04_12-10-09_503.log"

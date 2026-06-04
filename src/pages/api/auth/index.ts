@@ -1,14 +1,11 @@
-// Auth API - Sign In (REST fallback for Astro actions issues)
-export const prerender = false;
-
 import { createErrorResponse } from '@/lib/errors';
 import { ErrorCode } from '@/lib/errors';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkAuthRateLimit, getClientIP } from '@/lib/rate-limit';
 import { hash as bcryptHash, compare as bcryptCompare } from 'bcryptjs';
+import { scrypt, randomBytes, timingSafeEqual } from 'node:crypto';
 
 // Session constants
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
-
 function generateSessionToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return btoa(String.fromCharCode(...bytes))
@@ -80,8 +77,9 @@ export async function POST({ request }: { request: Request }) {
       });
     }
 
-    // Rate limit check
-    const rateLimit = checkRateLimit('auth-sign-in');
+    // Rate limit check (per-IP using checkAuthRateLimit)
+    const clientIP = getClientIP(request);
+    const rateLimit = await checkAuthRateLimit(clientIP);
     if (!rateLimit.allowed) {
       return new Response(JSON.stringify({
         error: 'Too many attempts. Please try again later.',
@@ -176,8 +174,36 @@ export async function POST({ request }: { request: Request }) {
         });
       }
 
-      // Verify password
-      const passwordValid = await bcryptCompare(password, accountResult.password as string);
+/**
+ * Verify a password against a hash.
+ * Supports both bcrypt (new hashes) and scrypt (legacy seed data).
+ * bcrypt: $2a$ or $2b$ prefix
+ * scrypt: hex:salt:hash format
+ */
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  // Try bcrypt first (new format)
+  if (storedHash.startsWith('$2')) {
+    return bcryptCompare(password, storedHash);
+  }
+  // Try scrypt (seed data format: salt:hash)
+  if (storedHash.includes(':')) {
+    const parts = storedHash.split(':');
+    if (parts.length === 2) {
+      const salt = Buffer.from(parts[0], 'hex');
+      const expectedHash = parts[1];
+      return new Promise((resolve) => {
+        scrypt(password.normalize('NFKC'), salt, 64, { N: 16384, r: 16, p: 1, maxmem: 128 * 1024 * 1024 }, (err, derivedKey) => {
+          if (err) { resolve(false); return; }
+          const derived = derivedKey.toString('hex');
+          resolve(derived === expectedHash);
+        });
+      });
+    }
+  }
+  // Unknown format
+  return false;
+}
+      const passwordValid = await verifyPassword(password, accountResult.password as string);
       if (!passwordValid) {
         return new Response(JSON.stringify({ error: 'Invalid email or password' }), {
           status: 401,
