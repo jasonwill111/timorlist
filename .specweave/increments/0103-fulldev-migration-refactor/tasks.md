@@ -1,4 +1,5 @@
 # Tasks — Increment 0103: Full-Stack Migration to @fulldev + Separation of Concerns
+Status legend: `[x]` = done · `[~]` = blocked by external dependency · `[ ]` = N/A or deferred (with rationale)
 
 **Analysis Report**: `docs/FULL-STACK-MIGRATION-ANALYSIS.md`
 **Goal**: Reduce codebase by 1,500+ LoC while improving maintainability 60-70%
