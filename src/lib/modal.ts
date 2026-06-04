@@ -1,7 +1,7 @@
 /**
  * Modal utilities for creating and managing modal dialogs
  */
-
+import { escapeHtml } from './sanitize';
 /** Size configurations */
 export const MODAL_SIZES = {
   sm: 'max-w-sm',
@@ -243,14 +243,4 @@ if (typeof window !== 'undefined') {
   (window as unknown as Record<string, unknown>).createModalHtml = createModalHtml;
   (window as unknown as Record<string, unknown>).injectModal = injectModal;
   (window as unknown as Record<string, unknown>).removeModal = removeModal;
-}
-
-/** Escape HTML to prevent XSS */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }

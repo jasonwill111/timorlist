@@ -24,24 +24,6 @@ export function isValidEnv(env: unknown): env is Record<string, unknown> {
   return isObject(env) && Object.keys(env).length > 0;
 }
 
-/**
- * Safe get workers env with type guard
- */
-export async function getWorkersEnv(): Promise<Record<string, unknown>> {
-  try {
-    const { env } = await import('cloudflare:workers');
-    if (isValidEnv(env)) {
-      return env;
-    }
-  } catch {
-    // Fallback for non-Workers environment
-  }
-  const fallback = (globalThis as unknown as { env?: Record<string, unknown> }).env;
-  if (isValidEnv(fallback)) {
-    return fallback;
-  }
-  return {};
-}
 
 /**
  * Check if API response has expected shape

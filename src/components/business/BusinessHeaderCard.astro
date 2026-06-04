@@ -1,6 +1,7 @@
 ---
 // Reusable Business/Org Header Card Component
 import Card from '@/components/ui/Card.astro';
+import { getHeaderTypeColors } from '@/lib/ui/card-colors';
 
 interface Props {
   title: string;
@@ -32,23 +33,7 @@ const {
   showWhatsApp = false,
 } = Astro.props;
 
-// Type-based styling
-const typeColors = {
-  business: {
-    gradient: 'from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30',
-    icon: 'text-amber-500 bg-amber-50 dark:bg-amber-900/30',
-  },
-  government: {
-    gradient: 'from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30',
-    icon: 'text-purple-500 bg-purple-50 dark:bg-purple-900/30',
-  },
-  nonprofit: {
-    gradient: 'from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30',
-    icon: 'text-orange-500 bg-orange-50 dark:bg-orange-900/30',
-  },
-};
-
-const colors = typeColors[entityType] || typeColors.business;
+const colors = getHeaderTypeColors(entityType);
 ---
 
 <Card class="overflow-hidden">

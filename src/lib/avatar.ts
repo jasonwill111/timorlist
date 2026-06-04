@@ -88,29 +88,8 @@ export function getAvatarColor(name: string | null | undefined): string {
 }
 
 /**
- * Generate inline avatar HTML string (for dynamic client-side rendering)
+ * Get media URL from profileImageId
  */
-export function createAvatarHtml(
-  src: string | null | undefined,
-  fallback: string,
-  size: AvatarSize = 'md',
-  extraClass: string = ''
-): string {
-  const classes = getAvatarClasses(size);
-
-  if (src) {
-    const sizeNum = AVATAR_SIZES[size].match(/h-(\d+)/)?.[1] || '10';
-    const px = parseInt(sizeNum) * 4;
-    return `<img src="${src}" alt="${fallback || 'Avatar'}" class="${classes.container} ${classes.image} ${extraClass}" width="${px}" height="${px}" loading="lazy" decoding="async" />`;
-  }
-
-  const initials = getUserInitials(fallback);
-  const bgColor = getAvatarColor(fallback);
-
-  return `<span class="${classes.container} ${bgColor} flex items-center justify-center ${extraClass}">
-    <span class="text-white font-medium">${initials}</span>
-  </span>`;
-}
 
 /**
  * Get media URL from profileImageId

@@ -3,8 +3,9 @@
  * Centralized queries for business listings
  */
 import { getDb } from '@/lib/db';
-import { businesses, reviews } from '@/db/schema';
-import { eq, sql, count, avg } from 'drizzle-orm';
+import { businesses } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { getRatingStats } from '@/lib/rating';
 
 export interface BusinessByOwner {
   id: string;
@@ -156,25 +157,15 @@ export async function updateBusiness(
 
 /**
  * Update business rating based on reviews
- */
 export async function updateBusinessRating(businessId: string): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
-
-  // Get average rating and count
-  const stats = await db
-    .select({
-      avgRating: avg(reviews.rating),
-      reviewCount: count(),
-    })
-    .from(reviews)
-    .where(eq(reviews.businessId, businessId))
-    .get();
-
+  // Reuse shared rating query from lib/rating
+  const stats = await getRatingStats(businessId);
   await db.update(businesses)
     .set({
-      ratingAverage: stats?.avgRating || null,
-      ratingCount: stats?.reviewCount || 0,
+      ratingAverage: stats.avgRating,
+      ratingCount: stats.reviewCount,
       updatedAt: Math.floor(Date.now() / 1000),
     })
     .where(eq(businesses.id, businessId))

@@ -2,7 +2,7 @@
  * Result type tests
  */
 import { describe, it, expect } from 'vitest';
-import { success, error, isSuccess, isError, unwrap, unwrapOr } from './result';
+import { success, error, isSuccess, isError, unwrap, unwrapOr } from '@/lib/result';
 
 describe('Result', () => {
   describe('success', () => {

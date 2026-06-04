@@ -1,6 +1,6 @@
 // Cloudflare Workers Environment Access - type-safe wrapper
-// Replaces (globalThis as any).env pattern
-// Env bindings defined in wrangler.jsonc and src/types/global.d.ts
+// Canonical location for all env/DB/Auth/KV access helpers.
+// Re-exports from specialized modules to provide a single import path.
 
 export function getEnv(): Env {
   if (typeof globalThis !== 'undefined' && 'env' in globalThis) {
@@ -8,6 +8,11 @@ export function getEnv(): Env {
   }
   return {} as Env;
 }
+
+// Re-export resource accessors from their canonical modules so callers
+// can import everything from '@/lib/env' for a single source of truth.
+export { getDb } from './db';
+export { getAuth, initAuth } from './auth';
 
 // MiniMax API Key - supports both environments:
 // - Local dev: Vite loads .env into import.meta.env

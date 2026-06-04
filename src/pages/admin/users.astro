@@ -296,7 +296,7 @@ import { actions } from 'astro:actions';
       // If role changed and user is super_admin, use actions to update role
       if (newRole !== originalRole && currentUserRole === 'super_admin') {
         try {
-          const roleResult = await actions.admin.setUserRole({
+          const roleResult = await actions.admin.users.setRole({
             userId,
             role: newRole as 'user' | 'editor' | 'admin' | 'super_admin',
           });

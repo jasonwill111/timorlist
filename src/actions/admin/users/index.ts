@@ -156,4 +156,30 @@ export const adminUsers = {
       return { success: true };
     },
   }),
+  // Set user role (super_admin only)
+  setRole: defineAction({
+    input: z.object({
+      userId: z.string(),
+      role: z.enum(['user', 'editor', 'admin', 'super_admin']),
+    }),
+    handler: async (input) => {
+      const currentUser = await getAdminUser();
+      if (!currentUser) return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Authentication required');
+      if (currentUser.role !== 'super_admin') {
+        return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Only super_admin can change roles');
+      }
+      if (input.userId === currentUser.id) {
+        return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Cannot change your own role');
+      }
+      const db = await getDb();
+      if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, 'Database not available');
+      const targetUser = await db.select().from(users).where(eq(users.id, input.userId)).limit(1).get();
+      if (!targetUser) return createErrorResponse(ErrorCode.BUSINESS_NOT_FOUND, 'User not found');
+      await db.update(users)
+        .set({ role: input.role, updatedAt: Math.floor(Date.now() / 1000) })
+        .where(eq(users.id, input.userId))
+        .run();
+      return { success: true, data: { id: input.userId, role: input.role } };
+    },
+  }),
 };

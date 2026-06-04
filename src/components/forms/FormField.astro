@@ -1,0 +1,62 @@
+---
+/**
+ * FormField - Composition of label + input + error message.
+ * Standardizes the label-then-input-then-error pattern used across auth pages.
+ *
+ * Use this instead of manually wiring up label, Input, and error message markup
+ * for simple form fields.
+ */
+import Input from '@/components/ui/Input.astro';
+
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'number' | 'search';
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+  errorId?: string;
+  errorMessage?: string;
+  showValidIcon?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  type = 'text',
+  placeholder,
+  required = false,
+  value,
+  errorId,
+  errorMessage,
+  showValidIcon = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={className}>
+  <label for={id} class="block text-sm font-medium mb-1">{label}</label>
+  <div class="relative">
+    <Input
+      id={id}
+      name={name}
+      type={type}
+      placeholder={placeholder}
+      required={required}
+      value={value}
+    />
+    {showValidIcon && (
+      <span id={`${id}-valid`} class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </span>
+    )}
+  </div>
+  {errorId && errorMessage && (
+    <p id={errorId} class="text-sm text-red-500 mt-1">{errorMessage}</p>
+  )}
+</div>

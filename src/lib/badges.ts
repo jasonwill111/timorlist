@@ -1,4 +1,6 @@
-// Badge utilities for consistent styling across Astro and JS templates
+// Badge utilities for consistent badge styling across Astro and JS templates.
+// Provides Tailwind class names for variants; HTML string generation has been
+// removed (use Astro components or framework components for that).
 
 export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline' | 'blue' | 'green' | 'purple' | 'orange';
 
@@ -18,18 +20,3 @@ export const badgeBaseClass = 'inline-flex items-center rounded-full border px-2
 export function getBadgeClass(variant: BadgeVariant = 'default'): string {
   return `${badgeBaseClass} ${variantClasses[variant]}`;
 }
-
-export function createBadgeHtml(variant: BadgeVariant, text: string, extraClass = ''): string {
-  return `<span class="${badgeBaseClass} ${variantClasses[variant]} ${extraClass}">${text}</span>`;
-}
-
-// Predefined badges
-export const badges = {
-  business: createBadgeHtml('blue', 'Business'),
-  nonprofit: createBadgeHtml('purple', 'Non-Profit'),
-  sub: createBadgeHtml('green', 'Sub'),
-  live: createBadgeHtml('green', 'Live'),
-  draft: createBadgeHtml('orange', 'Draft'),
-  expired: createBadgeHtml('destructive', 'Expired'),
-  paid: createBadgeHtml('green', 'Paid'),
-};

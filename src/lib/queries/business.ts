@@ -5,7 +5,7 @@
 import { getDb } from '@/lib/db';
 import { businesses, businessCategories, media, reviews, products } from '@/db/schema';
 import { eq, desc, and, like, or, sql, count } from 'drizzle-orm';
-import { success, error, type Result } from './result';
+import { success, error, type Result } from '@/lib/result';
 
 // Types
 export interface BusinessWithCategory {

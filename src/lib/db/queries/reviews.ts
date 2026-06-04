@@ -4,8 +4,10 @@
  */
 import { getDb } from '@/lib/db';
 import { reviews, businesses } from '@/db/schema';
-import { eq, avg, count } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { getRatingStats } from '@/lib/rating';
+import type { RatingStats } from '@/lib/rating';
 
 export interface CreateReviewInput {
   businessId: string;
@@ -14,10 +16,6 @@ export interface CreateReviewInput {
   content: string;
 }
 
-export interface ReviewStats {
-  avgRating: number | null;
-  reviewCount: number;
-}
 
 /**
  * Create a new review
@@ -70,21 +68,6 @@ export async function getReviewsByBusiness(businessId: string): Promise<Array<{
 /**
  * Get review statistics for a business
  */
-export async function getReviewStats(businessId: string): Promise<ReviewStats> {
-  const db = await getDb();
-  if (!db) throw new Error('Database not available');
-
-  const stats = await db
-    .select({
-      avgRating: avg(reviews.rating),
-      reviewCount: count(),
-    })
-    .from(reviews)
-    .where(eq(reviews.businessId, businessId))
-    .get();
-
-  return {
-    avgRating: stats?.avgRating || null,
-    reviewCount: stats?.reviewCount || 0,
-  };
+export async function getReviewStats(businessId: string): Promise<RatingStats> {
+  return getRatingStats(businessId);
 }

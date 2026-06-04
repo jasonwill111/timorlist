@@ -26,55 +26,7 @@ export interface SelectOption {
 /**
  * Select attributes interface
  */
-export interface SelectAttrs {
-  id?: string;
-  name?: string;
-  class?: string;
-  disabled?: boolean;
-  required?: boolean;
-  'data-slot'?: string;
-  [key: string]: string | boolean | undefined;
-}
-
-/**
- * Generate select HTML string
- */
-export function createSelectHtml(
-  options: SelectOption[],
-  attrs: SelectAttrs = {}
-): string {
-  const {
-    id,
-    name,
-    class: extraClass = '',
-    disabled = false,
-    required = false,
-    'data-slot': slot = 'select',
-    ...rest
-  } = attrs;
-
-  const classes = [selectBaseClass, extraClass].filter(Boolean).join(' ');
-
-  const optionsHtml = options
-    .map((opt) => {
-      const disabledAttr = opt.disabled ? ' disabled' : '';
-      const selectedAttr = opt.selected ? ' selected' : '';
-      return `<option value="${opt.value}"${disabledAttr}${selectedAttr}>${opt.label}</option>`;
-    })
-    .join('');
-
-  const disabledAttr = disabled ? ' disabled' : '';
-  const requiredAttr = required ? ' required' : '';
-  const idAttr = id ? ` id="${id}"` : '';
-  const nameAttr = name ? ` name="${name}"` : '';
-  const slotAttr = ` data-slot="${slot}"`;
-  const restAttrs = Object.entries(rest)
-    .filter(([, v]) => v !== undefined)
-    .map(([k, v]) => `${k}="${v}"`)
-    .join(' ');
-
-  return `<select class="${classes}"${disabledAttr}${requiredAttr}${idAttr}${nameAttr}${slotAttr} ${restAttrs}>${optionsHtml}</select>`;
-}
+// ============ Preset Options ============
 
 // ============ Preset Options ============
 

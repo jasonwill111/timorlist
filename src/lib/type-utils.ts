@@ -89,25 +89,10 @@ export type DeepRequired<T> = T extends object
   : T;
 
 /**
- * Result type for operations that can fail
+ * Re-export Result type from canonical location to maintain backward compatibility.
+ * New code should import directly from '@/lib/result'.
  */
-export type Result<T, E = Error> =
-  | { success: true; data: T }
-  | { success: false; error: E };
-
-/**
- * Convert possibly undefined to Result
- */
-export function toResult<T>(
-  val: T | null | undefined,
-  errorMessage = 'Value is null'
-): Result<T> {
-  if (val == null) {
-    return { success: false, error: new Error(errorMessage) };
-  }
-  return { success: true, data: val };
-}
-
+export { type Result, toResult } from './result';
 /**
  * Assert environment variable is set
  */
@@ -118,3 +103,15 @@ export function requireEnv(key: string): string {
   }
   return val;
 }
+
+/**
+ * Re-export of type guards from the legacy type-guards module.
+ * New code should use these directly.
+ */
+export {
+  isObject,
+  isNonEmptyString,
+  isValidEnv,
+  hasProperty,
+  castToType,
+} from './type-guards';

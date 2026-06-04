@@ -1,4 +1,8 @@
 ---
+import { getOrgTypeGradient, DEFAULT_GRADIENT } from '@/lib/ui/card-colors';
+import { buildEntityHref } from '@/lib/ui/card-helpers';
+import { resolveEntityImage } from '@/lib/ui/image-utils';
+
 interface Props {
   title: string;
   slug: string;
@@ -37,25 +41,11 @@ const {
   class: className = '',
 } = Astro.props;
 
-// Image resolution: thumbnail > profileImageId > null
-const imageSrc = thumbnail || (profileImageId ? `/api/media/${profileImageId}` : null);
-
-// Navigation based on entityType
-const href = entityType === 'nonprofit'
-  ? `/non-profit/${slug}`
-  : entityType === 'publicsector'
-    ? `/public-sector/${slug}`
-    : `/business/${slug}`;
+// Image resolution and navigation handled by lib/ui helpers.
+const imageSrc = resolveEntityImage(thumbnail, profileImageId);
+const href = buildEntityHref(entityType, slug);
 const isOrg = entityType === 'nonprofit' || entityType === 'publicsector';
-
-const orgTypeColors: Record<string, string> = {
-  government: 'from-blue-100 to-blue-200 dark:from-blue-900/40 dark:to-blue-800/40',
-  ngo: 'from-green-100 to-green-200 dark:from-green-900/40 dark:to-green-800/40',
-  nonprofit: 'from-purple-100 to-purple-200 dark:from-purple-900/40 dark:to-purple-800/40',
-  foundation: 'from-pink-100 to-pink-200 dark:from-pink-900/40 dark:to-pink-800/40',
-};
-
-const gradientClass = isOrg ? (orgTypeColors[orgType] || 'from-amber-100 to-orange-100') : 'from-amber-100 to-orange-100';
+const gradientClass = isOrg ? getOrgTypeGradient(orgType) : DEFAULT_GRADIENT;
 ---
 
 <a

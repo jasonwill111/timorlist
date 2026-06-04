@@ -5,7 +5,7 @@
 import { getDb } from '@/lib/db';
 import { reviews, users } from '@/db/schema';
 import { eq, desc, and, count } from 'drizzle-orm';
-import { success, error, type Result } from './result';
+import { success, error, type Result } from '@/lib/result';
 
 // Types - match actual database schema
 export interface ReviewWithUser {

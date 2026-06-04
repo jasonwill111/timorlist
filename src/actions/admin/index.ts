@@ -13,4 +13,3 @@ export { settings } from './settings';
 export { adminUsers as users } from './users';
 export { adminBusinesses as businesses } from './businesses';
 export { login } from './auth/login';
-export { adminServicePackages } from './servicePackages';

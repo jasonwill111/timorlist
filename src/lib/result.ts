@@ -1,6 +1,9 @@
 /**
  * Result/Either type pattern for error handling
- * Provides consistent error handling across all query functions
+ * Provides consistent error handling across the entire codebase.
+ *
+ * Canonical location for Result type and helpers.
+ * Replaces: type-utils.ts (Result, toResult) and queries/result.ts (Result, success, error, isSuccess, isError, unwrap, unwrapOr)
  */
 
 /**
@@ -22,8 +25,8 @@ export function success<T>(data: T): Result<T, never> {
 /**
  * Create an error Result
  */
-export function error<T = never, E = Error>(error: E): Result<T, E> {
-  return { success: false, error };
+export function error<T = never, E = Error>(err: E): Result<T, E> {
+  return { success: false, error: err };
 }
 
 /**
@@ -55,4 +58,17 @@ export function unwrap<T>(result: Result<T>): T {
  */
 export function unwrapOr<T>(result: Result<T>, defaultValue: T): T {
   return result.success ? result.data : defaultValue;
+}
+
+/**
+ * Convert possibly undefined to Result
+ */
+export function toResult<T>(
+  val: T | null | undefined,
+  errorMessage = 'Value is null'
+): Result<T> {
+  if (val === null || val === undefined) {
+    return { success: false, error: new Error(errorMessage) };
+  }
+  return { success: true, data: val };
 }

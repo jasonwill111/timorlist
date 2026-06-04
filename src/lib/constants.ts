@@ -1,3 +1,7 @@
+// constants.ts - Domain constants for the TimorUp application.
+// This file is the canonical source for INDUSTRIES, NONPROFIT_TYPES, and ENTITY_TYPES.
+// Product config re-exports below are intentional compatibility shims.
+
 // Entity types for listings
 export const ENTITY_TYPES = [
   { value: 'business', label: 'Business' },

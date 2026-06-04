@@ -10,7 +10,7 @@ import {
   listingCategories,
 } from '@/db/schema';
 import { eq, and, asc, isNull } from 'drizzle-orm';
-import { success, error, type Result } from './result';
+import { success, error, type Result } from '@/lib/result';
 
 // Types
 export interface CategoryInfo {
