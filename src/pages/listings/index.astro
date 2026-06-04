@@ -25,7 +25,7 @@ interface ListingRecord {
   slug: string;
   description: string | null;
   price: string | null;
-  listingType: string | null;
+  categoryId: string | null;
   location: string | null;
   imageIds: string | null;
   likes: number | null;
@@ -33,6 +33,17 @@ interface ListingRecord {
   status: string | null;
   createdAt: number | null;
 }
+
+// Map UI type filter values → listing category slugs
+// (listings table has no `listing_type` column; type is derived from category)
+const TYPE_TO_CATEGORY_SLUGS: Record<string, string[]> = {
+  product: ['for-sale', 'product'],
+  vehicle: ['vehicles'],
+  property: ['property-sale'],
+  job: ['jobs'],
+  service: ['services'],
+  wanted: ['wanted'],
+};
 
 // Build WHERE clause dynamically
 const conditions: string[] = ["status IN ('active', 'published', 'live')"];
@@ -45,10 +56,14 @@ if (search) {
   params.push(searchPattern, searchPattern);
 }
 
-// Type filter
+// Type filter - resolves to category slug match via subquery
 if (type) {
-  conditions.push("listing_type = ?");
-  params.push(type);
+  const categorySlugs = TYPE_TO_CATEGORY_SLUGS[type] || [];
+  if (categorySlugs.length > 0) {
+    const placeholders = categorySlugs.map(() => '?').join(',');
+    conditions.push(`category_id IN (SELECT id FROM listing_categories WHERE slug IN (${placeholders}) OR parent_id IN (SELECT id FROM listing_categories WHERE slug IN (${placeholders})))`);
+    params.push(...categorySlugs, ...categorySlugs);
+  }
 }
 
 const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -71,7 +86,7 @@ try {
   const db = await getRawDb();
   if (db) {
     const result = await db.prepare(`
-      SELECT id, title, slug, description, price, listing_type as listingType, location, image_ids as imageIds, likes, views, status, created_at as createdAt
+      SELECT id, title, slug, description, price, category_id as categoryId, location, image_ids as imageIds, likes, views, status, created_at as createdAt
       FROM listings
       ${whereClause}
       ORDER BY created_at DESC
@@ -133,7 +148,7 @@ const buildUrl = (pageNum: number) => {
               title={l.title}
               slug={l.slug}
               price={l.price || ''}
-              listingType={l.listingType || 'product'}
+              listingType={type || 'product'}
               location={l.location?.split(',')[0] || ''}
               imageIds={l.imageIds ? (typeof l.imageIds === 'string' ? JSON.parse(l.imageIds) : l.imageIds) : []}
               likes={l.likes || 0}

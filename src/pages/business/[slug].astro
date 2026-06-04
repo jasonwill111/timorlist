@@ -13,7 +13,12 @@ import BusinessSidebar from '../../components/islands/BusinessSidebar.astro';
 import TipTapRenderer from '../../components/ui/TipTapRenderer.astro';
 import { Eye, Heart, Bookmark, Globe, MapPin, Tag, Clock } from '@lucide/astro';
 import { getSubscriptionDashboard } from '@/lib/subscription';
+import { getDb } from '@/lib/db';
 const db = await getDb();
+if (!db) {
+  console.error('[business/[slug]] Database not available');
+  return Astro.redirect('/businesses');
+}
 import { businesses, businessCategories, reviews, media, latestUpdates } from '@/db/schema';
 import { eq, desc, inArray } from 'drizzle-orm';
 

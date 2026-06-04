@@ -25,24 +25,26 @@ interface ProductRow {
   title: string;
   slug: string;
   description: string | null;
-  price: string | number | null;
-  priceUnit: string | null;
+  productType: string | null;
+  priceFields: string | null;
   specifications: string | null;
-  stock: number | null;
-  unit: string | null;
-  location: string | null;
-  contactNumber: string | null;
-  countryCode: string | null;
-  email: string | null;
-  imageIds: string | null;
-  price_fields: string | null;
-  businessId: string | null;
-  categoryId: string | null;
+  images: string | null;  // JSON array of media IDs
+  featured: number | null;
+  active: number | null;
+  views: number | null;
+  likes: number | null;
+  businessId: string;
+  categoryId: string;
+  createdAt: number | null;
+  updatedAt: number | null;
 }
 interface BusinessRow {
   id: string;
   title: string;
   slug: string;
+  contactNumber: string | null;
+  countryCode: string | null;
+  email: string | null;
 }
 interface CategoryRow {
   id: string;
@@ -50,10 +52,12 @@ interface CategoryRow {
 }
 interface MediaRow {
   id: string;
-  url: string;
+  r2Key: string;
+  filename: string | null;
+  alt: string | null;
 }
 
-// Fetch product with raw SQL
+// Fetch product with raw SQL (using actual schema columns)
 let product: ProductRow | null = null;
 let business: BusinessRow | null = null;
 let category: CategoryRow | null = null;
@@ -61,14 +65,23 @@ let productImages: MediaRow[] = [];
 
 try {
   product = await db
-    .prepare('SELECT * FROM products WHERE slug = ? LIMIT 1')
+    .prepare(`
+      SELECT id, title, slug, description, product_type as productType,
+             price_fields as priceFields, specifications, images,
+             featured, active, views, likes,
+             business_id as businessId, category_id as categoryId,
+             created_at as createdAt, updated_at as updatedAt
+      FROM products
+      WHERE slug = ? AND (deleted_at IS NULL OR deleted_at = 0)
+      LIMIT 1
+    `)
     .bind(slug)
     .first() as ProductRow | null;
 
   if (product) {
     if (product.businessId) {
       business = await db
-        .prepare('SELECT id, title, slug FROM businesses WHERE id = ? LIMIT 1')
+        .prepare('SELECT id, title, slug, contact_name as contactNumber, country_code as countryCode, email FROM businesses WHERE id = ? LIMIT 1')
         .bind(product.businessId)
         .first() as BusinessRow | null;
     }
@@ -80,22 +93,23 @@ try {
         .first() as CategoryRow | null;
     }
 
-    if (product.imageIds) {
+    // product.images is a JSON array of media IDs
+    if (product.images) {
       try {
-        const imageIds: string[] = typeof product.imageIds === 'string'
-          ? JSON.parse(product.imageIds)
-          : (Array.isArray(product.imageIds) ? product.imageIds : []);
+        const imageIds: string[] = typeof product.images === 'string'
+          ? JSON.parse(product.images)
+          : (Array.isArray(product.images) ? product.images : []);
 
         if (imageIds.length > 0) {
           const placeholders = imageIds.map(() => '?').join(',');
           const imagesResult = await db
-            .prepare(`SELECT id, url FROM media WHERE id IN (${placeholders}) AND active = 1`)
+            .prepare(`SELECT id, r2_key as r2Key, filename, alt FROM media WHERE id IN (${placeholders}) AND (deleted_at IS NULL OR deleted_at = 0)`)
             .bind(...imageIds)
             .all();
           productImages = (imagesResult.results as unknown as MediaRow[]) || [];
         }
       } catch (e) {
-        console.error('Failed to parse imageIds:', e);
+        console.error('Failed to parse images:', e);
       }
     }
   }
@@ -105,21 +119,22 @@ try {
 
 if (!product) return Astro.redirect('/404');
 
-// Parse images from product.imageIds
-let parsedImages: string[] = [];
-if (product.imageIds) {
-  try {
-    parsedImages = typeof product.imageIds === 'string'
-      ? JSON.parse(product.imageIds)
-      : (Array.isArray(product.imageIds) ? (product.imageIds as unknown as string[]) : []);
-  } catch {
-    parsedImages = [];
+// Parse price fields from JSON
+interface PriceData { price: string | number; currency?: string; unit?: string; }
+let priceData: PriceData | null = null;
+try {
+  if (product.priceFields && typeof product.priceFields === 'string') {
+    priceData = JSON.parse(product.priceFields);
   }
-}
+} catch {}
 
 // Build meta info
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
 const canonicalUrl = `${siteUrl}/product/${slug}`;
+
+// Build image URLs from R2 keys
+const r2PublicUrl = 'https://pub-timorup.jasonwill.workers.dev';
+const imageUrls = productImages.map(img => `${r2PublicUrl}/${img.r2Key}`);
 
 // Schema.org Product markup
 const productSchema = {
@@ -128,20 +143,20 @@ const productSchema = {
   "name": product.title,
   "description": product.description,
   "url": canonicalUrl,
-  "image": productImages[0]?.url ? [productImages[0].url] : undefined,
-  "offers": product.price ? {
+  "image": imageUrls[0] ? [imageUrls[0]] : undefined,
+  "offers": priceData ? {
     "@type": "Offer",
-    "price": priceData?.price || '0',
-    "priceCurrency": "USD",
+    "price": priceData.price || '0',
+    "priceCurrency": priceData.currency || "USD",
     "availability": "https://schema.org/InStock"
   } : undefined,
   "category": category?.name,
 };
 
-// WhatsApp contact link
-const waNumber = (product.contactNumber || '').replace(/\D/g, '');
-const waLink = product.contactNumber
-  ? `https://wa.me/${(product.countryCode || '+670').replace('+', '')}${waNumber}?text=${encodeURIComponent('Hi, I saw your product: ' + product.title)}`
+// WhatsApp contact link (use business contact, products has no own contact)
+const waNumber = (business?.contactNumber || '').replace(/\D/g, '');
+const waLink = business?.contactNumber
+  ? `https://wa.me/${(business.countryCode || '+670').replace('+', '')}${waNumber}?text=${encodeURIComponent('Hi, I saw your product: ' + product.title)}`
   : '';
 
 // Breadcrumb schema for SEO
@@ -151,24 +166,10 @@ const breadcrumbSchema = createBreadcrumbSchema([
   { name: product.title, url: canonicalUrl }
 ]);
 
-interface PriceData { price: string; currency?: string; unit?: string; }
-let priceData: PriceData | null = null;
-try {
-  if (product.price_fields && typeof product.price_fields === 'string') {
-    priceData = JSON.parse(product.price_fields);
-  }
-} catch {}
-
-const productTitle = product.title;
-const pageTitle = `${productTitle} - TimorUp`;
+const pageTitle = `${product.title} - TimorUp`;
 const pageDesc = product.description?.substring(0, 160) || `${product.title} - Product in Timor-Leste`;
 
-// Get all images for gallery
-const allImages = productImages.length > 0
-  ? productImages.map(img => img.url)
-  : parsedImages.length > 0
-    ? parsedImages
-    : [];
+const allImages = imageUrls;
 ---
 
 <Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
@@ -217,9 +218,10 @@ const allImages = productImages.length > 0
           </div>
 
           <!-- Price -->
-          {product.price && (
+          {priceData && (
             <div class="text-3xl font-bold text-primary">
-              {priceData?.currency || 'CNY'}
+              {priceData.currency || 'USD'} {priceData.price}
+              {priceData.unit && <span class="text-base text-muted-foreground"> / {priceData.unit}</span>}
             </div>
           )}
 
@@ -232,37 +234,13 @@ const allImages = productImages.length > 0
           )}
 
           <!-- Specifications -->
-          {(product.specifications || product.stock || product.unit) && (
+          {product.specifications && (
             <div>
               <h2 class="text-lg font-semibold mb-3">Specifications</h2>
               <dl class="grid grid-cols-2 gap-4">
-                {product.specifications && (
-                  <>
-                    <dt class="text-muted-foreground">Details</dt>
-                    <dd class="text-foreground">{product.specifications}</dd>
-                  </>
-                )}
-                {product.stock && (
-                  <>
-                    <dt class="text-muted-foreground">Stock</dt>
-                    <dd class="text-foreground">{product.stock} units</dd>
-                  </>
-                )}
-                {product.unit && (
-                  <>
-                    <dt class="text-muted-foreground">Unit</dt>
-                    <dd class="text-foreground">{product.unit}</dd>
-                  </>
-                )}
+                <dt class="text-muted-foreground">Details</dt>
+                <dd class="text-foreground">{product.specifications}</dd>
               </dl>
-            </div>
-          )}
-
-          <!-- Location -->
-          {product.location && (
-            <div>
-              <h2 class="text-lg font-semibold mb-2">Location</h2>
-              <p class="text-muted-foreground">{product.location}</p>
             </div>
           )}
         </div>
@@ -270,11 +248,9 @@ const allImages = productImages.length > 0
 
       <!-- Right Column - Contact Card -->
       <div class="space-y-6">
-        <!-- Contact Card -->
         <div class="bg-card rounded-2xl border p-6 sticky top-24">
           <h3 class="text-lg font-semibold mb-4">Contact Seller</h3>
 
-          <!-- Seller Business -->
           {business && (
             <div class="mb-4 pb-4 border-b">
               <p class="text-sm text-muted-foreground mb-1">Sold by</p>
@@ -284,7 +260,6 @@ const allImages = productImages.length > 0
             </div>
           )}
 
-          <!-- WhatsApp Button -->
           {waLink ? (
             <a
               href={waLink}
@@ -300,24 +275,22 @@ const allImages = productImages.length > 0
             </div>
           )}
 
-          <!-- Contact Info -->
-          {product.contactNumber && (
+          {business?.contactNumber && (
             <div class="flex items-center gap-2 text-sm">
               <span class="text-muted-foreground">Phone:</span>
-              <span>{product.countryCode} {product.contactNumber}</span>
+              <span>{business.countryCode} {business.contactNumber}</span>
             </div>
           )}
 
-          {product.email && (
+          {business?.email && (
             <div class="flex items-center gap-2 text-sm">
               <span class="text-muted-foreground">Email:</span>
-              <a href={`mailto:${product.email}`} class="text-primary hover:underline">
-                {product.email}
+              <a href={`mailto:${business.email}`} class="text-primary hover:underline">
+                {business.email}
               </a>
             </div>
           )}
 
-          <!-- Share -->
           <div class="pt-4 border-t mt-4">
             <a
               href={`https://wa.me/?text=${encodeURIComponent(product.title + ' - ' + canonicalUrl)}`}

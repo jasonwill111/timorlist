@@ -3,6 +3,8 @@
 // This runs on the server and caches results
 import { getDb } from '@/lib/db';
 import { businesses, listings, nonProfits, publicSectors, listingCategories } from '@/db/schema';
+import BusinessCard from '@/components/business/BusinessCard.astro';
+import ListingCard from '@/components/business/ListingCard.astro';
 import { eq, desc, or, inArray } from 'drizzle-orm';
 
 // Safe JSON parser

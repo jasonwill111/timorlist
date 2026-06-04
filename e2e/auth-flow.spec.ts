@@ -3,7 +3,7 @@
 
 import { test, expect, Page } from '@playwright/test';
 
-const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:4321';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:8787';
 
 // ==================== TEST ACCOUNTS ====================
 

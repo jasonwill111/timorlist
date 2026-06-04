@@ -20,6 +20,39 @@ const db = getDbInstance();  // May return null!
 
 > **timorbuy lesson**: timorbuy used initDb() pattern and failed in Islands. timorup correctly uses getDb().
 
+### Astro Island Component Imports (2026-06-04)
+
+All `.astro` components used within an Astro page **MUST** be explicitly imported in the frontmatter, even if used inside nested island components. Missing imports cause `ReferenceError` in client-side hydration (with `client:load`) or SSR failures.
+
+```astro
+---
+// ✅ Correct - all components imported at page level
+import HomepageContent from '@/components/islands/HomepageContent.astro';
+import BusinessCard from '@/components/business/BusinessCard.astro';
+import ListingCard from '@/components/business/ListingCard.astro';
+---
+
+// ❌ Wrong - BusinessCard used inside HomepageContent but not imported
+// causes "BusinessCard is not defined" at runtime
+import HomepageContent from '@/components/islands/HomepageContent.astro';
+```
+
+**Rule**: For every `.astro` component imported by another `.astro` component, import it in the **using page's** frontmatter. This ensures the component is available in both SSR and client hydration contexts.
+
+**Windows Build Compatibility (2026-06-04)**
+
+`package.json` scripts that set environment variables must use `cross-env`:
+
+```json
+// ✅ Correct - cross-env sets CI=true on all platforms
+"build": "cross-env CI=true wrangler types && astro build && cp public/_routes.json dist/_routes.json"
+
+// ❌ Wrong - CI=true fails on Windows (parsed as command name)
+"build": "CI=true wrangler types && astro build"
+```
+
+**Rule**: Any script that sets env vars across platforms must wrap with `cross-env`. Install: `pnpm add -D cross-env`.
+
 ---
 
 ## Server Actions (Astro 6)
@@ -52,14 +85,14 @@ const result = await actions.auth.signIn({ email, password });
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| **Public Read-only** | 11 | businesses, non-profits, public-sectors, listings, categories, products, banners (SSR cache) |
+| **Public Read-only** | 16 | businesses, non-profits, public-sectors, listings, categories, products, banners, settings, search, auth/session (SSR cache) |
 | **Auth** | 2 | `/api/auth` (sign-in/sign-up), `/api/auth/session` (client auth) |
 | **Scheduled** | 5 | Cron jobs, must keep |
 | **Admin CRUD** | 0 | Migrated to Server Actions ✅ |
 | **Account/Profile** | 0 | Migrated to Server Actions ✅ |
 | **Blog/Settings/Plans** | 3 | Public data, REST kept |
 
-> **Key**: 48 Server Actions cover all write operations and user private data. REST API `/api/auth` kept as Cloudflare Workers compatibility fallback. Remaining 21 REST APIs mainly for public read cache and Cron jobs.
+> **Key**: 48 Server Actions cover all write operations and user private data. REST API `/api/auth` kept as Cloudflare Workers compatibility fallback. 24 REST APIs total — public read cache, scheduled jobs, and a few admin endpoints still in transition.
 
 ### Migration (2026-05-09)
 
@@ -80,7 +113,7 @@ All pages use SSR (Server-Side Rendering) with strategic caching to balance SEO,
 | Mode | Count | Pages |
 |------|-------|-------|
 | `prerender = true` | 7 | 404, 500, about, contact, faq, privacy, terms |
-| `prerender = false` | 40 | All dynamic pages (businesses, blog, admin, etc.) |
+| `prerender = false` | 75 | All dynamic pages (businesses, blog, admin, etc.) |
 | Implicit SSR | 3 | login, register, blog/[slug] |
 
 ### Caching Strategy by Page Type

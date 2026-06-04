@@ -62,7 +62,7 @@ const businessProducts = db
                   const priceValue = pf[0].value;
                   const priceUnit = pf[0].unit || 'unit';
                   return priceValue ? (
-                    <span class="font-bold text-primary">${priceValue} / {priceUnit}</span>
+                    <span class="font-bold text-primary">{priceValue} / {priceUnit}</span>
                   ) : null;
                 } catch {
                   return null;

@@ -40,6 +40,7 @@
     "CLEANUP_SECRET": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
     "CRON_SECRET": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
     "APP_URL": "https://timorup.jasonwill.workers.dev",
+    "SITE_URL": "https://timorup.com",
     "BETTER_AUTH_URL": "PLACEHOLDER_SET_VIA_WRANGLER_SECRET",
     "R2_PUBLIC_URL": "https://pub-timorup.jasonwill.workers.dev"
   }

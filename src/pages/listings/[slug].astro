@@ -29,7 +29,6 @@ interface Listing {
   saves: number | null;
   views: number | null;
   status: string | null;
-  listingType: string | null;
   categoryId: string | null;
   createdAt: number | null;
   updatedAt: number | null;
@@ -46,7 +45,7 @@ try {
       SELECT id, title, slug, description, price, condition, location, address,
              contact_name as contactName, contact_number as contactNumber, country_code as countryCode, email,
              image_ids as imageIds, tags,
-             likes, saves, views, status, listing_type as listingType, category_id as categoryId,
+             likes, saves, views, status, category_id as categoryId,
              created_at as createdAt, updated_at as updatedAt
       FROM listings WHERE slug = ? LIMIT 1
     `).bind(slug).first() as Listing | null;
