@@ -4,6 +4,7 @@
 import { getDb } from '@/lib/db';
 import { businesses, businessCategories } from '@/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
+import Select from '../ui/Select.astro';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('q') || '';
@@ -79,17 +80,16 @@ const entities = allEntities.slice(offset, offset + LIMIT);
       <input name="q" type="search" placeholder="Search businesses..." value={search}
         class="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200" />
     </div>
-    <div class="flex gap-2">
-      <select name="parent" onchange="this.form.submit()"
+      <Select name="parent" onchange="this.form.submit()"
         class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
         <option value="">All Categories</option>
         {parentCats.map(p => <option value={p.id} selected={parentCat === p.id}>{p.name}</option>)}
-      </select>
-      <select name="child" onchange="this.form.submit()"
+      </Select>
+      <Select name="child" onchange="this.form.submit()"
         class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
         <option value="">Subcategory</option>
         {getChildren(parentCat).map(c => <option value={c.id} selected={childCat === c.id}>{c.name}</option>)}
-      </select>
+      </Select>
     </div>
   </div>
 </form>
