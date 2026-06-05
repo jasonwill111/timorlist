@@ -16,6 +16,7 @@ interface Props {
 const { updates = [], slug, isOwner = false } = Astro.props;
 
 import { actions } from 'astro:actions';
+import Button from './ui/Button.astro';
 
 // Parse SKU mentions: @SKU-XXX -> link
 // Parse hashtags: #tag -> link
@@ -163,15 +164,10 @@ function formatRelativeTime(date: Date | null): string {
           </button>
           <input type="file" id="image-input" accept="image/*" multiple class="hidden" />
         </div>
-
         <div id="update-error" class="text-sm text-red-500 hidden"></div>
-
-        <button
-          type="submit"
-          class="w-full py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-        >
+        <Button type="submit" class="w-full">
           Post Update
-        </button>
+        </Button>
       </form>
     </div>
   </div>

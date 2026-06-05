@@ -30,11 +30,11 @@ import { actions } from 'astro:actions';
     <div class="bg-card border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
       <div class="p-4 border-b flex items-center justify-between sticky top-0 bg-card">
         <h2 id="modal-title" class="text-lg font-bold">Add Hero</h2>
-        <button id="close-modal" class="p-1 hover:bg-muted rounded">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
+          <Button id="close-modal" variant="ghost" size="icon" class="p-1" onclick="document.getElementById('hero-modal')?.classList.add('hidden')">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </Button>
       </div>
       <form id="hero-form" class="p-4 space-y-4">
         <input type="hidden" id="hero-id" name="id" />
