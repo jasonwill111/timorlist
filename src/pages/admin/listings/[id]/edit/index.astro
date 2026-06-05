@@ -142,15 +142,15 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
         <h2 class="text-lg font-semibold mb-4">Status</h2>
         <div class="flex flex-wrap gap-4">
           <label class="flex items-center gap-2">
-            <input type="radio" name="status" value="draft" checked={listing.status === 'draft'} />
+            <Input type="radio" name="status" value="draft" checked={listing.status === 'draft'} />
             <span>Draft</span>
           </label>
           <label class="flex items-center gap-2">
-            <input type="radio" name="status" value="live" checked={listing.status === 'live'} />
+            <Input type="radio" name="status" value="live" checked={listing.status === 'live'} />
             <span>Live</span>
           </label>
           <label class="flex items-center gap-2">
-            <input type="radio" name="status" value="suspended" checked={listing.status === 'suspended'} />
+            <Input type="radio" name="status" value="suspended" checked={listing.status === 'suspended'} />
             <span>Suspended</span>
           </label>
         </div>
