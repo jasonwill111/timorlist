@@ -1,3 +1,4 @@
+import Select from '@components/ui/Select.astro';
 ---
 // New Product page - for creating products
 export const prerender = false;
@@ -124,13 +125,12 @@ const UNIT_OPTIONS = [
           <form id="product-form" class="space-y-6">
             <!-- Product Category -->
             <div>
-              <Label for="categoryId">Category *</Label>
-              <select id="categoryId" name="categoryId" required class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                <option value="">Select a category</option>
-                {allCategories.map(cat => (
-                  <option value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
+              <Select
+                id="categoryId"
+                name="categoryId"
+                required
+                options={allCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+              />
               <p class="text-xs text-muted-foreground mt-1">Choose the product category</p>
             </div>
 
@@ -148,12 +148,12 @@ const UNIT_OPTIONS = [
             <!-- Product Type -->
             <div>
               <Label for="productType">Product Type *</Label>
-              <select id="productType" name="productType" required class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                {PRODUCT_TYPES.map(type => (
-                  <option value={type.value}>{type.label}</option>
-                ))}
-              </select>
-            </div>
+              <Select
+                id="productType"
+                name="productType"
+                required
+                options={PRODUCT_TYPES}
+              />
 
             <!-- Price Section -->
             <div class="grid grid-cols-3 gap-4">
@@ -171,22 +171,25 @@ const UNIT_OPTIONS = [
               </div>
               <div>
                 <Label for="currency">Currency</Label>
-                <select id="currency" name="currency" class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                  <option value="USD">USD ($)</option>
-                  <option value="IDR">IDR (Rp)</option>
-                  <option value="TLS">TLS ($)</option>
-                </select>
+                <Select
+                  id="currency"
+                  name="currency"
+                  options={[
+                    { value: 'USD', label: 'USD ($)' },
+                    { value: 'IDR', label: 'IDR (Rp)' },
+                    { value: 'TLS', label: 'TLS ($)' },
+                  ]}
+                />
               </div>
             </div>
 
             <!-- Unit -->
             <div>
-              <Label for="unit">Price Unit</Label>
-              <select id="unit" name="unit" class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                {UNIT_OPTIONS.map(opt => (
-                  <option value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <Select
+                id="unit"
+                name="unit"
+                options={UNIT_OPTIONS}
+              />
               <p class="text-xs text-muted-foreground mt-1">How the price is displayed (e.g., "$150 per hour")</p>
             </div>
 

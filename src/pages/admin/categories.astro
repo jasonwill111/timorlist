@@ -5,6 +5,7 @@ import Button from '@components/ui/Button.astro';
 import Tabs from '@components/ui/Tabs.astro';
 import TabsList from '@components/ui/TabsList.astro';
 import TabsTrigger from '@components/ui/TabsTrigger.astro';
+import Select from '@components/ui/Select.astro';
 ---
 
 <AdminLayout title="Categories">
@@ -34,14 +35,14 @@ import TabsTrigger from '@components/ui/TabsTrigger.astro';
         <!-- Filter -->
         <div class="bg-card border rounded-lg p-3 mb-4">
           <div class="flex flex-col sm:flex-row gap-2">
-            <select id="level-filter" class="h-9 px-3 rounded-md border bg-background text-sm">
+            <Select id="level-filter" class="h-9 px-3 text-sm">
               <option value="">All Levels</option>
               <option value="parent">Parent (Top-level)</option>
               <option value="child">Sub-categories</option>
-            </select>
-            <select id="parent-filter" class="h-9 px-3 rounded-md border bg-background text-sm">
+            </Select>
+            <Select id="parent-filter" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
-            </select>
+            </Select>
             <input type="search" id="search" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
           </div>
         </div>
@@ -75,15 +76,14 @@ import TabsTrigger from '@components/ui/TabsTrigger.astro';
         </div>
         <!-- Filter -->
         <div class="bg-card border rounded-lg p-3 mb-4">
-          <div class="flex flex-col sm:flex-row gap-2">
-            <select id="level-filter-non_profit" class="h-9 px-3 rounded-md border bg-background text-sm">
+            <Select id="level-filter-non_profit" class="h-9 px-3 text-sm">
               <option value="">All Levels</option>
               <option value="parent">Parent (Top-level)</option>
               <option value="child">Sub-categories</option>
-            </select>
-            <select id="parent-filter-non_profit" class="h-9 px-3 rounded-md border bg-background text-sm">
+            </Select>
+            <Select id="parent-filter-non_profit" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
-            </select>
+            </Select>
             <input type="search" id="search-non_profit" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
           </div>
         </div>
@@ -117,15 +117,14 @@ import TabsTrigger from '@components/ui/TabsTrigger.astro';
         </div>
         <!-- Filter -->
         <div class="bg-card border rounded-lg p-3 mb-4">
-          <div class="flex flex-col sm:flex-row gap-2">
-            <select id="level-filter-public_sector" class="h-9 px-3 rounded-md border bg-background text-sm">
+            <Select id="level-filter-public_sector" class="h-9 px-3 text-sm">
               <option value="">All Levels</option>
               <option value="parent">Parent (Top-level)</option>
               <option value="child">Sub-categories</option>
-            </select>
-            <select id="parent-filter-public_sector" class="h-9 px-3 rounded-md border bg-background text-sm">
+            </Select>
+            <Select id="parent-filter-public_sector" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
-            </select>
+            </Select>
             <input type="search" id="search-public_sector" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
           </div>
         </div>
@@ -160,16 +159,15 @@ import TabsTrigger from '@components/ui/TabsTrigger.astro';
         <!-- Filter -->
         <div class="bg-card border rounded-lg p-3 mb-4">
           <div class="flex flex-col sm:flex-row gap-2">
-            <select id="level-filter-listing" class="h-9 px-3 rounded-md border bg-background text-sm">
+            <Select id="level-filter-listing" class="h-9 px-3 text-sm">
               <option value="">All Levels</option>
               <option value="parent">Parent (Top-level)</option>
               <option value="child">Sub-categories</option>
-            </select>
-            <select id="parent-filter-listing" class="h-9 px-3 rounded-md border bg-background text-sm">
+            </Select>
+            <Select id="parent-filter-listing" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
-            </select>
+            </Select>
             <input type="search" id="search-listing" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
-          </div>
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
@@ -224,22 +222,23 @@ import TabsTrigger from '@components/ui/TabsTrigger.astro';
         </div>
         <div>
           <label for="cat-entity-type" class="block text-sm font-medium mb-1">Entity Type *</label>
-          <select id="cat-entity-type" required class="w-full px-3 py-2 border rounded-md text-sm">
+          <Select id="cat-entity-type" required class="w-full px-3 py-2 text-sm">
             <option value="business">Business</option>
             <option value="nonprofit">Non-Profit</option>
             <option value="public_sector">Public Sector</option>
             <option value="listing">Listing</option>
             <option value="product">Product</option>
-          </select>
+          </Select>
           <p class="text-xs text-muted-foreground mt-1">Category type determines which listings can use this category</p>
         </div>
         <div>
           <label for="cat-parent" class="block text-sm font-medium mb-1">Parent Industry</label>
-          <select id="cat-parent" class="w-full px-3 py-2 border rounded-md text-sm">
+          <Select id="cat-parent" class="w-full px-3 py-2 text-sm">
             <option value="">Top-level (Industry)</option>
-          </select>
+          </Select>
           <p class="text-xs text-muted-foreground mt-1">Leave empty for top-level industry categories</p>
         </div>
+        <div class="grid grid-cols-3 gap-4">
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label for="cat-icon" class="block text-sm font-medium mb-1">Icon (emoji)</label>

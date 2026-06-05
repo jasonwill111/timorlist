@@ -1,15 +1,14 @@
 ---
 // Edit Product page
 export const prerender = false;
-
 import Layout from '@layouts/Layout.astro';
 import Button from '@components/ui/Button.astro';
 import Input from '@components/ui/Input.astro';
 import Label from '@components/ui/Label.astro';
 import Card from '@components/ui/Card.astro';
+import Select from '@components/ui/Select.astro';
 import { getDb } from '@/lib/db';
 import { productCategories } from '@/db/schema';
-
 const db = await getDb();
 const allCategories = db ? await db.select().from(productCategories).all() : [];
 
@@ -103,12 +102,9 @@ const UNIT_OPTIONS = [
             <!-- Product Category -->
             <div>
               <Label for="categoryId">Category *</Label>
-              <select id="categoryId" name="categoryId" required class="w-full h-10 px-3 rounded-md border border-input bg-background">
+              <Select id="categoryId" name="categoryId" required options={allCategories.map(cat => ({ value: cat.id, label: cat.name }))}>
                 <option value="">Select a category</option>
-                {allCategories.map(cat => (
-                  <option value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
+              </Select>
             </div>
 
             <!-- Product Name -->
@@ -122,14 +118,9 @@ const UNIT_OPTIONS = [
               />
             </div>
 
-            <!-- Product Type -->
             <div>
               <Label for="productType">Product Type *</Label>
-              <select id="productType" name="productType" required class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                {PRODUCT_TYPES.map(type => (
-                  <option value={type.value}>{type.label}</option>
-                ))}
-              </select>
+              <Select id="productType" name="productType" required options={PRODUCT_TYPES} />
             </div>
 
             <!-- Price Section -->
@@ -148,22 +139,16 @@ const UNIT_OPTIONS = [
               </div>
               <div>
                 <Label for="currency">Currency</Label>
-                <select id="currency" name="currency" class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                  <option value="USD">USD ($)</option>
-                  <option value="IDR">IDR (Rp)</option>
-                  <option value="TLS">TLS ($)</option>
-                </select>
+                <Select id="currency" name="currency" options={[
+                  { value: 'USD', label: 'USD ($)' },
+                  { value: 'IDR', label: 'IDR (Rp)' },
+                  { value: 'TLS', label: 'TLS ($)' },
+                ]} />
               </div>
-            </div>
 
-            <!-- Unit -->
             <div>
               <Label for="unit">Price Unit</Label>
-              <select id="unit" name="unit" class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                {UNIT_OPTIONS.map(opt => (
-                  <option value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <Select id="unit" name="unit" options={UNIT_OPTIONS} />
             </div>
 
             <!-- Description -->
