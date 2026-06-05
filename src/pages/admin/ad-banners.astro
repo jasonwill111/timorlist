@@ -58,7 +58,7 @@ import { actions } from 'astro:actions';
           <div id="hero-image-preview" class="mt-2 hidden">
             <div class="relative inline-block">
               <img id="hero-preview-img" class="w-full max-h-40 rounded-lg object-cover" />
-              <button type="button" id="remove-hero-image" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs">×</button>
+              <button type="button" id="remove-hero-image" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600" onclick="removeHeroImage()">×</button>
             </div>
           </div>
           <input type="hidden" id="hero-image" name="imageId" value="" />
@@ -150,11 +150,11 @@ import { actions } from 'astro:actions';
           <div class="min-w-0 flex-1">
             <p class="font-medium truncate">${hero.title}</p>
             <p class="text-xs text-muted-foreground truncate">${hero.description || 'No description'}</p>
+            <button onclick="editHero('${hero.id}')" class="px-2 py-1 text-xs border rounded hover:bg-primary/10 text-primary">Edit</button>
+            <button onclick="deleteHero('${hero.id}')" class="px-2 py-1 text-xs border rounded hover:bg-red-50 text-red-500">Del</button>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 shrink-0">
             <span class="px-2 py-0.5 text-xs rounded-full ${hero.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800'}">${hero.isActive ? 'Active' : 'Inactive'}</span>
-            <button class="text-blue-500 hover:text-blue-600 text-xs px-2 py-1" onclick="editHero('${hero.id}')">Edit</button>
-            <button class="text-red-500 hover:text-red-600 text-xs px-2 py-1" onclick="deleteHero('${hero.id}')">Del</button>
           </div>
         </div>
       `).join('');

@@ -4,6 +4,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 import Input from '@components/ui/Input.astro';
 import Select from '@components/ui/Select.astro';
 import Textarea from '@components/ui/Textarea.astro';
+import Button from '@components/ui/Button.astro';
 ---
 
 <AdminLayout title="Public Sectors">
@@ -46,12 +47,11 @@ import Textarea from '@components/ui/Textarea.astro';
   <div id="business-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
     <div class="bg-card border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
       <div class="p-4 border-b flex items-center justify-between">
-        <h2 class="text-lg font-bold" id="modal-title">Create Public Sector</h2>
-        <button id="close-modal" class="p-1 hover:bg-muted rounded">
+        <Button id="close-modal" variant="ghost" size="icon" class="p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
-        </button>
+        </Button>
       </div>
       <form id="business-form" class="p-4 space-y-4">
         <div>
@@ -158,7 +158,7 @@ import Textarea from '@components/ui/Textarea.astro';
           <p class="text-xs text-muted-foreground">/${escapeHtml(biz.slug)}</p>
         </div>
         <div class="flex items-center gap-2 ml-2">
-          <button class="text-xs px-2 py-1 border rounded hover:bg-muted edit-btn" data-id="${biz.id}">Edit</button>
+          <Button variant="outline" size="sm" class="text-xs px-2 py-1 h-7 edit-btn" data-id="${biz.id}">Edit</Button>
           <span class="px-2 py-0.5 text-xs rounded-full ${biz.status === 'live' || biz.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}">${capitalizeFirst(biz.status)}</span>
           <select class="text-xs border rounded px-1 py-0.5 bg-background" onchange="updatePublicSectororStatus('${biz.id}', this.value)">
             <option value="draft" ${biz.status === 'draft' ? 'selected' : ''}>Draft</option>
