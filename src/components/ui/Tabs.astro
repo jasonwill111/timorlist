@@ -1,4 +1,22 @@
 ---
+/**
+ * Tabs - Accessible tab navigation component.
+ *
+ * Usage:
+ *   <Tabs defaultValue="overview">
+ *     <TabsList>
+ *       <TabsTrigger value="overview">Overview</TabsTrigger>
+ *       <TabsTrigger value="settings">Settings</TabsTrigger>
+ *     </TabsList>
+ *     <TabsContent value="overview">Overview content</TabsContent>
+ *     <TabsContent value="settings">Settings content</TabsContent>
+ *   </Tabs>
+ *
+ * Props:
+ *   - defaultValue: The value of the tab to show on initial render
+ *   - class: Additional classes to apply
+ *   - data-slot: Slot identifier for shadcn compatibility
+ */
 interface Props {
   defaultValue?: string;
   class?: string;

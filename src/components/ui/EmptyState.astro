@@ -1,0 +1,39 @@
+---
+/**
+ * EmptyState - Display when a list or section has no content.
+ * Provides consistent empty-state UX across admin and public pages.
+ *
+ * Usage:
+ *   <EmptyState title="No categories yet" description="Create your first category to get started.">
+ *     <a href="/admin/categories/new" class="...">Add Category</a>
+ *   </EmptyState>
+ */
+import LucideIcon from './LucideIcon.astro';
+
+interface Props {
+  icon?: string;
+  title: string;
+  description?: string;
+  class?: string;
+}
+
+const {
+  icon = 'inbox',
+  title,
+  description,
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['flex flex-col items-center justify-center text-center py-12 px-4', className]}>
+  <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4 text-muted-foreground">
+    <LucideIcon name={icon} size={24} />
+  </div>
+  <h3 class="text-lg font-semibold text-foreground mb-1">{title}</h3>
+  {description && (
+    <p class="text-sm text-muted-foreground mb-4 max-w-md">{description}</p>
+  )}
+  <div class="flex gap-2">
+    <slot />
+  </div>
+</div>
