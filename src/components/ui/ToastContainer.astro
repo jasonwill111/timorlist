@@ -51,7 +51,7 @@ const typeIconNames: Record<ToastType, string> = {
       <div class="toast-item flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg ${typeStyles[t.type]}" data-id="${t.id}">
         <span class="flex-shrink-0">${typeIcons[t.type]}</span>
         <span class="flex-1">${escapeHtml(t.message)}</span>
-        <button onclick="this.parentElement?.remove()" class="opacity-70 hover:opacity-100 p-0.5 rounded hover:bg-black/10 cursor-pointer"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button type="button" onclick="this.parentElement?.remove()" class="inline-flex items-center justify-center w-6 h-6 text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-all duration-200 cursor-pointer"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
     `).join('');
   }
