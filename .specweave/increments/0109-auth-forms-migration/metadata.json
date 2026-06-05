@@ -1,0 +1,44 @@
+{
+  "id": "0109-auth-forms-migration",
+  "title": "Auth Forms Migration to FormField",
+  "status": "pending",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-04T16:00:00.000Z",
+  "lastActivity": "2026-06-04T16:00:00.000Z",
+  "completed": null,
+  "testMode": "manual-e2e",
+  "coverageTarget": 0,
+  "feature_id": null,
+  "epic_id": "0103-fulldev-migration-refactor",
+  "externalLinks": {
+    "previousIncrement": "0108-ui-component-hardening",
+    "relatedComponents": [
+      "src/components/forms/FormField.astro",
+      "src/components/forms/PasswordInput.astro",
+      "src/components/forms/AuthCard.astro"
+    ]
+  },
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "scope": {
+    "authPages": [
+      "src/pages/login.astro",
+      "src/pages/register.astro",
+      "src/pages/forgot-password.astro",
+      "src/pages/reset-password.astro",
+      "src/pages/contact.astro"
+    ]
+  },
+  "expectedOutcomes": {
+    "pagesUsingFormField": 5,
+    "inlineFormMarkdup": 0,
+    "authFormConsistency": "100%"
+  },
+  "riskLevel": "MEDIUM",
+  "blockingRisks": [
+    "Auth forms are critical user flow; UI changes could break login/register"
+  ]
+}

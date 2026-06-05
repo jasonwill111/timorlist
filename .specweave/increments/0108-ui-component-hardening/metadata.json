@@ -1,0 +1,48 @@
+{
+  "id": "0108-ui-component-hardening",
+  "title": "UI Component Library Hardening",
+  "status": "pending",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-04T16:00:00.000Z",
+  "lastActivity": "2026-06-04T16:00:00.000Z",
+  "completed": null,
+  "testMode": "manual-e2e",
+  "coverageTarget": 0,
+  "feature_id": null,
+  "epic_id": "0103-fulldev-migration-refactor",
+  "externalLinks": {
+    "previousIncrement": "0103-fulldev-migration-refactor",
+    "relatedLibs": [
+      "src/components/ui/Button.astro",
+      "src/components/ui/Input.astro",
+      "src/components/ui/Badge.astro",
+      "src/components/ui/Card.astro",
+      "src/components/ui/Tabs.astro",
+      "src/components/ui/Modal.astro",
+      "src/components/ui/Avatar.astro"
+    ]
+  },
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "scope": {
+    "newComponents": [
+      "EmptyState.astro",
+      "PageHeader.astro",
+      "ConfirmDialog.astro"
+    ],
+    "enhancedComponents": [
+      "Input.astro (password type support)",
+      "Button.astro (loading state confirmed)"
+    ]
+  },
+  "expectedOutcomes": {
+    "reusableComponents": 18,
+    "missingFunctionality": 0,
+    "apiConsistency": "100%"
+  },
+  "riskLevel": "LOW",
+  "blockingRisks": []
+}

@@ -1,0 +1,57 @@
+{
+  "id": "0110-admin-pages-migration",
+  "title": "Admin Pages UI Component Migration",
+  "status": "pending",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-04T16:00:00.000Z",
+  "lastActivity": "2026-06-04T16:00:00.000Z",
+  "completed": null,
+  "testMode": "manual-e2e",
+  "coverageTarget": 0,
+  "feature_id": null,
+  "epic_id": "0103-fulldev-migration-refactor",
+  "externalLinks": {
+    "previousIncrement": "0109-auth-forms-migration",
+    "relatedComponents": [
+      "src/components/ui/Input.astro",
+      "src/components/ui/Button.astro",
+      "src/components/ui/Badge.astro",
+      "src/components/ui/Tabs.astro",
+      "src/components/ui/Avatar.astro"
+    ]
+  },
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "scope": {
+    "adminPages": [
+      "src/pages/admin/users.astro",
+      "src/pages/admin/businesses.astro",
+      "src/pages/admin/categories.astro",
+      "src/pages/admin/products.astro",
+      "src/pages/admin/listings/index.astro",
+      "src/pages/admin/listings/new/index.astro",
+      "src/pages/admin/listings/[id]/edit/index.astro",
+      "src/pages/admin/blogs.astro",
+      "src/pages/admin/ai-tools.astro",
+      "src/pages/admin/orders.astro",
+      "src/pages/admin/reviews.astro",
+      "src/pages/admin/service-packages.astro",
+      "src/pages/admin/media.astro",
+      "src/pages/admin/settings.astro"
+    ]
+  },
+  "expectedOutcomes": {
+    "adminPagesUsingInput": 14,
+    "adminPagesUsingBadge": 8,
+    "adminPagesUsingTabs": 4,
+    "adminPagesUsingAvatar": 4
+  },
+  "riskLevel": "MEDIUM",
+  "blockingRisks": [
+    "Admin pages are not public; lower risk than auth flows",
+    "Visual changes may surprise admin users"
+  ]
+}

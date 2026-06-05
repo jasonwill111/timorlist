@@ -1,0 +1,42 @@
+{
+  "id": "0112-ui-business-separation-audit",
+  "title": "UI/Business Separation Audit + Final Cleanup",
+  "status": "pending",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-04T16:00:00.000Z",
+  "lastActivity": "2026-06-04T16:00:00.000Z",
+  "completed": null,
+  "testMode": "manual-e2e",
+  "coverageTarget": 0,
+  "feature_id": null,
+  "epic_id": "0103-fulldev-migration-refactor",
+  "externalLinks": {
+    "previousIncrements": [
+      "0107-api-consolidation",
+      "0108-ui-component-hardening",
+      "0109-auth-forms-migration",
+      "0110-admin-pages-migration",
+      "0111-business-public-migration"
+    ]
+  },
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "scope": {
+    "auditAreas": [
+      "Page <script> tags with direct db imports",
+      "Business components with hidden db dependencies",
+      "Inline escapeHtml in client scripts",
+      "Remaining technical debt"
+    ]
+  },
+  "expectedOutcomes": {
+    "separationViolations": 0,
+    "pageScriptsRefactored": 5,
+    "documentedOutOfScope": "client-side escapeHtml (technical constraint)"
+  },
+  "riskLevel": "LOW",
+  "blockingRisks": []
+}
