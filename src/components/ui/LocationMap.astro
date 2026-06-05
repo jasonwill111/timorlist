@@ -1,3 +1,4 @@
+import Button from './Button.astro';
 ---
 /**
  * LocationMap - Reusable Leaflet map component for business/org pages
@@ -31,15 +32,16 @@ const { id, lat, lng, address = 'Location', openFn = 'openMap' } = Astro.props;
     <div class="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-sm">
       <p class="text-xs font-medium text-foreground max-w-[60%] md:max-w-full truncate">{address}</p>
     </div>
-    <button
+    <Button
+      variant="default"
       onclick={`${openFn}('${lat}', '${lng}')`}
-      class="bg-brand-500 hover:bg-brand-600 text-white rounded-full px-3 py-2 text-xs sm:text-sm font-medium shadow-lg flex items-center gap-1 sm:gap-2 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation min-h-[44px] min-w-[80px] sm:min-w-0 justify-center"
+      class="bg-brand-500 hover:bg-brand-600 text-white rounded-full px-3 py-2 text-xs sm:text-sm font-medium shadow-lg flex items-center gap-1 sm:gap-2 transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation min-h-[44px] min-w-[80px] sm:min-w-0 justify-center rounded-full"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
       </svg>
       <span class="hidden xs:inline">Navigate</span>
-    </button>
+    </Button>
   </div>
 </div>
 

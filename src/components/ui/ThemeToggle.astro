@@ -1,5 +1,6 @@
 ---
 import LucideIcon from './LucideIcon.astro';
+import Button from './Button.astro';
 
 interface Props {
   class?: string;
@@ -12,10 +13,9 @@ const {
   ...props
 } = Astro.props;
 ---
-
-<button
-  type="button"
-  class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-10 w-10"
+<Button
+  variant="ghost"
+  size="icon"
   id="theme-toggle"
   aria-label="Toggle theme"
   aria-pressed="false"
@@ -23,7 +23,7 @@ const {
 >
   <LucideIcon name="Sun" size={20} class="sun-icon" />
   <LucideIcon name="Moon" size={20} class="moon-icon hidden" />
-</button>
+</Button>
 
 <script is:inline>
   (function() {
