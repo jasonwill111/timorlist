@@ -11,17 +11,7 @@
   "coverageTarget": 0,
   "feature_id": null,
   "epic_id": "0103-fulldev-migration-refactor",
-  "externalLinks": {
-    "previousIncrement": "0108-ui-component-hardening",
-    "relatedComponents": [
-      "src/components/forms/FormField.astro",
-      "src/components/forms/PasswordInput.astro",
-      "src/components/forms/AuthCard.astro"
-    ]
-  },
-  "planning": {
-    "parallel": false
-  },
+  "planning": { "parallel": false },
   "project": "TimorUp",
   "scope": {
     "authPages": [
@@ -32,13 +22,7 @@
       "src/pages/contact.astro"
     ]
   },
-  "expectedOutcomes": {
-    "pagesUsingFormField": 5,
-    "inlineFormMarkdup": 0,
-    "authFormConsistency": "100%"
-  },
+  "expectedOutcomes": { "pagesUsingFormField": 5 },
   "riskLevel": "MEDIUM",
-  "blockingRisks": [
-    "Auth forms are critical user flow; UI changes could break login/register"
-  ]
+  "blockingRisks": ["Auth forms are critical user flow"]
 }

@@ -1,7 +1,7 @@
 {
   "id": "0107-api-consolidation",
   "title": "API Layer Consolidation",
-  "status": "pending",
+  "status": "in_progress",
   "type": "refactor",
   "priority": "P1",
   "created": "2026-06-04T16:00:00.000Z",
@@ -11,37 +11,10 @@
   "coverageTarget": 0,
   "feature_id": null,
   "epic_id": "0103-fulldev-migration-refactor",
-  "externalLinks": {
-    "previousIncrement": "0103-fulldev-migration-refactor",
-    "relatedLibs": [
-      "src/lib/api-helpers.ts",
-      "src/lib/api-cache.ts",
-      "src/lib/api-middleware.ts"
-    ]
-  },
-  "planning": {
-    "parallel": false
-  },
+  "planning": { "parallel": false },
   "project": "TimorUp",
-  "scope": {
-    "apiRoutes": {
-      "totalRoutes": 60,
-      "consolidationTargets": [
-        "src/pages/api/admin/skus/index.ts",
-        "src/pages/api/products/index.ts",
-        "src/pages/api/products/[id].ts"
-      ]
-    }
-  },
-  "expectedOutcomes": {
-    "duplicateJsonResponse": 0,
-    "inlineApiHelpers": 0,
-    "unrolledRateLimits": 12,
-    "cachedGetEndpoints": 6
-  },
+  "scope": { "apiRoutes": { "total": 60, "consolidationTargets": ["admin/skus", "products/index", "products/[id]"] } },
+  "expectedOutcomes": { "duplicateJsonResponse": 0, "rateLimitedRoutes": 12, "cachedGetEndpoints": 6 },
   "riskLevel": "MEDIUM",
-  "blockingRisks": [
-    "Changing API response shape could break consumers",
-    "Rate limit changes could affect legitimate users"
-  ]
+  "blockingRisks": ["API response shape changes could break consumers"]
 }

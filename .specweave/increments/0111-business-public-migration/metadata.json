@@ -11,56 +11,25 @@
   "coverageTarget": 0,
   "feature_id": null,
   "epic_id": "0103-fulldev-migration-refactor",
-  "externalLinks": {
-    "previousIncrement": "0110-admin-pages-migration",
-    "relatedComponents": [
-      "src/components/ui/Input.astro",
-      "src/components/ui/Button.astro",
-      "src/components/ui/Badge.astro",
-      "src/components/ui/Tabs.astro",
-      "src/components/ui/Avatar.astro"
-    ]
-  },
-  "planning": {
-    "parallel": false
-  },
+  "planning": { "parallel": false },
   "project": "TimorUp",
   "scope": {
     "businessPages": [
-      "src/pages/business/[slug].astro",
-      "src/pages/business/[slug]/edit/index.astro",
-      "src/pages/business/[slug]/product/new/index.astro",
-      "src/pages/business/[slug]/product/[id]/edit/index.astro",
-      "src/pages/business/[slug]/product/[id]/index.astro",
-      "src/pages/business/[slug]/products.astro"
+      "business/[slug]", "business/[slug]/edit", "business/[slug]/product/*"
     ],
     "publicPages": [
-      "src/pages/listings/index.astro",
-      "src/pages/listings/[slug].astro",
-      "src/pages/non-profit/[slug].astro",
-      "src/pages/public-sector/[slug].astro",
-      "src/pages/search.astro",
-      "src/pages/index.astro"
+      "listings", "non-profit/[slug]", "public-sector/[slug]", "search", "index"
     ],
     "sharedComponents": [
-      "src/components/Header.astro",
-      "src/components/Footer.astro",
-      "src/components/PhotoGallery.astro",
-      "src/components/UpdatesSection.astro",
-      "src/components/ui/CarouselBanner.astro",
-      "src/components/ui/Modal.astro"
+      "Header.astro", "Footer.astro", "PhotoGallery.astro",
+      "UpdatesSection.astro", "CarouselBanner.astro", "Modal.astro"
     ]
   },
-  "expectedOutcomes": {
-    "businessPagesUsingComponents": 6,
-    "publicPagesUsingComponents": 6,
-    "nativeButtonsReplaced": 20,
-    "nativeInputsReplaced": 10
-  },
+  "expectedOutcomes": { "nativeButtonsReplaced": 20, "nativeInputsReplaced": 10 },
   "riskLevel": "HIGH",
   "blockingRisks": [
-    "Public pages are the primary user-facing experience; changes are highly visible",
+    "Public pages are primary user experience",
     "Header.astro changes affect every page",
-    "CarouselBanner is used on homepage"
+    "CarouselBanner used on homepage"
   ]
 }

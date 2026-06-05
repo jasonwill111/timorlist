@@ -11,47 +11,16 @@
   "coverageTarget": 0,
   "feature_id": null,
   "epic_id": "0103-fulldev-migration-refactor",
-  "externalLinks": {
-    "previousIncrement": "0109-auth-forms-migration",
-    "relatedComponents": [
-      "src/components/ui/Input.astro",
-      "src/components/ui/Button.astro",
-      "src/components/ui/Badge.astro",
-      "src/components/ui/Tabs.astro",
-      "src/components/ui/Avatar.astro"
-    ]
-  },
-  "planning": {
-    "parallel": false
-  },
+  "planning": { "parallel": false },
   "project": "TimorUp",
   "scope": {
     "adminPages": [
-      "src/pages/admin/users.astro",
-      "src/pages/admin/businesses.astro",
-      "src/pages/admin/categories.astro",
-      "src/pages/admin/products.astro",
-      "src/pages/admin/listings/index.astro",
-      "src/pages/admin/listings/new/index.astro",
-      "src/pages/admin/listings/[id]/edit/index.astro",
-      "src/pages/admin/blogs.astro",
-      "src/pages/admin/ai-tools.astro",
-      "src/pages/admin/orders.astro",
-      "src/pages/admin/reviews.astro",
-      "src/pages/admin/service-packages.astro",
-      "src/pages/admin/media.astro",
-      "src/pages/admin/settings.astro"
+      "admin/users", "admin/businesses", "admin/categories", "admin/products",
+      "admin/listings/*", "admin/blogs", "admin/ai-tools", "admin/orders",
+      "admin/reviews", "admin/service-packages", "admin/media", "admin/settings"
     ]
   },
-  "expectedOutcomes": {
-    "adminPagesUsingInput": 14,
-    "adminPagesUsingBadge": 8,
-    "adminPagesUsingTabs": 4,
-    "adminPagesUsingAvatar": 4
-  },
+  "expectedOutcomes": { "adminPagesUsingInput": 14, "adminPagesUsingBadge": 8, "adminPagesUsingTabs": 4 },
   "riskLevel": "MEDIUM",
-  "blockingRisks": [
-    "Admin pages are not public; lower risk than auth flows",
-    "Visual changes may surprise admin users"
-  ]
+  "blockingRisks": ["Visual changes may surprise admin users"]
 }

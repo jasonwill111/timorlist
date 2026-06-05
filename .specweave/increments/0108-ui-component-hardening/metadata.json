@@ -11,38 +11,13 @@
   "coverageTarget": 0,
   "feature_id": null,
   "epic_id": "0103-fulldev-migration-refactor",
-  "externalLinks": {
-    "previousIncrement": "0103-fulldev-migration-refactor",
-    "relatedLibs": [
-      "src/components/ui/Button.astro",
-      "src/components/ui/Input.astro",
-      "src/components/ui/Badge.astro",
-      "src/components/ui/Card.astro",
-      "src/components/ui/Tabs.astro",
-      "src/components/ui/Modal.astro",
-      "src/components/ui/Avatar.astro"
-    ]
-  },
-  "planning": {
-    "parallel": false
-  },
+  "planning": { "parallel": false },
   "project": "TimorUp",
   "scope": {
-    "newComponents": [
-      "EmptyState.astro",
-      "PageHeader.astro",
-      "ConfirmDialog.astro"
-    ],
-    "enhancedComponents": [
-      "Input.astro (password type support)",
-      "Button.astro (loading state confirmed)"
-    ]
+    "newComponents": ["EmptyState.astro", "PageHeader.astro", "ConfirmDialog.astro"],
+    "enhancedComponents": ["Input.astro (password type)"]
   },
-  "expectedOutcomes": {
-    "reusableComponents": 18,
-    "missingFunctionality": 0,
-    "apiConsistency": "100%"
-  },
+  "expectedOutcomes": { "reusableComponents": 18 },
   "riskLevel": "LOW",
   "blockingRisks": []
 }
