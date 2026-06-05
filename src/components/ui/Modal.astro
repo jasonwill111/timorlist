@@ -1,3 +1,4 @@
+import Button from './Button.astro';
 ---
 /**
  * Reusable Modal Component
@@ -55,15 +56,17 @@ const maxWidth = maxWidthMap[size];
         {title || ''}
       </h2>
       {showClose && (
-        <button
-          type="button"
-          class={`${id}-close modal-close-btn p-1 hover:bg-muted rounded transition-colors`}
+        <Button
+          variant="ghost"
+          size="icon"
+          class="p-1 hover:bg-muted rounded transition-colors"
           aria-label="Close modal"
+          onclick={`hideModal('${id}')`}
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
-        </button>
+        </Button>
       )}
     </div>
 
@@ -75,15 +78,9 @@ const maxWidth = maxWidthMap[size];
 </div>
 
 <script>
-  // Auto-initialize modal close handlers
+  // Auto-initialize modal handlers
   document.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
     const modal = backdrop as HTMLElement;
-
-    // Close on X button click
-    modal.querySelector('.modal-close-btn')?.addEventListener('click', () => {
-      hideModal(modal.id);
-    });
-
     // Close on backdrop click
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
