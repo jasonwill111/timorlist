@@ -118,6 +118,7 @@ const urlParams = new URL(Astro.request.url).searchParams;
         <!-- Mobile Menu Button -->
         <Button
           id="mobile-menu-btn"
+          data-action="mobile-menu-open"
           variant="ghost"
           size="icon"
           class="md:hidden w-11 h-10 rounded-md hover:bg-muted transition-colors flex items-center justify-center"
@@ -133,40 +134,40 @@ const urlParams = new URL(Astro.request.url).searchParams;
   <!-- Mobile Menu -->
   <div id="mobile-menu" class="hidden md:hidden border-t">
     <nav class="container max-w-6xl py-4 space-y-2">
-      <a href="/businesses" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/businesses') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/businesses" data-action="mobile-nav" data-href="/businesses" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/businesses') ? "bg-muted text-primary" : "text-muted-foreground"]}>
         Business Directories
       </a>
-      <a href="/products-services" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/products-services') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/products-services" data-action="mobile-nav" data-href="/products-services" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/products-services') ? "bg-muted text-primary" : "text-muted-foreground"]}>
         Products & Services
       </a>
-      <a href="/listings" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/listings') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/listings" data-action="mobile-nav" data-href="/listings" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/listings') ? "bg-muted text-primary" : "text-muted-foreground"]}>
         Classified Ads
       </a>
-      <a href="/public-sectors" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/public-sectors') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/public-sectors" data-action="mobile-nav" data-href="/public-sectors" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/public-sectors') ? "bg-muted text-primary" : "text-muted-foreground"]}>
         Public Sectors
       </a>
-      <a href="/non-profits" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/non-profits') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/non-profits" data-action="mobile-nav" data-href="/non-profits" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/non-profits') ? "bg-muted text-primary" : "text-muted-foreground"]}>
         Non-Profits
       </a>
-      <a href="/pricing" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/pricing' ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/pricing" data-action="mobile-nav" data-href="/pricing" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/pricing' ? "bg-muted text-primary" : "text-muted-foreground"]}>
         Pricing
       </a>
-      <a href="/faq" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/faq' ? "bg-muted text-primary" : "text-muted-foreground"]}>
+      <a href="/faq" data-action="mobile-nav" data-href="/faq" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/faq' ? "bg-muted text-primary" : "text-muted-foreground"]}>
         FAQ
       </a>
-      <a href="/listings/create" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium bg-primary text-primary-foreground text-center flex items-center justify-center", currentPath === '/listings/create' ? "bg-primary/90" : ""]}>
+      <a href="/listings/create" data-action="mobile-nav" data-href="/listings/create" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium bg-primary text-primary-foreground text-center flex items-center justify-center", currentPath === '/listings/create' ? "bg-primary/90" : ""]}>
         + Create Listing
       </a>
       <div id="mobile-auth" class="border-t pt-2 mt-2 space-y-2">
         {isLoggedIn ? (
           <>
-            <a href="/account" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-muted-foreground flex items-center">My Account</a>
-            <Button id="mobile-logout" variant="ghost" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center" />
+            <a href="/account" data-action="mobile-nav" data-href="/account" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-muted-foreground flex items-center">My Account</a>
+            <Button id="mobile-logout" data-action="mobile-logout" variant="ghost" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center" />
           </>
         ) : (
           <>
-            <a href="/login" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center border border-primary text-primary hover:bg-primary/5 flex items-center justify-center">Log in</a>
-            <a href="/register" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center bg-primary text-primary-foreground flex items-center justify-center">Sign Up</a>
+            <a href="/login" data-action="mobile-nav" data-href="/login" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center border border-primary text-primary hover:bg-primary/5 flex items-center justify-center">Log in</a>
+            <a href="/register" data-action="mobile-nav" data-href="/register" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center bg-primary text-primary-foreground flex items-center justify-center">Sign Up</a>
           </>
         )}
       </div>
@@ -176,25 +177,44 @@ const urlParams = new URL(Astro.request.url).searchParams;
 
 <script>
   import { actions } from 'astro:actions';
-
-  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   let isMenuOpen = false;
-
-  mobileMenuBtn?.addEventListener('click', () => {
-    if (!mobileMenu) return;
-    isMenuOpen = !isMenuOpen;
-    if (isMenuOpen) {
-      mobileMenu.classList.remove('hidden');
-      const mobileNav = mobileMenu.querySelector('nav');
-      if (mobileNav) {
-        mobileNav.classList.add('animate-in');
+  // Event delegation for mobile menu
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const actionEl = target.closest('[data-action]');
+    const action = actionEl?.getAttribute('data-action');
+    if (action === 'mobile-menu-open') {
+      e.preventDefault();
+      if (!mobileMenu) return;
+      isMenuOpen = !isMenuOpen;
+      if (isMenuOpen) {
+        mobileMenu.classList.remove('hidden');
+        const mobileNav = mobileMenu.querySelector('nav');
+        if (mobileNav) {
+          mobileNav.classList.add('animate-in');
+        }
+      } else {
+        mobileMenu.classList.add('hidden');
       }
-    } else {
-      mobileMenu.classList.add('hidden');
+    }
+    if (action === 'mobile-menu-close') {
+      e.preventDefault();
+      isMenuOpen = false;
+      mobileMenu?.classList.add('hidden');
+    }
+    if (action === 'mobile-nav') {
+      const href = actionEl?.getAttribute('data-href') || (actionEl as HTMLAnchorElement)?.getAttribute('href');
+      if (href) {
+        // Close menu on navigation
+        isMenuOpen = false;
+        mobileMenu?.classList.add('hidden');
+      }
+    }
+    if (action === 'mobile-logout') {
+      handleLogout();
     }
   });
-
   // Dropdown menu animations via CSS classes - ONLY target nav dropdown groups, not all .group elements
   const dropdownGroups = document.querySelectorAll('nav .group');
   dropdownGroups.forEach(group => {
@@ -214,8 +234,7 @@ const urlParams = new URL(Astro.request.url).searchParams;
       });
     }
   });
-
-  document.getElementById('mobile-logout')?.addEventListener('click', async () => {
+  async function handleLogout() {
     try { await actions.auth.signOut(); }
     catch (e) { console.error('Logout error:', e); }
     finally {
@@ -223,7 +242,7 @@ const urlParams = new URL(Astro.request.url).searchParams;
       localStorage.removeItem('userId');
       window.location.href = '/';
     }
-  });
+  }
 
   function updateAuthState() {
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
@@ -251,24 +270,14 @@ const urlParams = new URL(Astro.request.url).searchParams;
             e.stopPropagation();
             document.getElementById('avatar-dropdown')?.classList.toggle('hidden');
           });
-          document.getElementById('logout-btn')?.addEventListener('click', async () => {
-            try { await actions.auth.signOut(); }
-            catch (e) { console.error('Logout error:', e); }
-            finally {
-              localStorage.removeItem('userId');
-              localStorage.removeItem('userName');
-              sessionStorage.removeItem('userId');
-              sessionStorage.removeItem('userName');
-              window.location.href = '/';
-            }
-          });
+          document.getElementById('logout-btn')?.addEventListener('click', () => handleLogout());
           document.addEventListener('click', () => document.getElementById('avatar-dropdown')?.classList.add('hidden'));
         }, 0);
       }
       if (mobileAuth) {
         mobileAuth.innerHTML = `
-          <a href="/account" class="block px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground">My Account</a>
-          <button id="mobile-logout" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-500">Log Out</button>
+          <a href="/account" data-action="mobile-nav" data-href="/account" class="block px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground">My Account</a>
+          <button id="mobile-logout" data-action="mobile-logout" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-500">Log Out</button>
         `;
       }
     }

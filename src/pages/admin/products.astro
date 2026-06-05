@@ -676,16 +676,6 @@ const businessOptionsJson = JSON.stringify(businessOptions);
       }
       return buildSkuItemHtml(sku, priceDisplay, bizMap.get(sku.businessId) || 'Unknown');
     }).join('');
-
-    // Edit handlers
-    container.querySelectorAll('.edit-sku').forEach(btn => {
-      btn.addEventListener('click', () => editSKU(btn.dataset.id));
-    });
-
-    // Delete handlers
-    container.querySelectorAll('.delete-sku').forEach(btn => {
-      btn.addEventListener('click', () => deleteSKU(btn.dataset.id));
-    });
   }
 
   // Edit SKU

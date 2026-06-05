@@ -804,28 +804,58 @@ import Textarea from '@/components/ui/Textarea.astro';
 
       return `
         <div class="flex items-center gap-2 p-2 border rounded-lg">
-          <input type="checkbox" id="${day}-closed" name="${day}-closed" class="rounded" ${isClosed ? 'checked' : ''} />
+          <input type="checkbox" id="${day}-closed" name="${day}-closed" data-action="toggle-closed" data-day="${day}" class="rounded" ${isClosed ? 'checked' : ''} />
           <label for="${day}-closed" class="w-20 font-medium">${dayLabels[index]}</label>
           <input
             type="time"
             id="${day}-open"
             name="${day}-open"
+            data-action="time-input"
+            data-day="${day}"
             class="border rounded px-2 py-1 text-sm"
             value="${open}"
+            ${isClosed ? 'disabled' : ''}
           />
           <span>to</span>
           <input
             type="time"
             id="${day}-close"
             name="${day}-close"
+            data-action="time-input"
+            data-day="${day}"
             class="border rounded px-2 py-1 text-sm"
             value="${close}"
+            ${isClosed ? 'disabled' : ''}
           />
         </div>
       `;
     }).join('');
+    // Apply initial disabled state based on checked state
+    const closedCheckboxes = container.querySelectorAll('[data-action="toggle-closed"]');
+    closedCheckboxes.forEach((cb) => {
+      const day = (cb as HTMLElement).dataset.day;
+      if (day && (cb as HTMLInputElement).checked) {
+        const timeInputs = container.querySelectorAll(`[data-day="${day}"][data-action="time-input"]`);
+        timeInputs.forEach(input => {
+          (input as HTMLInputElement).disabled = true;
+        });
+      }
+    });
   }
-
+  // Event delegation for business hours inputs
+  document.addEventListener('change', (e) => {
+    const target = e.target as HTMLElement;
+    const el = target.closest('[data-action]');
+    if (!el) return;
+    const action = el.dataset.action;
+    const day = el.dataset.day;
+    if (action === 'toggle-closed') {
+      const timeInputs = document.querySelectorAll(`[data-day="${day}"][data-action="time-input"]`);
+      timeInputs.forEach(input => {
+        (input as HTMLInputElement).disabled = (target as HTMLInputElement).checked;
+      });
+    }
+  });
   // Map
   async function loadLeaflet() {
     if (leafletLoaded) return;
