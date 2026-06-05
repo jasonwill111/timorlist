@@ -297,9 +297,8 @@ import { actions } from 'astro:actions';
           </Badge>
         </td>
         <td class="p-3 text-right">
-          ${canEdit ? `<button onclick="window.editPlan('${pkg.id}')" class="inline-flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors rounded-md px-2 py-1">Edit</button>` : '<span class="text-xs text-muted-foreground">View only</span>'}
+          ${canEdit ? `<button data-action="edit-plan" data-plan-id="${pkg.id}" class="inline-flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors rounded-md px-2 py-1">Edit</button>` : '<span class="text-xs text-muted-foreground">View only</span>'}
         </td>
-      </tr>
     `}).join('');
   }
 
@@ -537,12 +536,24 @@ import { actions } from 'astro:actions';
     });
 
     // Delete modal handlers
+    // Delete modal handlers
     document.getElementById('cancel-delete')?.addEventListener('click', hideDeleteConfirm);
     document.getElementById('confirm-delete')?.addEventListener('click', () => {
       if (deleteTargetId) deletePlan(deleteTargetId);
     });
     document.getElementById('delete-modal')?.addEventListener('click', (e) => {
       if (e.target === e.currentTarget) hideDeleteConfirm();
+    });
+    // Event delegation for dynamically rendered buttons
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const button = target.closest('[data-action]') as HTMLElement | null;
+      if (!button) return;
+      const action = button.getAttribute('data-action');
+      if (action === 'edit-plan') {
+        const planId = button.getAttribute('data-plan-id');
+        if (planId) (window as PlanData).editPlan?.(planId);
+      }
     });
   });
 </script>
