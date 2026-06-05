@@ -2,6 +2,7 @@
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import Button from '@components/ui/Button.astro';
+import Select from '@components/ui/Select.astro';
 import { actions } from 'astro:actions';
 ---
 
@@ -96,20 +97,19 @@ import { actions } from 'astro:actions';
           </div>
           <div id="package-type-field">
             <label class="block text-sm font-medium mb-1">Type</label>
-            <select id="package-type" name="serviceType" class="w-full h-9 px-3 rounded-md border bg-background text-sm">
-              <option value="subscription">Subscription (Business Plan)</option>
-              <option value="listing_renewal">Listing Renewal</option>
-              <option value="ad_banner">Ad Banner</option>
-            </select>
+            <Select id="package-type" name="serviceType" options={[
+              { value: 'subscription', label: 'Subscription (Business Plan)' },
+              { value: 'listing_renewal', label: 'Listing Renewal' },
+              { value: 'ad_banner', label: 'Ad Banner' }
+            ]} />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Relation To</label>
-            <select id="package-relation" name="serviceRelationTo" class="w-full h-9 px-3 rounded-md border bg-background text-sm">
-              <option value="business">Business</option>
-              <option value="listing">Listing</option>
-              <option value="business_product">Product/Service</option>
-              <option value="homepage">Homepage</option>
-            </select>
+            <Select id="package-relation" name="serviceRelationTo" options={[
+              { value: 'business', label: 'Business' },
+              { value: 'listing', label: 'Listing' },
+              { value: 'business_product', label: 'Product/Service' },
+              { value: 'homepage', label: 'Homepage' }
+            ]} />
         </div>
 
         <div class="grid grid-cols-2 gap-4">

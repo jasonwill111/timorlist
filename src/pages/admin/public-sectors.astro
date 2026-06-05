@@ -2,6 +2,7 @@
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import Button from '@components/ui/Button.astro';
+import Select from '@components/ui/Select.astro';
 ---
 
 <AdminLayout title="Public Sectors">
@@ -24,13 +25,7 @@ import Button from '@components/ui/Button.astro';
           />
         </div>
         <div class="flex gap-2">
-          <select id="status-filter" class="px-3 py-2 border rounded-lg text-sm bg-background">
-            <option value="">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="live">Live</option>
-            <option value="paid">Paid</option>
-            <option value="expired">Expired</option>
-          </select>
+          <Select id="status-filter" class="px-3 py-2 border rounded-lg text-sm bg-background" options={[ { value: '', label: 'All Status' }, { value: 'draft', label: 'Draft' }, { value: 'live', label: 'Live' }, { value: 'paid', label: 'Paid' }, { value: 'expired', label: 'Expired' } ]} />
         </div>
       </div>
     </div>
