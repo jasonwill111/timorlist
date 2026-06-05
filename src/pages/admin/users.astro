@@ -243,33 +243,17 @@ import { actions } from 'astro:actions';
     }
   }
 
-  // Modal controls
-  const modal = document.getElementById('edit-modal');
-  const closeBtn = document.getElementById('close-modal');
-  const cancelBtn = document.getElementById('cancel-btn');
-
-  closeBtn?.addEventListener('click', () => {
-    modal?.classList.add('hidden');
-    modal?.classList.remove('flex');
-  });
-
-  cancelBtn?.addEventListener('click', () => {
-    modal?.classList.add('hidden');
-    modal?.classList.remove('flex');
-  });
-
+  // Modal close on backdrop click
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }
   });
-
   // Form submission
   document.getElementById('user-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-
     const userId = formData.get('id') as string;
     const userData = {
       name: String(formData.get('name') || ''),
@@ -278,7 +262,6 @@ import { actions } from 'astro:actions';
     };
     const originalRole = (document.getElementById('users-list')?.querySelector(`[data-user-id="${userId}"]`) as HTMLElement)?.dataset.userRole || 'user';
     const newRole = String(formData.get('role') || 'user');
-
     try {
       // Update basic info
       const result = await actions.admin.users.update({
@@ -287,12 +270,10 @@ import { actions } from 'astro:actions';
         email: userData.email || undefined,
         phone: userData.phone || undefined,
       });
-
       if (!result.success) {
         toast.error(result.error?.message || 'Failed to update user');
         return;
       }
-
       // If role changed and user is super_admin, use actions to update role
       if (newRole !== originalRole && currentUserRole === 'super_admin') {
         try {
@@ -310,7 +291,6 @@ import { actions } from 'astro:actions';
           return;
         }
       }
-
       toast.success('User updated');
       modal?.classList.add('hidden');
       modal?.classList.remove('flex');
@@ -320,11 +300,9 @@ import { actions } from 'astro:actions';
       toast.error('Error updating user');
     }
   });
-
   // Event listeners for search and filter
   document.getElementById('search-input')?.addEventListener('input', renderUsers);
   document.getElementById('role-filter')?.addEventListener('change', renderUsers);
-
   // Initialize
   checkUserRole();
   loadUsers();
