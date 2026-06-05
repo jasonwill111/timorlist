@@ -8,13 +8,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/db/schema';
 import { and, eq, isNull } from 'drizzle-orm';
 import { initAuth } from '@/lib/auth';
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
+import { jsonResponse, unauthorizedResponse, notFoundResponse, badRequestResponse, errorResponse } from '@/lib/api-helpers';
 
 async function getUserFromRequest(request: Request): Promise<{ id: string; role: string } | null> {
   const cookieHeader = request.headers.get('cookie') || '';
@@ -35,13 +29,13 @@ async function getUserFromRequest(request: Request): Promise<{ id: string; role:
 export async function GET({ params, url }: { params: { id: string }; url: URL }) {
   const db = await getDb();
   if (!db) {
-    return jsonResponse({ success: false, error: { message: 'Database not available' } }, 500);
+    return errorResponse('Database not available', 'SERVER_DB_ERROR', 500);
   }
 
   try {
     const { id } = params;
     if (!id) {
-      return jsonResponse({ success: false, error: { message: 'Product id is required' } }, 400);
+      return badRequestResponse('Product id is required');
     }
 
     const includeDeleted = url.searchParams.get('includeDeleted') === 'true';
@@ -52,13 +46,13 @@ export async function GET({ params, url }: { params: { id: string }; url: URL })
     const row = await db.select().from(products).where(where).limit(1).get();
 
     if (!row) {
-      return jsonResponse({ success: false, error: { message: 'Product not found' } }, 404);
+      return notFoundResponse('Product not found');
     }
 
     return jsonResponse(row);
   } catch (error) {
     console.error('[products/:id GET] error:', error);
-    return jsonResponse({ success: false, error: { message: String(error) } }, 500);
+    return errorResponse(String(error), 'SERVER_ERROR', 500);
   }
 }
 
@@ -67,28 +61,28 @@ export async function PUT({ params, request }: { params: { id: string }; request
   const user = await getUserFromRequest(request);
   if (!user || !['admin', 'super_admin', 'editor', 'user'].includes(user.role)) {
     console.warn('[products/:id PUT] Unauthorized access attempt');
-    return jsonResponse({ success: false, error: { message: 'Unauthorized' } }, 401);
+    return unauthorizedResponse();
   }
 
   const db = await getDb();
   if (!db) {
-    return jsonResponse({ success: false, error: { message: 'Database not available' } }, 500);
+    return errorResponse('Database not available', 'SERVER_DB_ERROR', 500);
   }
 
   try {
     const { id } = params;
     if (!id) {
-      return jsonResponse({ success: false, error: { message: 'Product id is required' } }, 400);
+      return badRequestResponse('Product id is required');
     }
 
     const existing = await db.select().from(products).where(eq(products.id, id)).limit(1).get();
     if (!existing) {
-      return jsonResponse({ success: false, error: { message: 'Product not found' } }, 404);
+      return notFoundResponse('Product not found');
     }
 
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== 'object') {
-      return jsonResponse({ success: false, error: { message: 'Invalid JSON body' } }, 400);
+      return badRequestResponse('Invalid JSON body');
     }
 
     const updates: Record<string, unknown> = { updatedAt: Date.now() };
@@ -123,7 +117,7 @@ export async function PUT({ params, request }: { params: { id: string }; request
     return jsonResponse({ success: true, data: updated });
   } catch (error) {
     console.error('[products/:id PUT] error:', error);
-    return jsonResponse({ success: false, error: { message: String(error) } }, 500);
+    return errorResponse(String(error), 'SERVER_ERROR', 500);
   }
 }
 
@@ -132,23 +126,23 @@ export async function DELETE({ params, request }: { params: { id: string }; requ
   const user = await getUserFromRequest(request);
   if (!user || !['admin', 'super_admin', 'editor', 'user'].includes(user.role)) {
     console.warn('[products/:id DELETE] Unauthorized access attempt');
-    return jsonResponse({ success: false, error: { message: 'Unauthorized' } }, 401);
+    return unauthorizedResponse();
   }
 
   const db = await getDb();
   if (!db) {
-    return jsonResponse({ success: false, error: { message: 'Database not available' } }, 500);
+    return errorResponse('Database not available', 'SERVER_DB_ERROR', 500);
   }
 
   try {
     const { id } = params;
     if (!id) {
-      return jsonResponse({ success: false, error: { message: 'Product id is required' } }, 400);
+      return badRequestResponse('Product id is required');
     }
 
     const existing = await db.select().from(products).where(eq(products.id, id)).limit(1).get();
     if (!existing) {
-      return jsonResponse({ success: false, error: { message: 'Product not found' } }, 404);
+      return notFoundResponse('Product not found');
     }
 
     // Soft delete: set deletedAt to current timestamp
@@ -158,6 +152,6 @@ export async function DELETE({ params, request }: { params: { id: string }; requ
     return jsonResponse({ success: true });
   } catch (error) {
     console.error('[products/:id DELETE] error:', error);
-    return jsonResponse({ success: false, error: { message: String(error) } }, 500);
+    return errorResponse(String(error), 'SERVER_ERROR', 500);
   }
 }

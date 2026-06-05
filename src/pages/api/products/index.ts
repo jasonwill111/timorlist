@@ -7,13 +7,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/db/schema';
 import { and, eq, isNull, desc, type SQL } from 'drizzle-orm';
 import { initAuth } from '@/lib/auth';
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
+import { jsonResponse, unauthorizedResponse, badRequestResponse, errorResponse } from '@/lib/api-helpers';
 
 async function getUserFromRequest(request: Request): Promise<{ id: string; role: string } | null> {
   const cookieHeader = request.headers.get('cookie') || '';
@@ -34,7 +28,7 @@ async function getUserFromRequest(request: Request): Promise<{ id: string; role:
 export async function GET({ url }: { url: URL }) {
   const db = await getDb();
   if (!db) {
-    return jsonResponse({ success: false, error: { message: 'Database not available' } }, 500);
+    return errorResponse('Database not available', 'SERVER_DB_ERROR', 500);
   }
 
   try {
@@ -62,7 +56,7 @@ export async function GET({ url }: { url: URL }) {
     return jsonResponse({ success: true, data: rows });
   } catch (error) {
     console.error('[products GET] error:', error);
-    return jsonResponse({ success: false, error: { message: String(error) } }, 500);
+    return errorResponse(String(error), 'SERVER_ERROR', 500);
   }
 }
 
@@ -71,30 +65,30 @@ export async function POST({ request }: { request: Request }) {
   const user = await getUserFromRequest(request);
   if (!user || !['admin', 'super_admin', 'editor', 'user'].includes(user.role)) {
     console.warn('[products POST] Unauthorized access attempt');
-    return jsonResponse({ success: false, error: { message: 'Unauthorized' } }, 401);
+    return unauthorizedResponse();
   }
 
   const db = await getDb();
   if (!db) {
-    return jsonResponse({ success: false, error: { message: 'Database not available' } }, 500);
+    return errorResponse('Database not available', 'SERVER_DB_ERROR', 500);
   }
 
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== 'object') {
-      return jsonResponse({ success: false, error: { message: 'Invalid JSON body' } }, 400);
+      return badRequestResponse('Invalid JSON body');
     }
 
     const { title, businessId, categoryId, productType, priceFields, specifications, description, images } = body as Record<string, unknown>;
 
     if (typeof title !== 'string' || !title.trim()) {
-      return jsonResponse({ success: false, error: { message: 'title is required' } }, 400);
+      return badRequestResponse('title is required');
     }
     if (typeof businessId !== 'string' || !businessId) {
-      return jsonResponse({ success: false, error: { message: 'businessId is required' } }, 400);
+      return badRequestResponse('businessId is required');
     }
     if (typeof categoryId !== 'string' || !categoryId) {
-      return jsonResponse({ success: false, error: { message: 'categoryId is required' } }, 400);
+      return badRequestResponse('categoryId is required');
     }
 
     const now = Date.now();
@@ -135,6 +129,6 @@ export async function POST({ request }: { request: Request }) {
     return jsonResponse({ success: true, data: created ?? { id, slug: productSlug } }, 201);
   } catch (error) {
     console.error('[products POST] error:', error);
-    return jsonResponse({ success: false, error: { message: String(error) } }, 500);
+    return errorResponse(String(error), 'SERVER_ERROR', 500);
   }
 }

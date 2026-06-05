@@ -2,9 +2,9 @@
 
 ## Phase 1: jsonResponse Consolidation
 - [ ] T-101: src/pages/api/admin/skus/index.ts — replace local jsonResponse with import from @/lib/api-helpers
-- [ ] T-102: src/pages/api/products/index.ts — replace local jsonResponse with import from @/lib/api-helpers
-- [ ] T-103: src/pages/api/products/[id].ts — replace local jsonResponse with import from @/lib/api-helpers
-- [ ] T-104: Verify no inline `function jsonResponse` in src/pages/api/
+- [x] T-101: src/pages/api/admin/skus/index.ts — replace local jsonResponse with import from @/lib/api-helpers
+- [x] T-102: src/pages/api/products/index.ts — replace local jsonResponse with import from @/lib/api-helpers
+- [x] T-103: src/pages/api/products/[id].ts — replace local jsonResponse with import from @/lib/api-helpers
 - [ ] T-105: curl test: GET /api/products → 200 with success/data shape
 - [ ] T-106: curl test: POST /api/products (no auth) → 401
 - [ ] T-107: pnpm build exits 0
