@@ -74,8 +74,7 @@ const userId = Astro.locals.user?.id || 'system';
             <label class="block text-sm font-medium mb-1">Slug *</label>
             <div class="flex gap-2">
               <Input type="text" id="post-slug" required class="flex-1" placeholder="post-url-slug" />
-                Auto
-              </Button>
+              <Button type="button" id="auto-slug-btn" variant="secondary" size="sm" aria-label="Auto-generate slug">Auto</Button>
             </div>
           </div>
 
@@ -602,7 +601,7 @@ const userId = Astro.locals.user?.id || 'system';
   $('close-modal').addEventListener('click', closeModal);
   $('cancel-btn').addEventListener('click', closeModal);
 
-  $('generate-slug-btn').addEventListener('click', () => {
+  document.getElementById('auto-slug-btn')?.addEventListener('click', () => {
     slugInput.value = slugify(titleInput.value);
   });
 

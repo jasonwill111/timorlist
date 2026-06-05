@@ -37,7 +37,7 @@ import { actions } from 'astro:actions';
   <div id="order-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
     <div class="bg-card border rounded-lg w-full max-w-lg">
       <div class="p-4 border-b flex items-center justify-between">
-        <h2 class="text-lg font-bold">Order Details</h2>
+        <h2 class="text-lg font-bold" id="modal-title">Order Details</h2>
         <Button id="close-modal" variant="ghost" size="sm">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -88,14 +88,13 @@ import { actions } from 'astro:actions';
         </div>
       </form>
 
-      <!-- Action Buttons -->
       <div class="p-4 border-t flex gap-2 justify-between">
-        <Button id="delete-order-btn" variant="destructive" size="sm">Delete</Button>
+        <Button id="delete-order-btn" variant="destructive" size="sm" aria-label="Delete order">Delete</Button>
         <div class="flex gap-2">
-          <Button id="cancel-modal-btn" variant="secondary" size="sm">Cancel</Button>
-          <Button id="reject-order-btn" variant="warning" size="sm" class="hidden">Reject</Button>
-          <Button id="confirm-order-btn" variant="success" size="sm" class="hidden">Confirm Payment</Button>
-          <Button id="save-order-btn" variant="primary" size="sm">Save Changes</Button>
+          <Button id="cancel-modal-btn" variant="secondary" size="sm" aria-label="Cancel">Cancel</Button>
+          <Button id="reject-order-btn" variant="warning" size="sm" class="hidden" aria-label="Reject order">Reject</Button>
+          <Button id="confirm-order-btn" variant="success" size="sm" class="hidden" aria-label="Confirm payment">Confirm Payment</Button>
+          <Button id="save-order-btn" variant="primary" size="sm" aria-label="Save changes">Save Changes</Button>
         </div>
       </div>
     </div>

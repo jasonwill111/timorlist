@@ -247,34 +247,38 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
   <div class="space-y-8">
     <!-- Tab Navigation (Desktop) -->
     <div class="hidden md:flex items-center gap-1 border-b">
-      <button
+      <Button
+        variant="ghost"
         class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
         data-tab="businesses"
         data-active="true"
       >
         Businesses
-      </button>
-      <button
+      </Button>
+      <Button
+        variant="ghost"
         class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
         data-tab="listings"
         data-active="false"
       >
         Listings
-      </button>
-      <button
+      </Button>
+      <Button
+        variant="ghost"
         class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
         data-tab="public-sectors"
         data-active="false"
       >
         Public Sectors
-      </button>
-      <button
+      </Button>
+      <Button
+        variant="ghost"
         class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
         data-tab="non-profits"
         data-active="false"
       >
         Non-Profits
-      </button>
+      </Button>
     </div>
 
     <!-- Mobile: Select dropdown instead of tabs -->

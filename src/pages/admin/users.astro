@@ -26,13 +26,13 @@ import { actions } from 'astro:actions';
             class="w-full px-3 py-2 border rounded-lg text-sm"
           />
         </div>
-          <Select id="role-filter" class="px-3 py-2 border rounded-lg text-sm bg-background">
-            <option value="">All Roles</option>
-            <option value="user">User</option>
-            <option value="editor">Editor</option>
-            <option value="admin">Admin</option>
-            <option value="super_admin">Super Admin</option>
-          </Select>
+          <Select id="role-filter" class="px-3 py-2 border rounded-lg text-sm bg-background" options={[
+            { value: "", label: "All Roles" },
+            { value: "user", label: "User" },
+            { value: "editor", label: "Editor" },
+            { value: "admin", label: "Admin" },
+            { value: "super_admin", label: "Super Admin" },
+          ]} />
         </div>
       </div>
     </div>

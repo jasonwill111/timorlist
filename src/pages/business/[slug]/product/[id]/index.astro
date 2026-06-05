@@ -3,6 +3,7 @@
 export const prerender = false;
 
 import Layout from '@layouts/Layout.astro';
+import Button from '@components/ui/Button.astro';
 import { getRawDb } from '@/lib/db';
 import { createBreadcrumbSchema } from '@/lib/seo';
 
@@ -172,20 +173,21 @@ const productTypeLabels: Record<string, string> = {
             <!-- Thumbnail Navigation -->
             {images.length > 1 && (
               <div class="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
-                <button id="scroll-left" class="flex-shrink-0 w-10 h-20 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors">
+                <Button variant="ghost" size="icon" id="scroll-left" class="flex-shrink-0 w-10 h-20 rounded-lg bg-muted hover:bg-muted/80">
                   <ChevronLeft class="w-5 h-5" />
-                </button>
+                </Button>
                 {images.map((img, index) => (
-                  <button
+                  <Button
+                    variant="ghost"
                     class={`thumbnail-btn w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${index === 0 ? 'border-primary' : 'border-transparent hover:border-muted-foreground/30'}`}
                     data-index={index}
                   >
                     <img src={`/api/media/${img.mediaId}`} aria-hidden="true" alt="" class="w-full h-full object-cover" />
-                  </button>
+                  </Button>
                 ))}
-                <button id="scroll-right" class="flex-shrink-0 w-10 h-20 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors">
+                <Button variant="ghost" size="icon" id="scroll-right" class="flex-shrink-0 w-10 h-20 rounded-lg bg-muted hover:bg-muted/80">
                   <ChevronRight class="w-5 h-5" />
-                </button>
+                </Button>
               </div>
             )}
 

@@ -160,7 +160,6 @@ const buildUrl = (pageNum: number) => {
       <option value={b.id} selected={businessId === b.id}>{b.title}</option>
     ))}
   </Select>
-
   <Select id="sort-filter" name="sort">
     <option value="recent" selected={sort === 'recent'}>Recent</option>
     <option value="name" selected={sort === 'name'}>Name A-Z</option>
