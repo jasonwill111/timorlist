@@ -14,8 +14,8 @@ import { actions } from 'astro:actions';
       <h1 class="text-xl md:text-2xl font-bold">Orders</h1>
       <p class="text-sm text-muted-foreground mt-1">Manage subscription orders and payments</p>
     </div>
-
     <!-- Filter Tabs -->
+    <div class="flex gap-2 mb-4 overflow-x-auto">
       <Button variant="primary" size="sm" class="filter-btn" data-status="all">All</Button>
       <Button variant="secondary" size="sm" class="filter-btn" data-status="unpaid">Unpaid</Button>
       <Button variant="secondary" size="sm" class="filter-btn" data-status="paid">Paid</Button>
