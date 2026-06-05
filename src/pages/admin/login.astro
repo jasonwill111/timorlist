@@ -1,5 +1,6 @@
 ---
 export const prerender = false;
+import Button from '@components/ui/Button.astro';
 import '../../styles/globals.css';
 ---
 
@@ -68,13 +69,9 @@ import '../../styles/globals.css';
             </div>
           </div>
 
-          <button
-            type="submit"
-            id="submit-btn"
-            class="w-full bg-primary text-primary-foreground py-2 rounded-lg hover:opacity-90 transition-opacity"
-          >
+          <Button id="submit-btn" type="submit" class="w-full">
             Sign In
-          </button>
+          </Button>
         </form>
 
         <div id="error-message" class="mt-4 text-center text-red-500 text-sm hidden"></div>
