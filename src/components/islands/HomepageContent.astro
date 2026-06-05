@@ -1,3 +1,4 @@
+import Select from '@/components/ui/Select.astro';
 ---
 // Server Island: Fetches dynamic content on the homepage
 // This runs on the server and caches results
@@ -277,12 +278,15 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
 
     <!-- Mobile: Select dropdown instead of tabs -->
     <div class="md:hidden">
-      <select id="content-select" class="w-full p-3 rounded-lg border bg-card text-sm font-medium">
-        <option value="businesses">Businesses</option>
-        <option value="listings">Listings</option>
-        <option value="public-sectors">Public Sectors</option>
-        <option value="non-profits">Non-Profits</option>
-      </select>
+      <Select
+        id="content-select"
+        options={[
+          { value: 'businesses', label: 'Businesses' },
+          { value: 'listings', label: 'Listings' },
+          { value: 'public-sectors', label: 'Public Sectors' },
+          { value: 'non-profits', label: 'Non-Profits' }
+        ]}
+      />
     </div>
 
     <!-- Content Panels -->
