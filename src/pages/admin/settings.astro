@@ -1,3 +1,4 @@
+import Input from '@components/ui/Input.astro';
 ---
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
@@ -18,19 +19,19 @@ import Button from '@components/ui/Button.astro';
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label for="site-name" class="block text-xs md:text-sm font-medium mb-1">Site Name</label>
-            <input type="text" id="site-name" name="site-name" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" />
+            <Input type="text" id="site-name" name="site-name" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" />
           </div>
           <div>
             <label for="contact-email" class="block text-xs md:text-sm font-medium mb-1">Contact Email</label>
-            <input type="email" id="contact-email" name="contact-email" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" />
+            <Input type="email" id="contact-email" name="contact-email" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" />
           </div>
           <div>
             <label for="contact-phone" class="block text-xs md:text-sm font-medium mb-1">Contact Phone</label>
-            <input type="tel" id="contact-phone" name="contact-phone" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" />
+            <Input type="tel" id="contact-phone" name="contact-phone" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" />
           </div>
           <div>
             <label for="payment-info" class="block text-xs md:text-sm font-medium mb-1">Payment QR</label>
-            <input type="text" id="payment-info" name="payment-info" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" placeholder="/images/qr.png" />
+            <Input type="text" id="payment-info" name="payment-info" class="w-full px-2 py-1.5 md:py-2 text-sm border rounded" placeholder="/images/qr.png" />
           </div>
         </div>
         <Button type="submit" class="text-xs py-1 h-7 md:text-sm md:h-9">Save</Button>
