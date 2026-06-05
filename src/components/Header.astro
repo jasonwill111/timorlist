@@ -1,3 +1,4 @@
+---
 import ThemeToggle from './ui/ThemeToggle.astro';
 import LucideIcon from './ui/LucideIcon.astro';
 import Button from './ui/Button.astro';
@@ -121,11 +122,11 @@ const urlParams = new URL(Astro.request.url).searchParams;
           size="icon"
           class="md:hidden w-11 h-10 rounded-md hover:bg-muted transition-colors flex items-center justify-center"
           aria-label="Open menu"
-        />
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
-        </button>
-      </div>
+        </Button>
     </div>
   </div>
 
@@ -160,7 +161,7 @@ const urlParams = new URL(Astro.request.url).searchParams;
         {isLoggedIn ? (
           <>
             <a href="/account" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-muted-foreground flex items-center">My Account</a>
-            <button id="mobile-logout" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center">Log Out</button>
+            <Button id="mobile-logout" variant="ghost" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center" />
           </>
         ) : (
           <>
