@@ -1,5 +1,6 @@
 import Textarea from '@components/ui/Textarea.astro';
 import Select from '@components/ui/Select.astro';
+import Input from '@components/ui/Input.astro';
 ---
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
@@ -23,10 +24,10 @@ const userId = Astro.locals.user?.id || 'system';
 
     <!-- Filters -->
     <div class="flex flex-wrap gap-2 mb-4">
-      <input
+      <Input
         type="text" id="search-input"
         placeholder="Search posts..."
-        class="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary w-48"
+        class="w-48"
       />
       <Select id="status-filter"
         class="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-background"
@@ -66,19 +67,13 @@ const userId = Astro.locals.user?.id || 'system';
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium mb-1">Title *</label>
-            <input type="text" id="post-title" required
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Post title" />
+            <Input type="text" id="post-title" required class="w-full" placeholder="Post title" />
           </div>
 
           <div class="md:col-span-2">
             <label class="block text-sm font-medium mb-1">Slug *</label>
             <div class="flex gap-2">
-              <input type="text" id="post-slug" required
-                class="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="post-url-slug" />
-              <Button type="button" id="generate-slug-btn" variant="outline" size="sm" class="whitespace-nowrap">
+              <Input type="text" id="post-slug" required class="flex-1" placeholder="post-url-slug" />
                 Auto
               </Button>
             </div>
@@ -109,9 +104,7 @@ const userId = Astro.locals.user?.id || 'system';
 
           <div>
             <label class="block text-sm font-medium mb-1">Tags (comma-separated)</label>
-            <input type="text" id="post-tags"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="news, update, tips" />
+            <Input type="text" id="post-tags" class="w-full" placeholder="news, update, tips" />
           </div>
 
           <!-- SEO Fields Section -->
@@ -126,23 +119,15 @@ const userId = Astro.locals.user?.id || 'system';
 
           <div>
             <label class="block text-sm font-medium mb-1">Author Name</label>
-            <input type="text" id="post-author-name"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Author name" />
+            <Input type="text" id="post-author-name" class="w-full" placeholder="Author name" />
           </div>
-
           <div>
             <label class="block text-sm font-medium mb-1">Canonical URL</label>
-            <input type="url" id="post-canonical-url"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="https://..." />
+            <Input type="url" id="post-canonical-url" class="w-full" placeholder="https://..." />
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium mb-1">Meta Title</label>
-            <input type="text" id="post-meta-title" maxlength="60"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="SEO title (max 60 chars)" />
+            <Input type="text" id="post-meta-title" maxlength="60" class="w-full" placeholder="SEO title (max 60 chars)" />
             <p class="text-xs text-muted-foreground mt-1">Recommended: 50-60 characters</p>
           </div>
 
