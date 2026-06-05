@@ -1,3 +1,4 @@
+import Select from '@components/ui/Select.astro';
 ---
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
@@ -26,13 +27,15 @@ const userId = Astro.locals.user?.id || 'system';
         placeholder="Search posts..."
         class="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary w-48"
       />
-      <select id="status-filter"
-        class="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-background">
-        <option value="">All statuses</option>
-        <option value="draft">Draft</option>
-        <option value="published">Published</option>
-        <option value="archived">Archived</option>
-      </select>
+      <Select id="status-filter"
+        class="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-background"
+        options={[
+          { value: '', label: 'All statuses' },
+          { value: 'draft', label: 'Draft' },
+          { value: 'published', label: 'Published' },
+          { value: 'archived', label: 'Archived' },
+        ]}
+      />
     </div>
 
     <!-- Posts List -->
@@ -94,12 +97,14 @@ const userId = Astro.locals.user?.id || 'system';
 
           <div>
             <label class="block text-sm font-medium mb-1">Status</label>
-            <select id="post-status"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background">
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived</option>
-            </select>
+            <Select id="post-status"
+              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+              options={[
+                { value: 'draft', label: 'Draft' },
+                { value: 'published', label: 'Published' },
+                { value: 'archived', label: 'Archived' },
+              ]}
+            />
           </div>
 
           <div>
