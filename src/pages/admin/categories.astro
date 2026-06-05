@@ -7,6 +7,7 @@ import TabsList from '@components/ui/TabsList.astro';
 import TabsTrigger from '@components/ui/TabsTrigger.astro';
 import Select from '@components/ui/Select.astro';
 import Textarea from '@components/ui/Textarea.astro';
+import Input from '@components/ui/Input.astro';
 ---
 
 <AdminLayout title="Categories">
@@ -44,7 +45,7 @@ import Textarea from '@components/ui/Textarea.astro';
             <Select id="parent-filter" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
             </Select>
-            <input type="search" id="search" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+            <Input type="search" id="search" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
           </div>
         </div>
         <!-- Categories List -->
@@ -86,7 +87,7 @@ import Textarea from '@components/ui/Textarea.astro';
             <Select id="parent-filter-non_profit" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
             </Select>
-            <input type="search" id="search-non_profit" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+            <Input type="search" id="search-non_profit" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
           </div>
         </div>
         <!-- Categories List -->
@@ -128,7 +129,7 @@ import Textarea from '@components/ui/Textarea.astro';
            <Select id="parent-filter-public_sector" class="h-9 px-3 text-sm">
              <option value="">All Parents</option>
            </Select>
-           <input type="search" id="search-public_sector" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+           <Input type="search" id="search-public_sector" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
          </div>
         </div>
         <!-- Categories List -->
@@ -170,7 +171,7 @@ import Textarea from '@components/ui/Textarea.astro';
             <Select id="parent-filter-listing" class="h-9 px-3 text-sm">
               <option value="">All Parents</option>
             </Select>
-            <input type="search" id="search-listing" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+            <Input type="search" id="search-listing" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
           </div>
         </div>
         <!-- Categories List -->
@@ -218,11 +219,11 @@ import Textarea from '@components/ui/Textarea.astro';
 
         <div>
           <label for="cat-name" class="block text-sm font-medium mb-1">Category Name *</label>
-          <input type="text" id="cat-name" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Restaurants" />
+          <Input type="text" id="cat-name" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Restaurants" />
         </div>
         <div>
           <label for="cat-slug" class="block text-sm font-medium mb-1">Slug *</label>
-          <input type="text" id="cat-slug" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. restaurants" />
+          <Input type="text" id="cat-slug" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. restaurants" />
         </div>
         <div>
           <label for="cat-entity-type" class="block text-sm font-medium mb-1">Entity Type *</label>
@@ -246,7 +247,7 @@ import Textarea from '@components/ui/Textarea.astro';
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label for="cat-icon" class="block text-sm font-medium mb-1">Icon (emoji)</label>
-            <input type="text" id="cat-icon" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. 🍽️" maxlength="4" />
+            <Input type="text" id="cat-icon" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. 🍽️" maxlength="4" />
           </div>
           <div class="col-span-2">
             <label class="block text-sm font-medium mb-1">Image</label>
@@ -268,7 +269,7 @@ import Textarea from '@components/ui/Textarea.astro';
         </div>
         <div>
           <label for="cat-sort" class="block text-sm font-medium mb-1">Sort Order</label>
-          <input type="number" id="cat-sort" class="w-full px-3 py-2 border rounded-md text-sm" value="0" min="0" />
+          <Input type="number" id="cat-sort" class="w-full px-3 py-2 border rounded-md text-sm" value="0" min="0" />
         </div>
         <div>
           <label for="cat-desc" class="block text-sm font-medium mb-1">Description</label>

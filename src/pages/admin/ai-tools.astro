@@ -4,6 +4,7 @@ export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import { actions } from 'astro:actions';
 import Textarea from '@components/ui/Textarea.astro';
+import Input from '@components/ui/Input.astro';
 import Select from '@components/ui/Select.astro';
 ---
 
@@ -57,7 +58,7 @@ import Select from '@components/ui/Select.astro';
           <form id="listing-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium mb-1">Business Name *</label>
-              <input type="text" id="listing-title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Timor Coffee Shop" />
+              <Input type="text" id="listing-title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Timor Coffee Shop" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Entity Type *</label>
@@ -85,20 +86,20 @@ import Select from '@components/ui/Select.astro';
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium mb-1">Contact Name</label>
-                <input type="text" id="listing-contact" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Contact person" />
+              <Input type="text" id="listing-contact" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Contact person" />
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">Phone</label>
-                <input type="text" id="listing-phone" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="77000000" />
+              <Input type="text" id="listing-phone" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="77000000" />
               </div>
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Email</label>
-              <input type="email" id="listing-email" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="info@example.tl" />
+              <Input type="email" id="listing-email" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="info@example.tl" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Address</label>
-              <input type="text" id="listing-address" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Avenida Principal, Dili" />
+              <Input type="text" id="listing-address" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Avenida Principal, Dili" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">About Us</label>
@@ -106,7 +107,7 @@ import Select from '@components/ui/Select.astro';
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Tags (comma-separated)</label>
-              <input type="text" id="listing-tags" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="coffee, wifi, local" />
+              <Input type="text" id="listing-tags" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="coffee, wifi, local" />
             </div>
             <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate Listing
@@ -175,7 +176,7 @@ import Select from '@components/ui/Select.astro';
           <form id="sku-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium mb-1">Product/Service Title *</label>
-              <input type="text" id="sku-title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Wireless Headphones" />
+              <Input type="text" id="sku-title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Wireless Headphones" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Service Type *</label>
@@ -194,16 +195,16 @@ import Select from '@components/ui/Select.astro';
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Price Label</label>
-              <input type="text" id="sku-price-label" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Hourly Rate, Per Day" />
+              <Input type="text" id="sku-price-label" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Hourly Rate, Per Day" />
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium mb-1">Price Value</label>
-                <input type="text" id="sku-price-value" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="25.00" />
+                <Input type="text" id="sku-price-value" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="25.00" />
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">Unit</label>
-                <input type="text" id="sku-price-unit" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="/hour, /day" />
+                <Input type="text" id="sku-price-unit" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="/hour, /day" />
               </div>
             </div>
             <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
@@ -263,7 +264,7 @@ import Select from '@components/ui/Select.astro';
           <form id="blog-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium mb-1">Topic *</label>
-              <input type="text" id="blog-topic" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Best Coffee Shops in Dili" />
+              <Input type="text" id="blog-topic" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Best Coffee Shops in Dili" />
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -346,7 +347,7 @@ import Select from '@components/ui/Select.astro';
           <form id="landing-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium mb-1">Page Title *</label>
-              <input type="text" id="landing-title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Summer Sale 2026" />
+              <Input type="text" id="landing-title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g. Summer Sale 2026" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Page Type</label>
