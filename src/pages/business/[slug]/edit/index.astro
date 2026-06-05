@@ -123,11 +123,10 @@ import Input from '@/components/ui/Input.astro';
 
               <div>
                 <label for="email" class="block text-sm font-medium mb-1">Email</label>
-                <input
+                <Input
                   type="email"
                   id="email"
                   name="email"
-                  class="w-full px-3 py-2 border rounded-lg bg-background"
                   placeholder="business@email.com"
                 />
               </div>
@@ -158,23 +157,21 @@ import Input from '@/components/ui/Input.astro';
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label for="latitude" class="block text-xs font-medium mb-1">Latitude</label>
-                    <input
+                    <Input
                       type="number"
                       id="latitude"
                       name="latitude"
                       step="any"
-                      class="w-full px-3 py-2 border rounded-lg bg-background text-sm"
                       placeholder="-8.5569"
                     />
                   </div>
                   <div>
                     <label for="longitude" class="block text-xs font-medium mb-1">Longitude</label>
-                    <input
+                    <Input
                       type="number"
                       id="longitude"
                       name="longitude"
                       step="any"
-                      class="w-full px-3 py-2 border rounded-lg bg-background text-sm"
                       placeholder="125.5603"
                     />
                   </div>
@@ -225,28 +222,24 @@ import Input from '@/components/ui/Input.astro';
             <CardContent class="space-y-4">
               <div>
                 <label for="yearOfEstablishment" class="block text-sm font-medium mb-1">Year Established</label>
-                <input
+                <Input
                   type="number"
                   id="yearOfEstablishment"
                   name="yearOfEstablishment"
                   min="1900"
                   max="2100"
-                  class="w-full px-3 py-2 border rounded-lg bg-background"
                   placeholder="2020"
                 />
               </div>
-
               <div>
                 <label for="tags" class="block text-sm font-medium mb-1">Tags</label>
-                <input
+                <Input
                   type="text"
                   id="tags"
                   name="tags"
-                  class="w-full px-3 py-2 border rounded-lg bg-background"
                   placeholder="restaurant, cafe, coffee (comma separated)"
                 />
               </div>
-            </CardContent>
           </Card>
 
           <!-- Social Links -->
@@ -264,11 +257,10 @@ import Input from '@/components/ui/Input.astro';
                     Facebook
                   </span>
                 </label>
-                <input
+                <Input
                   type="url"
                   id="facebookUrl"
                   name="facebookUrl"
-                  class="w-full px-3 py-2 border rounded-lg bg-background"
                   placeholder="https://facebook.com/yourpage"
                 />
               </div>
@@ -282,15 +274,13 @@ import Input from '@/components/ui/Input.astro';
                     Instagram
                   </span>
                 </label>
-                <input
+                <Input
                   type="url"
                   id="instagramUrl"
                   name="instagramUrl"
-                  class="w-full px-3 py-2 border rounded-lg bg-background"
                   placeholder="https://instagram.com/yourpage"
                 />
               </div>
-
               <div>
                 <label for="tiktokUrl" class="block text-sm font-medium mb-1">
                   <span class="inline-flex items-center gap-2">
@@ -300,15 +290,13 @@ import Input from '@/components/ui/Input.astro';
                     TikTok
                   </span>
                 </label>
-                <input
+                <Input
                   type="url"
                   id="tiktokUrl"
                   name="tiktokUrl"
-                  class="w-full px-3 py-2 border rounded-lg bg-background"
                   placeholder="https://tiktok.com/@yourpage"
                 />
               </div>
-            </CardContent>
           </Card>
 
           
