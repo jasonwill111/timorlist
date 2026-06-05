@@ -1,3 +1,5 @@
+import Button from './Button.astro';
+
 ---
 // ShareDialog.astro - Reusable share button with social platforms
 interface Props {
@@ -23,19 +25,21 @@ const shareUrls = {
 };
 ---
 
-<button
+<Button
   id="share-btn"
-  class={`share-trigger px-3 py-1.5 rounded-lg border hover:bg-muted flex items-center gap-1.5 transition-colors cursor-pointer ${className}`}
+  class={`share-trigger ${className}`}
   data-url={url}
   data-title={title}
   data-description={description}
   title="Share"
+  variant="outline"
+  size="sm"
 >
   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
   </svg>
   <span>Share</span>
-</button>
+</Button>
 
 <!-- Share Dialog -->
 <div id="share-dialog" class="fixed inset-0 z-50 hidden">
@@ -46,11 +50,11 @@ const shareUrls = {
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background rounded-xl shadow-2xl border p-4 min-w-[280px] max-w-[320px]">
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-semibold text-sm">Share to</h3>
-      <button id="share-close" class="p-1 hover:bg-muted rounded-lg transition-colors">
+      <Button id="share-close" variant="ghost" size="icon" class="p-1">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </button>
+      </Button>
     </div>
 
     <div class="grid grid-cols-4 gap-2">
