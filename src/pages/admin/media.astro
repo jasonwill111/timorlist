@@ -195,6 +195,7 @@ const totalPages = Math.ceil(total / limit);
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <Button
                   class="p-2 bg-white/20 hover:bg-white/30 rounded-lg text-white copy-url"
+                  data-action="copy-url"
                   data-url={item.url}
                   title="Copy URL"
                 >
@@ -204,6 +205,7 @@ const totalPages = Math.ceil(total / limit);
                 </Button>
                 <Button
                   class="p-2 bg-red-500/80 hover:bg-red-500 rounded-lg text-white delete-media"
+                  data-action="delete-media"
                   data-id={item.id}
                   title="Delete"
                 >
@@ -263,27 +265,28 @@ const totalPages = Math.ceil(total / limit);
 <script>
   import { actions } from 'astro:actions';
 
-  // Copy URL to clipboard
-  document.querySelectorAll('.copy-url').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const url = btn.getAttribute('data-url');
+  // Event delegation for copy and delete actions
+  document.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('[data-action]') as HTMLElement | null;
+    if (!btn) return;
+
+    const action = btn.dataset.action;
+
+    if (action === 'copy-url') {
+      const url = btn.dataset.url;
       if (url) {
         await navigator.clipboard.writeText(url);
         alert('URL copied!');
       }
-    });
-  });
-
-  // Delete media
-  document.querySelectorAll('.delete-media').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.getAttribute('data-id');
+    } else if (action === 'delete-media') {
+      const id = btn.dataset.id;
       if (!id) return;
 
       if (!confirm('Delete this media? This cannot be undone.')) return;
 
       try {
-        const result = await actions.media.deleteMedia({ id: id! });
+        const result = await actions.media.deleteMedia({ id });
 
         if (result.success) {
           // Remove from DOM
@@ -291,9 +294,9 @@ const totalPages = Math.ceil(total / limit);
         } else {
           alert(result.error?.message || 'Failed to delete');
         }
-      } catch (err) {
+      } catch {
         alert('Failed to delete');
       }
-    });
+    }
   });
 </script>

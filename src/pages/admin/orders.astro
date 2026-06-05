@@ -16,9 +16,9 @@ import { actions } from 'astro:actions';
     </div>
     <!-- Filter Tabs -->
     <div class="flex gap-2 mb-4 overflow-x-auto">
-      <Button variant="primary" size="sm" class="filter-btn" data-status="all">All</Button>
-      <Button variant="secondary" size="sm" class="filter-btn" data-status="unpaid">Unpaid</Button>
-      <Button variant="secondary" size="sm" class="filter-btn" data-status="paid">Paid</Button>
+      <Button variant="primary" size="sm" class="filter-btn" data-action="filter-orders" data-filter="all">All</Button>
+      <Button variant="secondary" size="sm" class="filter-btn" data-action="filter-orders" data-filter="unpaid">Unpaid</Button>
+      <Button variant="secondary" size="sm" class="filter-btn" data-action="filter-orders" data-filter="paid">Paid</Button>
     </div>
 
     <!-- Orders List -->
@@ -140,7 +140,7 @@ import { actions } from 'astro:actions';
       container.innerHTML = data.map((order: SubscriptionData) => {
         const snapshot = order.variantSnapshot ? JSON.parse(order.variantSnapshot) : {};
         return `
-        <div class="flex items-center justify-between p-3 border rounded text-sm cursor-pointer hover:bg-muted/50" onclick="showOrderDetails('${order.id}')">
+        <div class="flex items-center justify-between p-3 border rounded text-sm cursor-pointer hover:bg-muted/50" data-action="show-order-details" data-id="${order.id}">
           <div class="min-w-0 flex-1">
             <p class="font-medium truncate">#${order.id.slice(0, 8)}</p>
             <p class="text-xs text-muted-foreground truncate">${snapshot.name || order.servicePackageId || 'N/A'} - $${order.amount / 100}</p>
@@ -157,16 +157,32 @@ import { actions } from 'astro:actions';
     }
   }
 
-  // Filter buttons
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => {
-        b.classList.remove('bg-primary', 'text-primary-foreground');
-      });
-      btn.classList.add('bg-primary', 'text-primary-foreground');
-      currentFilter = (btn as HTMLElement).dataset.status || 'all';
-      loadOrders();
-    });
+  // Event delegation for all interactive elements
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const action = target.closest('[data-action]')?.getAttribute('data-action');
+    if (!action) return;
+    switch (action) {
+      case 'filter-orders': {
+        const btn = target.closest('[data-action]') as HTMLElement;
+        const filter = btn?.dataset.filter || 'all';
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('bg-primary', 'text-primary-foreground');
+        });
+        btn?.classList.add('bg-primary', 'text-primary-foreground');
+        currentFilter = filter;
+        loadOrders();
+        break;
+      }
+      case 'show-order-details': {
+        const row = target.closest('[data-action]') as HTMLElement;
+        const id = row?.dataset.id;
+        if (id) {
+          showOrderDetails(id);
+        }
+        break;
+      }
+    }
   });
 
   // Show order details

@@ -3,14 +3,21 @@
   "title": "DOM API 重构 — 消除 JS 模板字符串",
   "type": "refactor",
   "priority": "P1",
-  "status": "in_progress",
+  "status": "completed",
   "created": "2026-06-05",
+  "completed": "2026-06-05",
   "parent": "0103-fulldev-migration-refactor",
   "epic": "0103",
   "domains": ["frontend", "architecture"],
   "tasks_total": 22,
-  "tasks_done": 0,
+  "tasks_done": 22,
   "tasks_blocked": 0,
   "risk": "medium",
-  "test_mode": "manual-e2e"
+  "test_mode": "manual-e2e",
+  "commits": [
+    "0ff7a5ef - Phase 0: static elements to components",
+    "7a5b04d8 - Phase 1: event delegation unified",
+    "d27309f4 - Phase 2-4: products hours header",
+    "fc65349b - Phase 5: ai-tools and service-packages"
+  ]
 }
