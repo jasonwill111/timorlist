@@ -3,10 +3,17 @@
  * FormField - Composition of label + input + error message.
  * Standardizes the label-then-input-then-error pattern used across auth pages.
  *
- * Use this instead of manually wiring up label, Input, and error message markup
- * for simple form fields.
+ * Supports:
+ *   - Regular <Input> for text/email/etc
+ *   - <PasswordInput> for password fields (with show/hide toggle)
+ *
+ * Usage:
+ *   <FormField id="email" name="email" label="Email" type="email" />
+ *   <FormField id="password" name="password" label="Password" type="password"
+ *              usePasswordInput errorId="password-error" errorMessage="..." showValidIcon />
  */
 import Input from '@/components/ui/Input.astro';
+import PasswordInput from './PasswordInput.astro';
 
 interface Props {
   id: string;
@@ -19,6 +26,7 @@ interface Props {
   errorId?: string;
   errorMessage?: string;
   showValidIcon?: boolean;
+  usePasswordInput?: boolean;
   class?: string;
 }
 
@@ -33,6 +41,7 @@ const {
   errorId,
   errorMessage,
   showValidIcon = false,
+  usePasswordInput = false,
   class: className = '',
 } = Astro.props;
 ---
@@ -40,14 +49,23 @@ const {
 <div class:list={className}>
   <label for={id} class="block text-sm font-medium mb-1">{label}</label>
   <div class="relative">
-    <Input
-      id={id}
-      name={name}
-      type={type}
-      placeholder={placeholder}
-      required={required}
-      value={value}
-    />
+    {usePasswordInput ? (
+      <PasswordInput
+        id={id}
+        name={name}
+        label=""
+        placeholder={placeholder}
+      />
+    ) : (
+      <Input
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+        value={value}
+      />
+    )}
     {showValidIcon && (
       <span id={`${id}-valid`} class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
