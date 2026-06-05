@@ -1,10 +1,12 @@
 ---
-// Admin listing management page - API driven (listings table)
-export const prerender = false;
-
+import Select from '../../../components/ui/Select.astro';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import Button from '../../../components/ui/Button.astro';
+
+// Admin listing management page - API driven (listings table)
+export const prerender = false;
 ---
+
 
 <AdminLayout title="Listing Management">
   <div class="container py-8">
@@ -45,11 +47,11 @@ import Button from '../../../components/ui/Button.astro';
 
     <!-- Filters -->
     <div class="flex flex-wrap gap-4 mb-6">
-      <select id="filter-status" class="h-10 px-3 rounded-md border border-input bg-background">
-        <option value="">All Status</option>
-        <option value="draft">Draft</option>
-        <option value="published">Published</option>
-      </select>
+      <Select id="filter-status" options={[
+        { value: '', label: 'All Status' },
+        { value: 'draft', label: 'Draft' },
+        { value: 'published', label: 'Published' },
+      ]} />
       <input
         id="search"
         type="search"

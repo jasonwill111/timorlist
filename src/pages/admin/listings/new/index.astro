@@ -1,3 +1,4 @@
+import Select from '@/components/ui/Select.astro';
 ---
 // Admin new listing page - for listings table
 export const prerender = false;
@@ -55,8 +56,7 @@ const conditions = [
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Category</label>
-            <select name="categoryId" class="w-full h-10 px-3 rounded-md border border-input bg-background">
+            <Select name="categoryId" class="w-full h-10 px-3 rounded-md border border-input bg-background">
               <option value="">Select category...</option>
               {parentCategories.map(parent => (
                 <optgroup label={parent.name}>
@@ -65,7 +65,7 @@ const conditions = [
                   ))}
                 </optgroup>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
@@ -80,12 +80,12 @@ const conditions = [
 
           <div>
             <label class="block text-sm font-medium mb-1">Condition</label>
-            <select name="condition" class="w-full h-10 px-3 rounded-md border border-input bg-background">
+            <Select name="condition" class="w-full h-10 px-3 rounded-md border border-input bg-background">
               <option value="">Select condition...</option>
               {conditions.map(cond => (
                 <option value={cond.value}>{cond.label}</option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
       </div>
