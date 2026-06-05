@@ -1,4 +1,6 @@
 import Select from '@components/ui/Select.astro';
+import Input from '@components/ui/Input.astro';
+import Button from '@components/ui/Button.astro';
 ---
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
@@ -41,11 +43,11 @@ const businessOptionsJson = JSON.stringify(businessOptions);
     <div class="bg-card border rounded-lg p-3 md:p-4 mb-4">
       <div class="flex flex-col md:flex-row gap-3">
         <div class="flex-1">
-          <input
+          <Input
             type="text"
             id="search-input"
             placeholder="Search by title..."
-            class="w-full px-3 py-2 border rounded-lg text-sm"
+            class="w-full"
           />
         </div>
         <div class="flex gap-2">
@@ -89,7 +91,7 @@ const businessOptionsJson = JSON.stringify(businessOptions);
         <!-- Title -->
         <div>
           <label for="sku-title" class="block text-sm font-medium mb-1">Product/Service Name *</label>
-          <input type="text" id="sku-title" name="title" required class="w-full px-3 py-2 border rounded-md text-sm" placeholder="e.g., Hourly Massage Service" />
+          <Input type="text" id="sku-title" name="title" required class="w-full" placeholder="e.g., Hourly Massage Service" />
         </div>
 
         <!-- Product Type -->

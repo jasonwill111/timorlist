@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
-import Button from '@components/ui/Button.astro';
+import Input from '@components/ui/Input.astro';
 import Select from '@components/ui/Select.astro';
 import Textarea from '@components/ui/Textarea.astro';
 ---
@@ -18,7 +18,7 @@ import Textarea from '@components/ui/Textarea.astro';
     <div class="bg-card border rounded-lg p-3 md:p-4 mb-4">
       <div class="flex flex-col md:flex-row gap-3">
         <div class="flex-1">
-          <input
+          <Input
             type="text"
             id="search-input"
             placeholder="Search by name or slug..."
@@ -56,19 +56,19 @@ import Textarea from '@components/ui/Textarea.astro';
       <form id="business-form" class="p-4 space-y-4">
         <div>
           <label for="biz-title" class="block text-sm font-medium mb-1">Public Sector Name *</label>
-          <input type="text" id="biz-title" name="title" required class="w-full px-3 py-2 border rounded-md text-sm" />
+          <Input type="text" id="biz-title" name="title" required class="w-full px-3 py-2 border rounded-md text-sm" />
         </div>
         <div>
           <label for="biz-slug" class="block text-sm font-medium mb-1">Slug *</label>
-          <input type="text" id="biz-slug" name="slug" required class="w-full px-3 py-2 border rounded-md text-sm" />
+          <Input type="text" id="biz-slug" name="slug" required class="w-full px-3 py-2 border rounded-md text-sm" />
         </div>
         <div>
           <label for="biz-email" class="block text-sm font-medium mb-1">Email</label>
-          <input type="email" id="biz-email" name="email" class="w-full px-3 py-2 border rounded-md text-sm" />
+          <Input type="email" id="biz-email" name="email" class="w-full px-3 py-2 border rounded-md text-sm" />
         </div>
         <div>
           <label for="biz-phone" class="block text-sm font-medium mb-1">Phone</label>
-          <input type="tel" id="biz-phone" name="phone" class="w-full px-3 py-2 border rounded-md text-sm" />
+          <Input type="tel" id="biz-phone" name="phone" class="w-full px-3 py-2 border rounded-md text-sm" />
         </div>
         <div>
           <label for="biz-about" class="block text-sm font-medium mb-1">About Us</label>

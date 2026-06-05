@@ -5,6 +5,7 @@ export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
 import Select from '../../components/ui/Select.astro';
+import Input from '../../components/ui/Input.astro'
 import Button from '../../components/ui/Button.astro';
 import { actions } from 'astro:actions';
 
@@ -90,24 +91,22 @@ import CardContent from '../../components/ui/CardContent.astro'
         <CardContent class="space-y-4">
           <div>
             <label for="title" class="block text-sm font-medium mb-1">Business Name *</label>
-            <input 
+            <Input 
               type="text" 
               id="title" 
               name="title" 
               required
-              class="w-full px-3 py-2 border rounded-lg bg-background"
               placeholder="Your business name"
             />
           </div>
           
           <div>
             <label for="slug" class="block text-sm font-medium mb-1">URL Slug *</label>
-            <input 
+            <Input 
               type="text" 
               id="slug" 
               name="slug" 
               required
-              class="w-full px-3 py-2 border rounded-lg bg-background"
               placeholder="your-business-name"
             />
             <p class="text-xs text-muted-foreground mt-1">URL: timorup.com/business/your-business-name</p>
@@ -135,11 +134,10 @@ import CardContent from '../../components/ui/CardContent.astro'
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label for="contactName" class="block text-sm font-medium mb-1">Contact Person</label>
-              <input 
+              <Input 
                 type="text" 
                 id="contactName" 
                 name="contactName"
-                class="w-full px-3 py-2 border rounded-lg bg-background"
                 placeholder="John Doe"
               />
             </div>
@@ -147,28 +145,25 @@ import CardContent from '../../components/ui/CardContent.astro'
               <label for="contactNumber" class="block text-sm font-medium mb-1">Phone Number</label>
               <div class="flex">
                 <span class="px-3 py-2 border border-r-0 rounded-l-lg bg-muted">+670</span>
-                <input 
+                <Input 
                   type="tel" 
                   id="contactNumber" 
                   name="contactNumber"
-                  class="flex-1 px-3 py-2 border rounded-r-lg bg-background"
+                  class="flex-1 rounded-l-none"
                   placeholder="7723XXXX"
                 />
               </div>
             </div>
           </div>
-          
           <div>
             <label for="email" class="block text-sm font-medium mb-1">Email</label>
-            <input 
+            <Input 
               type="email" 
               id="email" 
               name="email"
-              class="w-full px-3 py-2 border rounded-lg bg-background"
               placeholder="business@example.com"
             />
           </div>
-          
           <div>
             <label for="address" class="block text-sm font-medium mb-1">Address</label>
             <Textarea
@@ -204,11 +199,10 @@ import CardContent from '../../components/ui/CardContent.astro'
           <CardDescription>Add keywords to help customers find you (3-5 tags)</CardDescription>
         </CardHeader>
         <CardContent>
-          <input 
+          <Input 
             type="text" 
             id="tags" 
             name="tags"
-            class="w-full px-3 py-2 border rounded-lg bg-background"
             placeholder="restaurant, cafe, coffee, wifi, parking"
           />
           <p class="text-xs text-muted-foreground mt-1">Separate tags with commas</p>
