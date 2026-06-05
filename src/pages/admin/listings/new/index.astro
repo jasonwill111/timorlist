@@ -1,3 +1,4 @@
+import Input from '@/components/ui/Input.astro';
 import Textarea from '@/components/ui/Textarea.astro';
 import Select from '@/components/ui/Select.astro';
 ---
@@ -41,17 +42,14 @@ const conditions = [
 
     <form id="listing-form" class="space-y-6">
       <!-- Basic Info -->
-      <!-- Basic Info -->
       <div class="bg-card rounded-lg border p-6">
         <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium mb-1">Title *</label>
-            <input
+            <Input
               type="text"
               name="title"
               required
-              class="w-full h-10 px-3 rounded-md border border-input bg-background"
               placeholder="What are you listing?"
             />
           </div>
@@ -70,11 +68,9 @@ const conditions = [
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Price</label>
-            <input
+            <Input
               type="text"
               name="price"
-              class="w-full h-10 px-3 rounded-md border border-input bg-background"
               placeholder="$100 or Negotiable"
             />
           </div>
@@ -106,38 +102,30 @@ const conditions = [
         <h2 class="text-lg font-semibold mb-4">Location & Contact</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium mb-1">Location</label>
-            <input
+            <Input
               type="text"
               name="location"
-              class="w-full h-10 px-3 rounded-md border border-input bg-background"
               placeholder="Dili, Timor-Leste"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Contact Name</label>
-            <input
+            <Input
               type="text"
               name="contactName"
-              class="w-full h-10 px-3 rounded-md border border-input bg-background"
               placeholder="Your name"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Phone</label>
-            <input
+            <Input
               type="tel"
               name="contactNumber"
-              class="w-full h-10 px-3 rounded-md border border-input bg-background"
               placeholder="7700 0000"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Email</label>
-            <input
+            <Input
               type="email"
               name="email"
-              class="w-full h-10 px-3 rounded-md border border-input bg-background"
               placeholder="email@example.com"
             />
           </div>

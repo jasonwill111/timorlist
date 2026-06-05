@@ -1,3 +1,4 @@
+import Input from '../../../components/ui/Input.astro';
 ---
 import Select from '../../../components/ui/Select.astro';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
@@ -52,11 +53,11 @@ export const prerender = false;
         { value: 'draft', label: 'Draft' },
         { value: 'published', label: 'Published' },
       ]} />
-      <input
+      <Input
         id="search"
         type="search"
         placeholder="Search listings..."
-        class="h-10 px-3 rounded-md border border-input bg-background w-64"
+        class="w-64"
       />
     </div>
 

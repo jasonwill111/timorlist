@@ -7,6 +7,7 @@ import { eq, like, sql, desc, isNull, and } from 'drizzle-orm';
 import { actions } from 'astro:actions';
 import { getAdminUser } from '@/lib/admin-auth';
 import Select from '@/components/ui/Select.astro';
+import Input from '@/components/ui/Input.astro';
 
 
 // Check admin auth using KV session
@@ -142,12 +143,11 @@ const totalPages = Math.ceil(total / limit);
 
         <div class="flex-1 min-w-[200px]">
           <label class="block text-sm font-medium mb-1">Entity ID</label>
-          <input
+          <Input
             type="text"
             name="entityId"
             value={entityIdFilter}
             placeholder="Filter by ID..."
-            class="w-full px-3 py-2 border rounded-lg bg-background"
           />
         </div>
 
