@@ -6,6 +6,7 @@ import Layout from '../../../../../layouts/Layout.astro';
 import Button from '../../../../../components/ui/Button.astro';
 import Input from '../../../../../components/ui/Input.astro';
 import Textarea from '../../../../../components/ui/Textarea.astro';
+import Select from '../../../../../components/ui/Select.astro';
 import { getDb } from '@/lib/db';
 import { businesses, businessCategories as categories } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -68,15 +69,13 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
               <label class="block text-sm font-medium mb-1">Category *</label>
-              <select name="categoryId" required class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                {allCategories.map(cat => (
-                  <option value={cat.id} selected={cat.id === listing.categoryId}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                name="categoryId"
+                required
+                options={allCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+                value={listing.categoryId}
+              />
             </div>
           </div>
         </div>
