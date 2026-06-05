@@ -2,6 +2,9 @@
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import Button from '@components/ui/Button.astro';
+import Tabs from '@components/ui/Tabs.astro';
+import TabsList from '@components/ui/TabsList.astro';
+import TabsTrigger from '@components/ui/TabsTrigger.astro';
 ---
 
 <AdminLayout title="Categories">
@@ -16,56 +19,184 @@ import Button from '@components/ui/Button.astro';
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-4 border-b">
-      <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent" data-table="business">Business</button>
-      <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent" data-table="non_profit">Non-Profit</button>
-      <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent" data-table="public_sector">Public Sector</button>
-      <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent" data-table="listing">Listing</button>
+    <Tabs defaultValue="business">
+      <TabsList class="w-full flex gap-1 mb-4 border-b bg-transparent p-0 rounded-none justify-start overflow-x-auto">
+        <TabsTrigger value="business" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent data-active:border-primary data-active:text-foreground hover:border-muted-foreground hover:text-foreground transition-colors rounded-none">Business</TabsTrigger>
+        <TabsTrigger value="non_profit" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent data-active:border-primary data-active:text-foreground hover:border-muted-foreground hover:text-foreground transition-colors rounded-none">Non-Profit</TabsTrigger>
+        <TabsTrigger value="public_sector" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent data-active:border-primary data-active:text-foreground hover:border-muted-foreground hover:text-foreground transition-colors rounded-none">Public Sector</TabsTrigger>
+        <TabsTrigger value="listing" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent data-active:border-primary data-active:text-foreground hover:border-muted-foreground hover:text-foreground transition-colors rounded-none">Listing</TabsTrigger>
+      </TabsList>
+      <TabsContent value="business">
+        <div class="bg-card border rounded-lg p-3 mb-4 text-center">
+          <p class="text-lg font-bold" id="stat-count">-</p>
+          <p class="text-xs text-muted-foreground">categories in <span id="current-table-name">Business</span></p>
+        </div>
+        <!-- Filter -->
+        <div class="bg-card border rounded-lg p-3 mb-4">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <select id="level-filter" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Levels</option>
+              <option value="parent">Parent (Top-level)</option>
+              <option value="child">Sub-categories</option>
+            </select>
+            <select id="parent-filter" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Parents</option>
+            </select>
+            <input type="search" id="search" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+          </div>
+        </div>
+        <!-- Categories List -->
+        <div class="bg-card border rounded-lg">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-muted/50">
+                <tr>
+                  <th class="text-left p-3 font-medium">Category</th>
+                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
+                  <th class="text-left p-3 font-medium">Sort</th>
+                  <th class="text-right p-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categories-list">
+                <tr>
+                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </TabsContent>
+      <TabsContent value="non_profit">
+        <div class="bg-card border rounded-lg p-3 mb-4 text-center">
+          <p class="text-lg font-bold" id="stat-count-non_profit">-</p>
+          <p class="text-xs text-muted-foreground">categories in <span id="current-table-name-non_profit">Non-Profit</span></p>
+        </div>
+        <!-- Filter -->
+        <div class="bg-card border rounded-lg p-3 mb-4">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <select id="level-filter-non_profit" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Levels</option>
+              <option value="parent">Parent (Top-level)</option>
+              <option value="child">Sub-categories</option>
+            </select>
+            <select id="parent-filter-non_profit" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Parents</option>
+            </select>
+            <input type="search" id="search-non_profit" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+          </div>
+        </div>
+        <!-- Categories List -->
+        <div class="bg-card border rounded-lg">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-muted/50">
+                <tr>
+                  <th class="text-left p-3 font-medium">Category</th>
+                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
+                  <th class="text-left p-3 font-medium">Sort</th>
+                  <th class="text-right p-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categories-list-non_profit">
+                <tr>
+                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </TabsContent>
+      <TabsContent value="public_sector">
+        <div class="bg-card border rounded-lg p-3 mb-4 text-center">
+          <p class="text-lg font-bold" id="stat-count-public_sector">-</p>
+          <p class="text-xs text-muted-foreground">categories in <span id="current-table-name-public_sector">Public Sector</span></p>
+        </div>
+        <!-- Filter -->
+        <div class="bg-card border rounded-lg p-3 mb-4">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <select id="level-filter-public_sector" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Levels</option>
+              <option value="parent">Parent (Top-level)</option>
+              <option value="child">Sub-categories</option>
+            </select>
+            <select id="parent-filter-public_sector" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Parents</option>
+            </select>
+            <input type="search" id="search-public_sector" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+          </div>
+        </div>
+        <!-- Categories List -->
+        <div class="bg-card border rounded-lg">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-muted/50">
+                <tr>
+                  <th class="text-left p-3 font-medium">Category</th>
+                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
+                  <th class="text-left p-3 font-medium">Sort</th>
+                  <th class="text-right p-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categories-list-public_sector">
+                <tr>
+                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </TabsContent>
+      <TabsContent value="listing">
+        <div class="bg-card border rounded-lg p-3 mb-4 text-center">
+          <p class="text-lg font-bold" id="stat-count-listing">-</p>
+          <p class="text-xs text-muted-foreground">categories in <span id="current-table-name-listing">Listing</span></p>
+        </div>
+        <!-- Filter -->
+        <div class="bg-card border rounded-lg p-3 mb-4">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <select id="level-filter-listing" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Levels</option>
+              <option value="parent">Parent (Top-level)</option>
+              <option value="child">Sub-categories</option>
+            </select>
+            <select id="parent-filter-listing" class="h-9 px-3 rounded-md border bg-background text-sm">
+              <option value="">All Parents</option>
+            </select>
+            <input type="search" id="search-listing" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+          </div>
+        </div>
+        <!-- Categories List -->
+        <div class="bg-card border rounded-lg">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-muted/50">
+                <tr>
+                  <th class="text-left p-3 font-medium">Category</th>
+                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
+                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
+                  <th class="text-left p-3 font-medium">Sort</th>
+                  <th class="text-right p-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categories-list-listing">
+                <tr>
+                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
     </div>
-
-    <!-- Stats -->
-    <div class="bg-card border rounded-lg p-3 mb-4 text-center">
-      <p class="text-lg font-bold" id="stat-count">-</p>
-      <p class="text-xs text-muted-foreground">categories in <span id="current-table-name">Business</span></p>
-    </div>
-
-    <!-- Filter -->
-    <div class="bg-card border rounded-lg p-3 mb-4">
-      <div class="flex flex-col sm:flex-row gap-2">
-        <select id="level-filter" class="h-9 px-3 rounded-md border bg-background text-sm">
-          <option value="">All Levels</option>
-          <option value="parent">Parent (Top-level)</option>
-          <option value="child">Sub-categories</option>
-        </select>
-        <select id="parent-filter" class="h-9 px-3 rounded-md border bg-background text-sm">
-          <option value="">All Parents</option>
-        </select>
-        <input type="search" id="search" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
-      </div>
-    </div>
-
-    <!-- Categories List -->
-    <div class="bg-card border rounded-lg">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="bg-muted/50">
-            <tr>
-              <th class="text-left p-3 font-medium">Category</th>
-              <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
-              <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
-              <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
-              <th class="text-left p-3 font-medium">Sort</th>
-              <th class="text-right p-3 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="categories-list">
-            <tr>
-              <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <!-- Categories List moved inside TabsContent per entity type -->
   </div>
 
   <!-- Create/Edit Category Modal -->
@@ -158,7 +289,6 @@ import Button from '@components/ui/Button.astro';
 <script>
   import { actions } from 'astro:actions';
   import { injectModal, createDeleteDialog, showModal, hideModal } from '@/lib/modal';
-
   interface Category {
     id: string;
     name: string;
@@ -172,150 +302,91 @@ import Button from '@components/ui/Button.astro';
     isActive: boolean;
     formFields?: string | null;
   }
-
-  let categories: Category[] = [];
+  let allCategories: Category[] = [];
   let parentCategories: Category[] = [];
   let editingId: string | null = null;
   let catImageId: string | null = null;
-  let currentTable = 'business';
   const TABLE_NAMES: Record<string, string> = {
     business: 'Business',
     non_profit: 'Non-Profit',
     public_sector: 'Public Sector',
     listing: 'Listing'
   };
-
-  // Tab click handler
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentTable = (btn as HTMLElement).dataset.table || 'business';
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('border-primary', 'text-primary'));
-      btn.classList.add('border-primary', 'text-primary');
-      document.getElementById('current-table-name').textContent = TABLE_NAMES[currentTable];
-      loadCategories();
+  const ENTITY_TYPE_MAP: Record<string, string> = {
+    business: 'business',
+    non_profit: 'nonprofit',
+    public_sector: 'public_sector',
+    listing: 'listing',
+  };
+  // Listen for tab changes from Tabs component
+  document.querySelectorAll('[data-tabs]').forEach((tabs) => {
+    tabs.addEventListener('tab-change', (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const activeTab = customEvent.detail?.value;
+      if (activeTab) {
+        loadAndRenderTab(activeTab);
+      }
     });
   });
-  // Init first tab
-  document.querySelector('.tab-btn[data-table="business"]')?.classList.add('border-primary', 'text-primary');
-
-  // Image upload handler
-  document.getElementById('cat-image-upload')?.addEventListener('click', () => {
-    document.getElementById('cat-image-file')?.click();
-  });
-  document.getElementById('cat-image-file')?.addEventListener('change', async (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-
-    try {
-      const result = await actions.media.uploadMedia({
-        file,
-        category: 'category',
-      });
-
-      if (result.success && result.data?.id) {
-        catImageId = result.data.id;
-        (document.getElementById('cat-image-id') as HTMLInputElement).value = result.data.id;
-        (document.getElementById('cat-preview-img') as HTMLImageElement).src = result.data.url;
-        document.getElementById('cat-image-preview')?.classList.remove('hidden');
-        document.getElementById('cat-image-upload')?.classList.add('hidden');
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-    }
-    (e.target as HTMLInputElement).value = '';
-  });
-  document.getElementById('remove-cat-image')?.addEventListener('click', () => {
-    catImageId = null;
-    (document.getElementById('cat-image-id') as HTMLInputElement).value = '';
-    document.getElementById('cat-image-preview')?.classList.add('hidden');
-    document.getElementById('cat-image-upload')?.classList.remove('hidden');
-  });
-
-  // Load categories
-  async function loadCategories() {
+  // Initial load on page load
+  loadAllCategories();
+  // Load all categories once
+  async function loadAllCategories() {
     try {
       const result = await actions.admin.categories.getAll();
       if (result.success && result.data) {
-        // Filter by current table/entity type on client side
-        const entityTypeMap: Record<string, string> = {
-          business: 'business',
-          non_profit: 'nonprofit',
-          public_sector: 'public_sector',
-          listing: 'listing',
-        };
-        const targetType = entityTypeMap[currentTable] || currentTable;
-        categories = result.data.filter((c: Category) => c.entityType === targetType);
-        parentCategories = categories.filter((c: Category) => !c.parentId);
-        renderCategories();
-        updateStats();
-        updateParentDropdown();
+        allCategories = result.data;
+        // Load default tab
+        loadAndRenderTab('business');
       }
     } catch (err) {
       console.error('Error loading categories:', err);
       showToast('Failed to load categories', 'error');
     }
   }
-
-  // Update stats
-  function updateStats() {
-    const count = categories.length;
-    document.getElementById('stat-count').textContent = String(count);
-
-    const el = document.getElementById('stat-total');
-    if (el) el.textContent = String(total);
-    const businessEl = document.getElementById('stat-business');
-    if (businessEl) businessEl.textContent = String(businessCount);
-    const nonprofitEl = document.getElementById('stat-nonprofit');
-    if (nonprofitEl) nonprofitEl.textContent = String(nonprofitCount);
+  // Load and render for a specific tab
+  function loadAndRenderTab(tableName: string) {
+    const targetType = ENTITY_TYPE_MAP[tableName] || tableName;
+    const categories = allCategories.filter((c: Category) => c.entityType === targetType);
+    const parents = categories.filter((c: Category) => !c.parentId);
+    renderCategoriesForTab(tableName, categories);
+    updateStatsForTab(tableName, categories);
+    updateParentDropdownForTab(tableName, parents);
   }
-
-  // Update parent dropdown - filter by entity type
-  function updateParentDropdown(entityType?: string) {
-    const select = document.getElementById('cat-parent') as HTMLSelectElement;
-    const filterSelect = document.getElementById('parent-filter') as HTMLSelectElement;
-
-    // Filter by entity type if specified
-    const filteredParents = entityType
-      ? parentCategories.filter((c: Category) => c.entityType === entityType)
-      : parentCategories;
-
-    const options = filteredParents.map((c: Category) =>
+  // Update stats for specific tab
+  function updateStatsForTab(tableName: string, categories: Category[]) {
+    const count = categories.length;
+    document.getElementById(`stat-count-${tableName}`).textContent = String(count);
+    document.getElementById(`current-table-name-${tableName}`).textContent = TABLE_NAMES[tableName];
+  }
+  // Update parent dropdown for specific tab
+  function updateParentDropdownForTab(tableName: string, parents: Category[]) {
+    const filterSelect = document.getElementById(`parent-filter-${tableName}`) as HTMLSelectElement;
+    if (!filterSelect) return;
+    const options = parents.map((c: Category) =>
       `<option value="${c.id}">${c.icon ? getIcon(c.icon) + ' ' : ''}${c.name}</option>`
     ).join('');
-
-    if (select) {
-      select.innerHTML = '<option value="">Top-level (Industry)</option>' + options;
-    }
-    if (filterSelect) {
-      filterSelect.innerHTML = '<option value="">All Parents</option>' + options;
-    }
+    filterSelect.innerHTML = '<option value="">All Parents</option>' + options;
   }
-
   // Get icon without prefix (strip "emoji:" if present)
   function getIcon(icon: string | null): string {
     if (!icon) return '';
     return icon.replace(/^emoji:/, '');
   }
-
   // Get parent name
   function getParentName(parentId: string | null): string {
     if (!parentId) return '-';
-    const parent = categories.find((c: Category) => c.id === parentId);
+    const parent = allCategories.find((c: Category) => c.id === parentId);
     return parent ? parent.name : '-';
   }
-
-  // Render categories list
-  function renderCategories() {
-    const container = document.getElementById('categories-list');
+  // Render categories list for specific tab
+  function renderCategoriesForTab(tableName: string, categories: Category[]) {
+    const container = document.getElementById(`categories-list-${tableName}`);
     if (!container) return;
-
-    const entityFilter = (document.getElementById('entity-filter') as HTMLSelectElement)?.value || '';
-    const levelFilter = (document.getElementById('level-filter') as HTMLSelectElement)?.value || '';
-    const parentFilter = (document.getElementById('parent-filter') as HTMLSelectElement)?.value || '';
-    const search = (document.getElementById('search') as HTMLInputElement)?.value.toLowerCase() || '';
-
+    const levelFilter = (document.getElementById(`level-filter-${tableName}`) as HTMLSelectElement)?.value || '';
+    const parentFilter = (document.getElementById(`parent-filter-${tableName}`) as HTMLSelectElement)?.value || '';
+    const search = (document.getElementById(`search-${tableName}`) as HTMLInputElement)?.value.toLowerCase() || '';
     const filtered = categories.filter((cat: Category) => {
-      const matchesEntity = !entityFilter || cat.entityType === entityFilter;
       const matchesLevel = !levelFilter ||
         (levelFilter === 'parent' && !cat.parentId) ||
         (levelFilter === 'child' && cat.parentId);
@@ -323,14 +394,12 @@ import Button from '@components/ui/Button.astro';
       const matchesSearch = !search ||
         (cat.name && cat.name.toLowerCase().includes(search)) ||
         (cat.slug && cat.slug.toLowerCase().includes(search));
-      return matchesEntity && matchesLevel && matchesParent && matchesSearch;
+      return matchesLevel && matchesParent && matchesSearch;
     });
-
     if (filtered.length === 0) {
       container.innerHTML = '<tr><td colspan="5" class="text-center p-8 text-muted-foreground">No categories found</td></tr>';
       return;
     }
-
     container.innerHTML = filtered.map((cat: Category) => `
       <tr class="border-t hover:bg-muted/50">
         <td class="p-3">
@@ -343,14 +412,7 @@ import Button from '@components/ui/Button.astro';
           </div>
         </td>
         <td class="p-3 hidden md:table-cell">
-          ${currentTable === 'business'
-            ? '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">Business</span>'
-            : currentTable === 'non_profit'
-              ? '<span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">Non-Profit</span>'
-              : currentTable === 'public_sector'
-                ? '<span class="px-2 py-0.5 text-xs rounded-full bg-cyan-100 text-cyan-800">Public Sector</span>'
-                : '<span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800">Listing</span>'
-          }
+          ${getEntityBadge(tableName)}
         </td>
         <td class="p-3 hidden lg:table-cell">
           ${cat.parentId
@@ -379,7 +441,50 @@ import Button from '@components/ui/Button.astro';
       </tr>
     `).join('');
   }
-
+  function getEntityBadge(tableName: string): string {
+    switch (tableName) {
+      case 'business':
+        return '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">Business</span>';
+      case 'non_profit':
+        return '<span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">Non-Profit</span>';
+      case 'public_sector':
+        return '<span class="px-2 py-0.5 text-xs rounded-full bg-cyan-100 text-cyan-800">Public Sector</span>';
+      case 'listing':
+        return '<span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800">Listing</span>';
+      default:
+        return '';
+    }
+  }
+  // Image upload handler
+  document.getElementById('cat-image-upload')?.addEventListener('click', () => {
+    document.getElementById('cat-image-file')?.click();
+  });
+  document.getElementById('cat-image-file')?.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const result = await actions.media.uploadMedia({
+        file,
+        category: 'category',
+      });
+      if (result.success && result.data?.id) {
+        catImageId = result.data.id;
+        (document.getElementById('cat-image-id') as HTMLInputElement).value = result.data.id;
+        (document.getElementById('cat-preview-img') as HTMLImageElement).src = result.data.url;
+        document.getElementById('cat-image-preview')?.classList.remove('hidden');
+        document.getElementById('cat-image-upload')?.classList.add('hidden');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+    }
+    (e.target as HTMLInputElement).value = '';
+  });
+  document.getElementById('remove-cat-image')?.addEventListener('click', () => {
+    catImageId = null;
+    (document.getElementById('cat-image-id') as HTMLInputElement).value = '';
+    document.getElementById('cat-image-preview')?.classList.add('hidden');
+    document.getElementById('cat-image-upload')?.classList.remove('hidden');
+  });
   // Auto-generate slug from name
   document.getElementById('cat-name')?.addEventListener('input', (e) => {
     const name = (e.target as HTMLInputElement).value;
@@ -388,11 +493,9 @@ import Button from '@components/ui/Button.astro';
       slugInput.value = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     }
   });
-
   document.getElementById('cat-slug')?.addEventListener('input', (e) => {
     (e.target as HTMLInputElement).dataset.userModified = 'true';
   });
-
   // Modal controls
   const modal = document.getElementById('category-modal');
   const addBtn = document.getElementById('add-category-btn');
@@ -400,7 +503,6 @@ import Button from '@components/ui/Button.astro';
   const cancelBtn = document.getElementById('cancel-btn');
   const formTitle = document.getElementById('form-title');
   const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-
   function openModal() {
     editingId = null;
     catImageId = null;
@@ -420,7 +522,6 @@ import Button from '@components/ui/Button.astro';
     modal?.classList.remove('hidden');
     modal?.classList.add('flex');
   }
-
   // Show/hide formFields based on entity type
   function updateFormFieldsVisibility() {
     const entityType = (document.getElementById('cat-entity-type') as HTMLSelectElement)?.value;
@@ -433,28 +534,23 @@ import Button from '@components/ui/Button.astro';
       }
     }
   }
-
   // Listen for entity type changes
   document.getElementById('cat-entity-type')?.addEventListener('change', updateFormFieldsVisibility);
-
   function closeModalFn() {
     modal?.classList.add('hidden');
     modal?.classList.remove('flex');
     editingId = null;
   }
-
   addBtn?.addEventListener('click', openModal);
   closeBtn?.addEventListener('click', closeModalFn);
   cancelBtn?.addEventListener('click', closeModalFn);
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) closeModalFn();
   });
-
   // Edit category
   window.editCategory = function(id: string) {
-    const cat = categories.find((c: Category) => c.id === id);
+    const cat = allCategories.find((c: Category) => c.id === id);
     if (!cat) return;
-
     editingId = id;
     (document.getElementById('cat-id') as HTMLInputElement).value = id;
     (document.getElementById('cat-name') as HTMLInputElement).value = cat.name || '';
@@ -466,7 +562,6 @@ import Button from '@components/ui/Button.astro';
     (document.getElementById('cat-desc') as HTMLTextAreaElement).value = cat.description || '';
     (document.getElementById('cat-active') as HTMLInputElement).checked = cat.isActive !== false;
     (document.getElementById('cat-slug') as HTMLInputElement).dataset.userModified = 'true';
-
     // Load existing image
     catImageId = cat.image || null;
     if (cat.image) {
@@ -479,21 +574,17 @@ import Button from '@components/ui/Button.astro';
       document.getElementById('cat-image-preview')?.classList.add('hidden');
       document.getElementById('cat-image-upload')?.classList.remove('hidden');
     }
-
     // Load formFields
     (document.getElementById('cat-formfields') as HTMLTextAreaElement).value = cat.formFields || '';
     updateFormFieldsVisibility();
-
     if (formTitle) formTitle.textContent = 'Edit Category';
     if (submitBtn) submitBtn.textContent = 'Save Changes';
     modal?.classList.remove('hidden');
     modal?.classList.add('flex');
   };
-
   // Form submission
   document.getElementById('category-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const categoryData: Omit<Category, 'id'> = {
       name: (document.getElementById('cat-name') as HTMLInputElement)?.value,
       slug: (document.getElementById('cat-slug') as HTMLInputElement)?.value,
@@ -509,17 +600,14 @@ import Button from '@components/ui/Button.astro';
         ? (document.getElementById('cat-formfields') as HTMLTextAreaElement)?.value || null
         : null,
     };
-
     if (!categoryData.name || !categoryData.slug) {
       showToast('Name and slug are required', 'error');
       return;
     }
-
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.textContent = editingId ? 'Saving...' : 'Creating...';
     }
-
     try {
       let result;
       if (editingId) {
@@ -527,11 +615,13 @@ import Button from '@components/ui/Button.astro';
       } else {
         result = await actions.admin.categories.create(categoryData);
       }
-
       if (result.success) {
         showToast(editingId ? 'Category updated!' : 'Category created!');
         closeModalFn();
-        loadCategories();
+        // Reload categories and re-render current tab
+        await loadAllCategories();
+        const activeTab = document.querySelector('[data-tab-trigger][data-active]')?.getAttribute('data-tab-trigger') || 'business';
+        loadAndRenderTab(activeTab);
       } else {
         showToast(result.error?.message || 'Failed to save', 'error');
       }
@@ -544,19 +634,19 @@ import Button from '@components/ui/Button.astro';
       }
     }
   });
-
   // Initialize delete confirmation modal
   const deleteModalHtml = createDeleteDialog({ id: 'delete-category-dialog', itemName: '' });
   const deleteModal = injectModal(deleteModalHtml);
   let deleteTargetId: string | null = null;
-
   (deleteModal.querySelector('[data-confirm-btn]') as HTMLButtonElement)?.addEventListener('click', async () => {
     if (!deleteTargetId) return;
     try {
       const result = await actions.admin.categories.delete({ id: deleteTargetId });
       if (result.success) {
         showToast('Category deleted');
-        loadCategories();
+        await loadAllCategories();
+        const activeTab = document.querySelector('[data-tab-trigger][data-active]')?.getAttribute('data-tab-trigger') || 'business';
+        loadAndRenderTab(activeTab);
       } else {
         showToast(result.error?.message || 'Failed to delete', 'error');
       }
@@ -564,11 +654,10 @@ import Button from '@components/ui/Button.astro';
       showToast('Error deleting category', 'error');
     }
   });
-
   // Delete category
   window.deleteCategory = function(id: string) {
     deleteTargetId = id;
-    const cat = categories.find((c: Category) => c.id === id);
+    const cat = allCategories.find((c: Category) => c.id === id);
     const modal = document.getElementById('delete-category-dialog');
     if (modal) {
       const msgEl = modal.querySelector('.modal-body p');
@@ -576,22 +665,15 @@ import Button from '@components/ui/Button.astro';
     }
     showModal('delete-category-dialog');
   };
-
-  // Filter listeners
-  document.getElementById('level-filter')?.addEventListener('change', renderCategories);
-  document.getElementById('parent-filter')?.addEventListener('change', renderCategories);
-  document.getElementById('search')?.addEventListener('input', renderCategories);
-
-  // Entity type change - update parent dropdown to show only matching parents
-  document.getElementById('entity-filter')?.addEventListener('change', (e) => {
-    const entityType = (e.target as HTMLSelectElement).value;
-    // Reset parent filter when entity type changes - prevents stale selections
-    const parentFilterSelect = document.getElementById('parent-filter') as HTMLSelectElement;
-    if (parentFilterSelect) parentFilterSelect.value = '';
-    updateParentDropdown(entityType);
-    renderCategories(); // Re-render to apply entity type filter
-  });
-
-  // Initialize
-  loadCategories();
+  // Update parent dropdown for modal (uses all categories)
+  function updateParentDropdown() {
+    const select = document.getElementById('cat-parent') as HTMLSelectElement;
+    if (!select) return;
+    const entityType = (document.getElementById('cat-entity-type') as HTMLSelectElement)?.value;
+    const filteredParents = allCategories.filter((c: Category) => !c.parentId && c.entityType === entityType);
+    const options = filteredParents.map((c: Category) =>
+      `<option value="${c.id}">${c.icon ? getIcon(c.icon) + ' ' : ''}${c.name}</option>`
+    ).join('');
+    select.innerHTML = '<option value="">Top-level (Industry)</option>' + options;
+  }
 </script>
