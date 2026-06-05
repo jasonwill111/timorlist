@@ -1,6 +1,6 @@
----
 import ThemeToggle from './ui/ThemeToggle.astro';
 import LucideIcon from './ui/LucideIcon.astro';
+import Button from './ui/Button.astro';
 
 interface Props {
   currentPath?: string;
@@ -27,10 +27,10 @@ const urlParams = new URL(Astro.request.url).searchParams;
       <nav class="hidden md:flex items-center gap-0">
         <!-- Dropdown: Business -->
         <div class="relative group">
-          <button class="text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded px-1.5 py-1 flex items-center text-muted-foreground hover:text-primary">
+          <Button variant="ghost" size="sm" class="flex items-center text-muted-foreground">
             Business
             <LucideIcon name="ChevronDown" size={12} class="ml-0.5" />
-          </button>
+          </Button>
           <!-- Hover bridge: invisible area to prevent dropdown from disappearing when mouse moves down -->
           <div class="absolute left-0 right-0 h-2 -mb-1 -mt-0.5 cursor-default"></div>
           <div class="hidden group-hover:block absolute left-0 mt-1 w-48 bg-background border rounded-lg shadow-lg py-1 z-50">
@@ -49,10 +49,10 @@ const urlParams = new URL(Astro.request.url).searchParams;
         </a>
         <!-- Dropdown: Govs & NGOs -->
         <div class="relative group">
-          <button class="text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded px-1.5 py-1 flex items-center text-muted-foreground hover:text-primary">
+          <Button variant="ghost" size="sm" class="flex items-center text-muted-foreground">
             Govs & NGOs
             <LucideIcon name="ChevronDown" size={12} class="ml-0.5" />
-          </button>
+          </Button>
           <!-- Hover bridge: invisible area to prevent dropdown from disappearing when mouse moves down -->
           <div class="absolute left-0 right-0 h-2 -mb-1 -mt-0.5 cursor-default"></div>
           <div class="hidden group-hover:block absolute left-0 mt-1 w-40 bg-background border rounded-lg shadow-lg py-1 z-50">
@@ -93,13 +93,13 @@ const urlParams = new URL(Astro.request.url).searchParams;
         <div id="desktop-auth" class="hidden md:flex items-center gap-2">
           {isLoggedIn ? (
             <div class="relative">
-              <button id="avatar-dropdown-btn" class="w-11 h-10 rounded-lg bg-brand-500 flex items-center justify-center hover:opacity-80 transition-opacity">
+              <Button id="avatar-dropdown-btn" variant="ghost" size="default" class="w-11 h-10 rounded-lg bg-brand-500 flex items-center justify-center hover:opacity-80 transition-opacity p-0">
                 <span class="text-white text-sm font-medium">?</span>
-              </button>
+              </Button>
               <div id="avatar-dropdown" class="hidden absolute right-0 mt-2 w-40 bg-background border rounded-lg shadow-lg py-1 z-50">
                 <a href="/account" class="block px-4 py-3 text-sm hover:bg-muted">My Account</a>
                 <hr class="my-1 border-muted" />
-                <button id="logout-btn" class="block w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-muted">Log Out</button>
+                <Button id="logout-btn" variant="ghost" class="block w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-muted rounded-none" />
               </div>
             </div>
           ) : (
@@ -115,12 +115,13 @@ const urlParams = new URL(Astro.request.url).searchParams;
         </div>
 
         <!-- Mobile Menu Button -->
-        <button
+        <Button
           id="mobile-menu-btn"
+          variant="ghost"
+          size="icon"
           class="md:hidden w-11 h-10 rounded-md hover:bg-muted transition-colors flex items-center justify-center"
           aria-label="Open menu"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
