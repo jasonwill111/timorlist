@@ -76,6 +76,7 @@ import Select from '@components/ui/Select.astro';
         </div>
         <!-- Filter -->
         <div class="bg-card border rounded-lg p-3 mb-4">
+          <div class="flex flex-col sm:flex-row gap-2">
             <Select id="level-filter-non_profit" class="h-9 px-3 text-sm">
               <option value="">All Levels</option>
               <option value="parent">Parent (Top-level)</option>
@@ -117,16 +118,17 @@ import Select from '@components/ui/Select.astro';
         </div>
         <!-- Filter -->
         <div class="bg-card border rounded-lg p-3 mb-4">
-            <Select id="level-filter-public_sector" class="h-9 px-3 text-sm">
-              <option value="">All Levels</option>
-              <option value="parent">Parent (Top-level)</option>
-              <option value="child">Sub-categories</option>
-            </Select>
-            <Select id="parent-filter-public_sector" class="h-9 px-3 text-sm">
-              <option value="">All Parents</option>
-            </Select>
-            <input type="search" id="search-public_sector" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
-          </div>
+          <div class="flex flex-col sm:flex-row gap-2">
+           <Select id="level-filter-public_sector" class="h-9 px-3 text-sm">
+             <option value="">All Levels</option>
+             <option value="parent">Parent (Top-level)</option>
+             <option value="child">Sub-categories</option>
+           </Select>
+           <Select id="parent-filter-public_sector" class="h-9 px-3 text-sm">
+             <option value="">All Parents</option>
+           </Select>
+           <input type="search" id="search-public_sector" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+         </div>
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
@@ -168,6 +170,7 @@ import Select from '@components/ui/Select.astro';
               <option value="">All Parents</option>
             </Select>
             <input type="search" id="search-listing" placeholder="Search categories..." class="h-9 px-3 rounded-md border bg-background text-sm flex-1" />
+          </div>
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
