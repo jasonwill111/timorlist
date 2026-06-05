@@ -105,8 +105,8 @@ import CardFooter from '../components/ui/CardFooter.astro';
 
     const link = document.createElement('a');
     link.href = '/login';
-    link.className = 'inline-block mt-4';
-    link.innerHTML = '<button class="px-4 py-2 bg-primary text-primary-foreground rounded hover:opacity-90">Go to Login</button>';
+    link.className = 'inline-flex items-center justify-center gap-2 px-4 py-2.5 h-11 rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200 mt-4';
+    link.textContent = 'Go to Login';
 
     statusContainer.appendChild(svg);
     statusContainer.appendChild(p);
