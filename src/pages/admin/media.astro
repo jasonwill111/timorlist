@@ -8,6 +8,7 @@ import { actions } from 'astro:actions';
 import { getAdminUser } from '@/lib/admin-auth';
 import Select from '@/components/ui/Select.astro';
 import Input from '@/components/ui/Input.astro';
+import Button from '@/components/ui/Button.astro';
 
 
 // Check admin auth using KV session
@@ -100,12 +101,12 @@ const totalPages = Math.ceil(total / limit);
         </p>
       </div>
       <div class="flex gap-2 flex-shrink-0">
-        <button form="upload-form" type="submit" class="text-xs px-2 py-1 h-7 border rounded-lg hover:bg-muted flex items-center gap-1 md:text-sm md:px-4 md:h-9">
+        <Button form="upload-form" type="submit" class="text-xs px-2 py-1 h-7 border rounded-lg hover:bg-muted flex items-center gap-1 md:text-sm md:px-4 md:h-9">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
           </svg>
           Upload
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -152,9 +153,9 @@ const totalPages = Math.ceil(total / limit);
         </div>
 
 
-        <button type="submit" class="text-xs px-2 py-1 h-7 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 md:text-sm md:px-4 md:h-9">
+        <Button type="submit" class="text-xs px-2 py-1 h-7 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 md:text-sm md:px-4 md:h-9">
           Filter
-        </button>
+        </Button>
         <a href="/admin/media" class="text-xs px-2 py-1 h-7 border rounded-lg hover:bg-muted md:text-sm md:px-4 md:h-9">
           Reset
         </a>
@@ -192,7 +193,7 @@ const totalPages = Math.ceil(total / limit);
 
               <!-- Overlay with actions -->
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <button
+                <Button
                   class="p-2 bg-white/20 hover:bg-white/30 rounded-lg text-white copy-url"
                   data-url={item.url}
                   title="Copy URL"
@@ -200,8 +201,8 @@ const totalPages = Math.ceil(total / limit);
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                   </svg>
-                </button>
-                <button
+                </Button>
+                <Button
                   class="p-2 bg-red-500/80 hover:bg-red-500 rounded-lg text-white delete-media"
                   data-id={item.id}
                   title="Delete"
@@ -209,7 +210,7 @@ const totalPages = Math.ceil(total / limit);
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                   </svg>
-                </button>
+                </Button>
               </div>
 
               <!-- Type badge -->

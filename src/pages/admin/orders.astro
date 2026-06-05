@@ -1,3 +1,4 @@
+import Button from '@components/ui/Button.astro';
 import Textarea from '@components/ui/Textarea.astro';
 import Select from '@components/ui/Select.astro';
 ---
@@ -15,10 +16,9 @@ import { actions } from 'astro:actions';
     </div>
 
     <!-- Filter Tabs -->
-    <div class="flex gap-2 mb-4 overflow-x-auto">
-      <button class="filter-btn px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground" data-status="all">All</button>
-      <button class="filter-btn px-3 py-1.5 text-xs rounded-full border" data-status="unpaid">Unpaid</button>
-      <button class="filter-btn px-3 py-1.5 text-xs rounded-full border" data-status="paid">Paid</button>
+      <Button variant="primary" size="sm" class="filter-btn" data-status="all">All</Button>
+      <Button variant="secondary" size="sm" class="filter-btn" data-status="unpaid">Unpaid</Button>
+      <Button variant="secondary" size="sm" class="filter-btn" data-status="paid">Paid</Button>
     </div>
 
     <!-- Orders List -->
@@ -38,11 +38,11 @@ import { actions } from 'astro:actions';
     <div class="bg-card border rounded-lg w-full max-w-lg">
       <div class="p-4 border-b flex items-center justify-between">
         <h2 class="text-lg font-bold">Order Details</h2>
-        <button id="close-modal" class="p-1 hover:bg-muted rounded">
+        <Button id="close-modal" variant="ghost" size="sm">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
-        </button>
+        </Button>
       </div>
 
       <form id="order-form" class="p-4 space-y-4">
@@ -90,12 +90,12 @@ import { actions } from 'astro:actions';
 
       <!-- Action Buttons -->
       <div class="p-4 border-t flex gap-2 justify-between">
-        <button id="delete-order-btn" class="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700">Delete</button>
+        <Button id="delete-order-btn" variant="destructive" size="sm">Delete</Button>
         <div class="flex gap-2">
-          <button id="cancel-modal-btn" class="px-4 py-2 border text-sm rounded-md hover:bg-muted">Cancel</button>
-          <button id="reject-order-btn" class="px-4 py-2 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 hidden">Reject</button>
-          <button id="confirm-order-btn" class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 hidden">Confirm Payment</button>
-          <button id="save-order-btn" class="px-4 py-2 bg-primary text-black text-sm rounded-md hover:bg-primary/90">Save Changes</button>
+          <Button id="cancel-modal-btn" variant="secondary" size="sm">Cancel</Button>
+          <Button id="reject-order-btn" variant="warning" size="sm" class="hidden">Reject</Button>
+          <Button id="confirm-order-btn" variant="success" size="sm" class="hidden">Confirm Payment</Button>
+          <Button id="save-order-btn" variant="primary" size="sm">Save Changes</Button>
         </div>
       </div>
     </div>

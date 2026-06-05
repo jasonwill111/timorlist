@@ -6,6 +6,7 @@ import { actions } from 'astro:actions';
 import Textarea from '@components/ui/Textarea.astro';
 import Input from '@components/ui/Input.astro';
 import Select from '@components/ui/Select.astro';
+import Button from '@components/ui/Button.astro';
 ---
 
 <AdminLayout title="AI Tools">
@@ -108,10 +109,8 @@ import Select from '@components/ui/Select.astro';
             <div>
               <label class="block text-sm font-medium mb-1">Tags (comma-separated)</label>
               <Input type="text" id="listing-tags" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="coffee, wifi, local" />
-            </div>
-            <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate Listing
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -153,9 +152,8 @@ import Select from '@components/ui/Select.astro';
               <button id="listing-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
                 Save Listing
               </button>
-              <button id="listing-copy-btn" class="py-2 px-4 border rounded-md font-medium hover:bg-muted">
                 Copy
-              </button>
+              </Button>
             </div>
           </div>
           <div id="listing-empty" class="py-12 text-center text-muted-foreground">
@@ -207,9 +205,8 @@ import Select from '@components/ui/Select.astro';
                 <Input type="text" id="sku-price-unit" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="/hour, /day" />
               </div>
             </div>
-            <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate SKU
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -244,9 +241,8 @@ import Select from '@components/ui/Select.astro';
               <button id="sku-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
                 Save SKU
               </button>
-              <button id="sku-copy-btn" class="py-2 px-4 border rounded-md font-medium hover:bg-muted">
                 Copy JSON
-              </button>
+              </Button>
             </div>
           </div>
           <div id="sku-empty" class="py-12 text-center text-muted-foreground">
@@ -291,9 +287,8 @@ import Select from '@components/ui/Select.astro';
               <label class="block text-sm font-medium mb-1">Additional Requirements</label>
               <Textarea id="blog-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key points to cover, specific businesses to mention..." />
             </div>
-            <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate Article
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -329,8 +324,7 @@ import Select from '@components/ui/Select.astro';
               </button>
               <button id="blog-copy-btn" class="py-2 px-4 border rounded-md font-medium hover:bg-muted">
                 Copy
-              </button>
-            </div>
+              </Button>
           </div>
           <div id="blog-empty" class="py-12 text-center text-muted-foreground">
             <p>Fill the form and click Generate</p>
@@ -366,9 +360,8 @@ import Select from '@components/ui/Select.astro';
               <label class="block text-sm font-medium mb-1">Requirements for AI</label>
               <Textarea id="landing-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key message, target audience, specific products..." />
             </div>
-            <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate Landing Page
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -406,9 +399,8 @@ import Select from '@components/ui/Select.astro';
               <button id="landing-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
                 Save Page
               </button>
-              <button id="landing-copy-btn" class="py-2 px-4 border rounded-md font-medium hover:bg-muted">
                 Copy
-              </button>
+              </Button>
             </div>
           </div>
           <div id="landing-empty" class="py-12 text-center text-muted-foreground">
