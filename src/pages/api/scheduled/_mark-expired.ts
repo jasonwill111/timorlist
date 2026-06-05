@@ -2,22 +2,17 @@
 // NOTE: Subscription status is now derived from orders table, not cached on businesses.
 // This job is kept for monitoring purposes but no longer updates business records.
 export const prerender = false;
-
 import { getDb } from '@/lib/db';
 import { businesses, orders } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { GRACE_PERIOD_DAYS } from '@/lib/subscription';
-
+import { unauthorizedResponse } from '@/lib/api-helpers';
 export async function GET({ request }: { params: Record<string, string>; request: Request }) {
   // Verify this is an internal/scheduled call
   const authHeader = request.headers.get('authorization');
   const expectedToken = import.meta.env.CLEANUP_SECRET;
-
   if (authHeader !== `Bearer ${expectedToken}`) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: { message: 'Unauthorized' }
-    }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    return unauthorizedResponse();
   }
 
   const db = await getDb();

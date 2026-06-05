@@ -1,23 +1,17 @@
 // Scheduled cleanup job - Delete expired listings after grace period
 export const prerender = false;
-
 import { getDb } from '@/lib/db';
 import { businesses, products, orders } from '@/db/schema';
 import { eq, lt, and, sql, desc } from 'drizzle-orm';
 import { GRACE_PERIOD_DAYS } from '@/lib/subscription';
-
+import { unauthorizedResponse } from '@/lib/api-helpers';
 export async function GET({ request }: { params: Record<string, string>; request: Request }) {
   // Verify this is an internal/scheduled call
   const authHeader = request.headers.get('authorization');
   const expectedToken = import.meta.env.CLEANUP_SECRET;
-
   if (authHeader !== `Bearer ${expectedToken}`) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: { message: 'Unauthorized' }
-    }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    return unauthorizedResponse();
   }
-
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const now = new Date();

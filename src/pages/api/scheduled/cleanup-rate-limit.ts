@@ -6,21 +6,18 @@
  * 
  * Runs: Every hour (defined in wrangler.jsonc triggers.crons)
  */
-
 import { cleanupRateLimitStore } from '@/lib/rate-limit';
-
+import { unauthorizedResponse } from '@/lib/api-helpers';
 /**
  * Endpoint: /api/scheduled/cleanup-rate-limit
  * Method: GET
  * Auth: Cron secret or internal call only
  */
 export const prerender = false;
-
 export async function GET({ request }: { request: Request }) {
   // Verify this is a cron invocation (from wrangler)
   const isCron = request.headers.get('CF-Cron-Trigger-Requested') === 'true' ||
                  request.headers.get('User-Agent')?.includes('Cloudflare-Cron');
-  
   // Optional: verify cron secret for additional security
   const authHeader = request.headers.get('Authorization');
   const cronSecret = import.meta.env.CRON_SECRET || '';
@@ -28,17 +25,11 @@ export async function GET({ request }: { request: Request }) {
   if (cronSecret) {
     // Auth is required - check Bearer token
     if (authHeader !== `Bearer ${cronSecret}`) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return unauthorizedResponse();
     }
   } else if (!isCron) {
     // No cron secret configured - only allow if called by Cloudflare cron
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return unauthorizedResponse();
   }
   try {
     // Perform cleanup
