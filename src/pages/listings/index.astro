@@ -1,9 +1,8 @@
 ---
-export const prerender = false;
-
 import Layout from '../../layouts/Layout.astro';
 import CarouselBanner from '../../components/ui/CarouselBanner.astro';
 import ListingCard from '../../components/business/ListingCard.astro';
+import Input from '../../components/ui/Input.astro';
 import { getRawDb } from '@/lib/db';
 
 const searchParams = Astro.url.searchParams;
@@ -122,8 +121,8 @@ const buildUrl = (pageNum: number) => {
     <form method="GET" action="/listings" class="bg-card rounded-2xl border border-border/50 p-4 mb-6 shadow-sm">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="relative flex-1">
-          <input name="q" type="search" placeholder="Search listings..." value={search}
-            class="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200" />
+          <Input name="q" type="search" placeholder="Search listings..." value={search}
+            class="pl-10 pr-4 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200" />
         </div>
         <div class="flex gap-2">
           <select name="type" onchange="this.form.submit()"
