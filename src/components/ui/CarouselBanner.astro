@@ -1,3 +1,4 @@
+import Button from './Button.astro';
 ---
 // Reusable Carousel Banner Component
 // Used on: Homepage, Businesses, Listings, Products-Services pages
@@ -61,25 +62,27 @@ const slides = [
       ))}
     </div>
 
-    <!-- Navigation Arrows -->
-    <button
-      class="carousel-prev w-11 h-11 bg-white/95 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-opacity disabled:opacity-30"
+    <Button
+      variant="ghost"
+      size="icon"
+      class="carousel-prev"
       aria-label="Previous slide"
       style="position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); z-index: 20;"
     >
-      <svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
       </svg>
-    </button>
-    <button
-      class="carousel-next w-11 h-11 bg-white/95 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-opacity disabled:opacity-30"
+    <Button
+      variant="ghost"
+      size="icon"
+      class="carousel-next"
       aria-label="Next slide"
       style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); z-index: 20;"
     >
-      <svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
       </svg>
-    </button>
+    </Button>
 
     <!-- Indicators -->
     <div class="flex gap-1.5" style="position: absolute; bottom: 0.75rem; left: 50%; transform: translateX(-50%); z-index: 20;">
