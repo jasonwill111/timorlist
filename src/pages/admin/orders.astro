@@ -1,3 +1,4 @@
+import Select from '@components/ui/Select.astro';
 ---
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
@@ -46,14 +47,17 @@ import { actions } from 'astro:actions';
       <form id="order-form" class="p-4 space-y-4">
         <input type="hidden" id="order-id" name="orderId" />
 
-        <!-- Service Package -->
         <div>
           <label for="plan-type" class="block text-sm font-medium mb-1">Service Package</label>
-          <select id="plan-type" name="servicePackageId" class="w-full px-3 py-2 border rounded-lg bg-background">
-            <option value="sp-business-basic">Basic Monthly - $29</option>
-            <option value="sp-business-pro">Pro Monthly - $59</option>
-            <option value="sp-business-max">Max Monthly - $89</option>
-          </select>
+          <Select
+            id="plan-type"
+            name="servicePackageId"
+            options={[
+              { value: "sp-business-basic", label: "Basic Monthly - $29" },
+              { value: "sp-business-pro", label: "Pro Monthly - $59" },
+              { value: "sp-business-max", label: "Max Monthly - $89" }
+            ]}
+          />
         </div>
 
         <!-- Admin Notes -->
