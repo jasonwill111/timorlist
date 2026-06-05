@@ -13,6 +13,7 @@ interface Props {
   error?: boolean;
   name?: string;
   id?: string;
+  value?: string;
   'data-slot'?: string;
 }
 
@@ -23,6 +24,7 @@ const {
   required = false,
   error = false,
   name,
+  value,
   id,
   'data-slot': slot = 'select',
   ...props
@@ -39,12 +41,13 @@ const {
   required={required}
   name={name}
   id={id}
+  value={value}
   data-slot={slot}
   {...props}
 >
   <slot />
   {options.map((option) => (
-    <option value={option.value} disabled={option.disabled}>
+    <option value={option.value} disabled={option.disabled} selected={value !== undefined && option.value === value}>
       {option.label}
     </option>
   ))}
