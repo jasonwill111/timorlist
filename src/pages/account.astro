@@ -125,10 +125,10 @@ const isSubscriptionExpired = subscription?.status === 'paid' && subscription?.p
                       <div>
                         <CardTitle>{page.title}</CardTitle>
                         <CardDescription>Created on {page.createdAt ? new Date(page.createdAt * 1000).toLocaleDateString() : ''}</CardDescription>
+                      </div>
                       <Badge variant={page.status === 'active' ? 'success' : 'secondary'} size="sm">
                         {page.status}
                       </Badge>
-                    </div>
                     </div>
                     <div class="flex gap-2 mt-4">
                       <a href={`/business/${page.slug}`}>

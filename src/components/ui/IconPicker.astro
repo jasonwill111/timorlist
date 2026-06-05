@@ -7,8 +7,8 @@
  *   value: string - current icon value
  *   type: 'emoji' | 'lucide' - current icon type
  */
-import { EMOJI_ICONS, LUCIDE_ICONS } from '@/lib/icons';
 import Select from './Select.astro';
+import Input from './Input.astro';
 
 interface Props {
   name: string;
@@ -24,7 +24,7 @@ const iconValue = value?.replace(/^(emoji:|lucide:)/, '') ?? '';
   <!-- Icon Type Toggle -->
   <div class="flex gap-2">
     <label class="flex items-center gap-2 cursor-pointer">
-      <input
+      <Input
         type="radio"
         name={`${name}_type`}
         value="emoji"
@@ -34,7 +34,7 @@ const iconValue = value?.replace(/^(emoji:|lucide:)/, '') ?? '';
       <span class="text-sm">Emoji</span>
     </label>
     <label class="flex items-center gap-2 cursor-pointer">
-      <input
+      <Input
         type="radio"
         name={`${name}_type`}
         value="lucide"
@@ -50,7 +50,7 @@ const iconValue = value?.replace(/^(emoji:|lucide:)/, '') ?? '';
     <div class="flex flex-wrap gap-2">
       {EMOJI_ICONS.map((emoji) => (
         <label class="cursor-pointer">
-          <input
+          <Input
             type="radio"
             name={name}
             value={`emoji:${emoji}`}
