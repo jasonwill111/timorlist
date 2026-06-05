@@ -4,6 +4,7 @@
 import { getDb, getRawDb } from '@/lib/db';
 import { products, businesses } from '@/db/schema';
 import { desc, eq, like, asc, and } from 'drizzle-orm';
+import Select from '@/components/ui/Select.astro';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('search') || '';
@@ -151,20 +152,17 @@ const buildUrl = (pageNum: number) => {
     />
   </div>
 
-  <select id="business-filter" name="business"
-    class="h-10 px-3 rounded-lg border border-input bg-background text-sm cursor-pointer">
+  <Select id="business-filter" name="business">
     <option value="">All Businesses</option>
     {allBusinesses.map(b => (
       <option value={b.id} selected={businessId === b.id}>{b.title}</option>
     ))}
-  </select>
+  </Select>
 
-  <select id="sort-filter" name="sort"
-    class="h-10 px-3 rounded-lg border border-input bg-background text-sm cursor-pointer">
+  <Select id="sort-filter" name="sort">
     <option value="recent" selected={sort === 'recent'}>Recent</option>
     <option value="name" selected={sort === 'name'}>Name A-Z</option>
-  </select>
-
+  </Select>
   <button type="submit" class="h-10 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium">
     Filter
   </button>

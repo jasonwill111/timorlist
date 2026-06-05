@@ -8,6 +8,7 @@
  *   type: 'emoji' | 'lucide' - current icon type
  */
 import { EMOJI_ICONS, LUCIDE_ICONS } from '@/lib/icons';
+import Select from './Select.astro';
 
 interface Props {
   name: string;
@@ -66,17 +67,14 @@ const iconValue = value?.replace(/^(emoji:|lucide:)/, '') ?? '';
 
   <!-- Lucide Picker -->
   <div class="icon-type-panel hidden" data-panel="lucide">
-    <select
-      name={name}
-      class="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm focus:ring-primary focus:border-primary"
-    >
+    <Select name={name}>
       <option value="">Select icon...</option>
       {LUCIDE_ICONS.map((iconName) => (
         <option value={`lucide:${iconName}`} selected={value === `lucide:${iconName}`}>
           {iconName}
         </option>
       ))}
-    </select>
+    </Select>
   </div>
 </div>
 
