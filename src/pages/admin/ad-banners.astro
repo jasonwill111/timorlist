@@ -58,7 +58,7 @@ import { actions } from 'astro:actions';
           <div id="hero-image-preview" class="mt-2 hidden">
             <div class="relative inline-block">
               <img id="hero-preview-img" class="w-full max-h-40 rounded-lg object-cover" />
-              <button type="button" id="remove-hero-image" data-action="remove-hero-image" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600">×</button>
+              <Button id="remove-hero-image" variant="destructive" size="icon-xs" data-action="remove-hero-image" class="absolute top-1 right-1">×</Button>
           </div>
           <input type="hidden" id="hero-image" name="imageId" value="" />
         </div>

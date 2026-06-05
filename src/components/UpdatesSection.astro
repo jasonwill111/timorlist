@@ -76,12 +76,13 @@ function formatRelativeTime(date: Date | null): string {
               {formatRelativeTime(update.createdAt)}
             </span>
             {isOwner && (
-              <button
+              <Button
+                variant="ghost"
                 class="text-xs text-red-500 hover:text-red-700 delete-update"
                 data-update-id={update.id}
               >
                 Delete
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -127,12 +128,11 @@ function formatRelativeTime(date: Date | null): string {
   <div id="update-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
     <div class="bg-background rounded-xl p-6 max-w-md w-full shadow-xl">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-semibold">New Update</h3>
-        <button id="close-update-modal" class="p-1 hover:bg-muted rounded">
+        <Button id="close-update-modal" variant="ghost" size="sm">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
-        </button>
+        </Button>
       </div>
 
       <form id="update-form" class="space-y-4">
@@ -159,9 +159,9 @@ function formatRelativeTime(date: Date | null): string {
         </div>
 
         <div class="flex gap-2">
-          <button type="button" id="add-images-btn" class="px-3 py-1.5 border rounded-lg text-sm hover:bg-muted">
+          <Button id="add-images-btn" variant="outline" size="sm">
             + Images
-          </button>
+          </Button>
           <input type="file" id="image-input" accept="image/*" multiple class="hidden" />
         </div>
         <div id="update-error" class="text-sm text-red-500 hidden"></div>

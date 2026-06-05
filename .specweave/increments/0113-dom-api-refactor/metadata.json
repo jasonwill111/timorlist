@@ -1,0 +1,16 @@
+{
+  "increment": "0113-dom-api-refactor",
+  "title": "DOM API 重构 — 消除 JS 模板字符串",
+  "type": "refactor",
+  "priority": "P1",
+  "status": "in_progress",
+  "created": "2026-06-05",
+  "parent": "0103-fulldev-migration-refactor",
+  "epic": "0103",
+  "domains": ["frontend", "architecture"],
+  "tasks_total": 22,
+  "tasks_done": 0,
+  "tasks_blocked": 0,
+  "risk": "medium",
+  "test_mode": "manual-e2e"
+}
