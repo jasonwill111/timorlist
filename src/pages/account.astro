@@ -10,6 +10,7 @@ import CardDescription from '@/components/ui/CardDescription.astro';
 import CardContent from '@/components/ui/CardContent.astro';
 import CardFooter from '@/components/ui/CardFooter.astro';
 import Button from '@/components/ui/Button.astro';
+import Badge from '@/components/ui/Badge.astro';
 import { getDb, getRawDb } from '@/lib/db';
 import { businesses, orders, reviews } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
@@ -124,10 +125,10 @@ const isSubscriptionExpired = subscription?.status === 'paid' && subscription?.p
                       <div>
                         <CardTitle>{page.title}</CardTitle>
                         <CardDescription>Created on {page.createdAt ? new Date(page.createdAt * 1000).toLocaleDateString() : ''}</CardDescription>
-                      </div>
-                      <span class={`px-2 py-1 text-xs rounded-full ${page.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
+                      <Badge variant={page.status === 'active' ? 'success' : 'secondary'} size="sm">
                         {page.status}
-                      </span>
+                      </Badge>
+                    </div>
                     </div>
                     <div class="flex gap-2 mt-4">
                       <a href={`/business/${page.slug}`}>

@@ -33,7 +33,7 @@ import { actions } from 'astro:actions';
     <div class="bg-card border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
       <div class="p-4 border-b flex items-center justify-between sticky top-0 bg-card">
         <h2 id="modal-title" class="text-lg font-bold">Add Hero</h2>
-          <Button id="close-modal" variant="ghost" size="icon" class="p-1" onclick="document.getElementById('hero-modal')?.classList.add('hidden')">
+          <Button id="close-modal" data-action="close-modal" variant="ghost" size="icon" class="p-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -58,8 +58,7 @@ import { actions } from 'astro:actions';
           <div id="hero-image-preview" class="mt-2 hidden">
             <div class="relative inline-block">
               <img id="hero-preview-img" class="w-full max-h-40 rounded-lg object-cover" />
-              <button type="button" id="remove-hero-image" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600" onclick="removeHeroImage()">×</button>
-            </div>
+              <button type="button" id="remove-hero-image" data-action="remove-hero-image" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600">×</button>
           </div>
           <input type="hidden" id="hero-image" name="imageId" value="" />
         </div>
@@ -121,13 +120,40 @@ import { actions } from 'astro:actions';
     }
     (e.target as HTMLInputElement).value = '';
   });
-  document.getElementById('remove-hero-image')?.addEventListener('click', () => {
+  // Event delegation for data-action attributes
+  document.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest('[data-action]') as HTMLElement | null;
+    if (!target) return;
+    const action = target.dataset.action;
+    const id = target.dataset.id;
+    switch (action) {
+      case 'edit-hero':
+        if (id) editHero(id);
+        break;
+      case 'delete-hero':
+        if (id) deleteHero(id);
+        break;
+      case 'remove-hero-image':
+        removeHeroImage();
+        break;
+      case 'close-modal':
+        closeModal();
+        break;
+    }
+  });
+  // Remove hero image
+  function removeHeroImage() {
     heroImageId = null;
     (document.getElementById('hero-image') as HTMLInputElement).value = '';
     document.getElementById('hero-image-preview')?.classList.add('hidden');
     document.getElementById('hero-image-upload')?.classList.remove('hidden');
-  });
-  
+  }
+  // Close modal
+  function closeModal() {
+    const modal = document.getElementById('hero-modal');
+    modal?.classList.add('hidden');
+    modal?.classList.remove('flex');
+  }
   // Load heroes
   async function loadHeroes() {
     try {
@@ -150,8 +176,8 @@ import { actions } from 'astro:actions';
           <div class="min-w-0 flex-1">
             <p class="font-medium truncate">${hero.title}</p>
             <p class="text-xs text-muted-foreground truncate">${hero.description || 'No description'}</p>
-            <button onclick="editHero('${hero.id}')" class="px-2 py-1 text-xs border rounded hover:bg-primary/10 text-primary">Edit</button>
-            <button onclick="deleteHero('${hero.id}')" class="px-2 py-1 text-xs border rounded hover:bg-red-50 text-red-500">Del</button>
+            <button data-action="edit-hero" data-id="${hero.id}" class="px-2 py-1 text-xs border rounded hover:bg-primary/10 text-primary">Edit</button>
+            <button data-action="delete-hero" data-id="${hero.id}" class="px-2 py-1 text-xs border rounded hover:bg-red-50 text-red-500">Del</button>
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <span class="px-2 py-0.5 text-xs rounded-full ${hero.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800'}">${hero.isActive ? 'Active' : 'Inactive'}</span>
@@ -253,9 +279,7 @@ import { actions } from 'astro:actions';
   // Modal controls
   const modal = document.getElementById('hero-modal');
   const addBtn = document.getElementById('add-hero-btn');
-  const closeBtn = document.getElementById('close-modal');
   const cancelBtn = document.getElementById('cancel-btn');
-  
   addBtn?.addEventListener('click', () => {
     isEditMode = false;
     heroImageId = null;
@@ -268,24 +292,14 @@ import { actions } from 'astro:actions';
     modal?.classList.remove('hidden');
     modal?.classList.add('flex');
   });
-  
-  closeBtn?.addEventListener('click', () => {
-    modal?.classList.add('hidden');
-    modal?.classList.remove('flex');
-  });
-  
   cancelBtn?.addEventListener('click', () => {
-    modal?.classList.add('hidden');
-    modal?.classList.remove('flex');
+    closeModal();
   });
-  
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      closeModal();
     }
   });
-  
   // Form submission
   document.getElementById('hero-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();

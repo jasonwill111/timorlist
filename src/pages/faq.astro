@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
+import Accordion from '@/components/ui/Accordion.astro';
 
 // FAQ structured data
 const faqSchema = {
@@ -93,21 +94,14 @@ const faqs = [
     </div>
 
     <!-- FAQ Grid -->
-    <div class="space-y-4">
-      {faqs.map((faq, index) => (
-        <details class="group bg-card border rounded-lg overflow-hidden" key={index}>
-          <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold hover:bg-muted/50 transition-colors list-none">
-            <span>{faq.question}</span>
-            <svg class="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <div class="px-6 pb-6 text-muted-foreground">
-            <p>{faq.answer}</p>
-          </div>
-        </details>
-      ))}
-    </div>
+    <Accordion
+      items={faqs.map((faq, index) => ({
+        id: `faq-${index}`,
+        title: faq.question,
+        content: faq.answer,
+      }))}
+      class="divide-y divide-border rounded-lg border"
+    />
 
     <!-- CTA -->
     <div class="mt-12 text-center bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-8">

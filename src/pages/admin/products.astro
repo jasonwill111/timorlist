@@ -228,7 +228,164 @@ const businessOptionsJson = JSON.stringify(businessOptions);
 
   // Preload video processor
   import('@/lib/video-compress').then(({ preloadFFmpeg }) => preloadFFmpeg());
-
+  // =============================================================================
+  // HELPER FUNCTIONS - Generate HTML strings
+  // =============================================================================
+  function escapeHtml(str: string) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function buildPriceFieldRow(idx: number, field: {label: string; value: string; unit: string}, units: {value: string; label: string}[]): string {
+    const isFirst = idx === 0;
+    return `<div class="flex gap-2 items-center price-field-row" data-index="${idx}">
+      <input type="text" name="priceLabel_${idx}" value="${escapeHtml(field.label)}" placeholder="Label (e.g., Hourly Rate)" class="flex-1 px-2 py-1 border rounded text-xs" />
+      <input type="number" name="priceValue_${idx}" value="${escapeHtml(field.value)}" placeholder="${field.unit ? '0.00' : 'Ask for price'}" class="w-20 px-2 py-1 border rounded text-xs" step="0.01" />
+      <select name="priceUnit_${idx}" class="px-2 py-1 border rounded text-xs bg-background">
+        ${units.map(u => `<option value="${u.value}" ${u.value === field.unit ? 'selected' : ''}>${escapeHtml(u.label)}</option>`).join('')}
+      </select>
+      <button type="button" data-action="remove-price-field" class="text-red-500 hover:text-red-600 p-1" ${isFirst ? 'style="visibility:hidden"' : ''}>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>`;
+  }
+  function buildPriceFieldsHtml(productType: string, existingFields: {label: string; value: string; unit: string}[]): string {
+    const units = getPriceUnitsForServiceType(productType);
+    if (existingFields.length === 0) {
+      existingFields.push({ label: '', value: '', unit: '' });
+    }
+    return existingFields.map((field, idx) => buildPriceFieldRow(idx, field, units)).join('');
+  }
+  function buildNewPriceFieldHtml(productType: string, count: number): string {
+    const units = getPriceUnitsForServiceType(productType);
+    return `<div class="flex gap-2 items-center price-field-row" data-index="${count}">
+      <input type="text" name="priceLabel_${count}" placeholder="Label (e.g., Weekend Rate)" class="flex-1 px-2 py-1 border rounded text-xs" />
+      <input type="number" name="priceValue_${count}" placeholder="0.00" class="w-20 px-2 py-1 border rounded text-xs" step="0.01" />
+      <select name="priceUnit_${count}" class="px-2 py-1 border rounded text-xs bg-background">
+        ${units.map(u => `<option value="${u.value}">${escapeHtml(u.label)}</option>`).join('')}
+      </select>
+      <button type="button" data-action="remove-price-field" class="text-red-500 hover:text-red-600 p-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>`;
+  }
+  function buildBusinessOptions(selectedId: string = ''): string {
+    return businessOptions.map(b => `<option value="${b.value}" ${b.value === selectedId ? 'selected' : ''}>${escapeHtml(b.label)}</option>`).join('');
+  }
+  function buildBusinessFilterOptions(): string {
+    return businessOptions.map(b => `<option value="${b.value}">${escapeHtml(b.label)}</option>`).join('');
+  }
+  function buildSpecFieldHtml(field: {key: string; type: string; label: string; placeholder?: string; options?: string[]}, value: string): string {
+    const id = `spec-${field.key}`;
+    const escapedValue = escapeHtml(Array.isArray(value) ? value.join(', ') : value);
+    if (field.type === 'text') {
+      return `<div>
+        <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${escapeHtml(field.label)}</label>
+        <input type="text" id="${id}" name="spec_${field.key}" value="${escapedValue}"
+          placeholder="${field.placeholder ? escapeHtml(field.placeholder) : ''}"
+          class="w-full px-3 py-2 border rounded-md text-sm" />
+      </div>`;
+    }
+    if (field.type === 'number') {
+      return `<div>
+        <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${escapeHtml(field.label)}</label>
+        <input type="number" id="${id}" name="spec_${field.key}" value="${escapedValue}"
+          placeholder="${field.placeholder ? escapeHtml(field.placeholder) : ''}"
+          class="w-full px-3 py-2 border rounded-md text-sm" />
+      </div>`;
+    }
+    if (field.type === 'select') {
+      return `<div>
+        <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${escapeHtml(field.label)}</label>
+        <select id="${id}" name="spec_${field.key}" class="w-full px-3 py-2 border rounded-md text-sm bg-background">
+          <option value="">Select...</option>
+          ${(field.options || []).map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${escapeHtml(opt.charAt(0).toUpperCase() + opt.slice(1).replace('_', ' '))}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    if (field.type === 'checkbox') {
+      return `<div class="flex items-center gap-2">
+        <input type="checkbox" id="${id}" name="spec_${field.key}" value="true" ${value ? 'checked' : ''} class="w-4 h-4" />
+        <label for="${id}" class="text-sm">${escapeHtml(field.label)}</label>
+      </div>`;
+    }
+    if (field.type === 'tags') {
+      return `<div>
+        <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${escapeHtml(field.label)}</label>
+        <input type="text" id="${id}" name="spec_${field.key}" value="${escapedValue}"
+          placeholder="${field.placeholder ? escapeHtml(field.placeholder) : 'Comma separated values'}"
+          class="w-full px-3 py-2 border rounded-md text-sm" />
+        <p class="text-xs text-muted-foreground mt-1">Separate with commas</p>
+      </div>`;
+    }
+    return '';
+  }
+  function buildSkuItemHtml(sku: any, priceDisplay: string, businessName: string): string {
+    const typeClass = sku.productType === 'product'
+      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+    const typeLabel = sku.productType || 'product';
+    return `<div class="flex items-center justify-between p-2 md:p-3 border rounded text-sm hover:bg-muted/30">
+      <div class="min-w-0 flex-1">
+        <p class="font-medium truncate">${escapeHtml(sku.title)}</p>
+        <p class="text-xs text-muted-foreground">
+          ${escapeHtml(priceDisplay)} - ${escapeHtml(businessName)}
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 text-xs rounded-full ${typeClass}">${typeLabel}</span>
+        <button data-action="edit-sku" data-id="${sku.id}" class="text-primary hover:text-primary/80 text-xs px-2 py-1">Edit</button>
+        <button data-action="delete-sku" data-id="${sku.id}" class="text-red-500 hover:text-red-600 text-xs px-2 py-1">Del</button>
+      </div>
+    </div>`;
+  }
+  function buildMediaThumbnailHtml(mediaId: string, mediaUrl: string, isVideo: boolean): string {
+    const mediaHtml = isVideo
+      ? `<video src="${mediaUrl}" class="w-full h-full object-cover" muted /><div class="absolute inset-0 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>`
+      : `<img src="${mediaUrl}" class="w-full h-full object-cover" />`;
+    return `<div class="relative aspect-square rounded-lg overflow-hidden bg-muted">
+      ${mediaHtml}
+      <button type="button" data-action="remove-media" data-media-id="${mediaId}" class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs">×</button>
+    </div>`;
+  }
+  // =============================================================================
+  // EVENT DELEGATION - Single listener for all dynamic content
+  // =============================================================================
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const actionEl = target.closest('[data-action]') as HTMLElement | null;
+    if (!actionEl) return;
+    const action = actionEl.dataset.action;
+    if (!action) return;
+    switch (action) {
+      case 'remove-price-field': {
+        const row = actionEl.closest('.price-field-row');
+        row?.remove();
+        break;
+      }
+      case 'remove-media': {
+        const mediaId = actionEl.dataset.mediaId;
+        if (mediaId) {
+          skuMediaIds = skuMediaIds.filter(id => id !== mediaId);
+          actionEl.closest('.relative.aspect-square')?.remove();
+          document.getElementById('sku-media-ids')!.value = skuMediaIds.join(',');
+        }
+        break;
+      }
+      case 'edit-sku': {
+        const id = actionEl.dataset.id;
+        if (id) editSKU(id);
+        break;
+      }
+      case 'delete-sku': {
+        const id = actionEl.dataset.id;
+        if (id) deleteSKU(id);
+        break;
+      }
+    }
+  });
   async function handleSkuImageUpload(files: FileList) {
     const preview = document.getElementById('sku-image-preview')!;
     const uploadArea = document.getElementById('sku-image-upload')!;
@@ -285,25 +442,10 @@ const businessOptionsJson = JSON.stringify(businessOptions);
       try {
         const result = await actions.media.uploadMedia({ file: fileToUpload, category: 'sku' });
         const data = { success: result.success, data: result.data };
-
         if (data.success && data.data?.id) {
           skuMediaIds.push(data.data.id);
-          const mediaId = data.data.id;
-          const mediaUrl = data.data.url;
-          const mediaType = isVideo ? 'video' : 'image';
-
-          const div = document.createElement('div');
-          div.className = 'relative aspect-square rounded-lg overflow-hidden bg-muted';
-          div.innerHTML = mediaType === 'video'
-            ? `<video src="${mediaUrl}" class="w-full h-full object-cover" muted /><div class="absolute inset-0 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>`
-            : `<img src="${mediaUrl}" class="w-full h-full object-cover" />`;
-          div.innerHTML += `<button type="button" data-remove="${mediaId}" class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs">×</button>`;
-          div.querySelector('[data-remove]')?.addEventListener('click', () => {
-            skuMediaIds = skuMediaIds.filter(id => id !== mediaId);
-            div.remove();
-            document.getElementById('sku-media-ids')!.value = skuMediaIds.join(',');
-          });
-          preview.appendChild(div);
+          const html = buildMediaThumbnailHtml(data.data.id, data.data.url, isVideo);
+          preview.insertAdjacentHTML('beforeend', html);
           preview.classList.remove('hidden');
           document.getElementById('sku-media-ids')!.value = skuMediaIds.join(',');
         }
@@ -410,74 +552,25 @@ const businessOptionsJson = JSON.stringify(businessOptions);
   function populateBusinesses(selectedId = '') {
     const select = document.getElementById('sku-business');
     if (!select) return;
-    select.innerHTML = '<option value="">Select a business...</option>' +
-      businessOptions.map(b => `<option value="${b.value}" ${b.value === selectedId ? 'selected' : ''}>${b.label}</option>`).join('');
+    select.innerHTML = '<option value="">Select a business...</option>' + buildBusinessOptions(selectedId);
   }
-
   // Render price fields based on service type
-  function renderPriceFields(productType = 'product', existingFields = []) {
+  function renderPriceFields(productType = 'product', existingFields: {label: string; value: string; unit: string}[] = []) {
     const container = document.getElementById('price-fields');
     if (!container) return;
-
-    const units = getPriceUnitsForServiceType(productType);
-
-    // Add first field if empty
-    if (existingFields.length === 0) {
-      existingFields.push({ label: '', value: '', unit: '' });
-    }
-
-    container.innerHTML = existingFields.map((field, idx) => `
-      <div class="flex gap-2 items-center price-field-row" data-index="${idx}">
-        <input type="text" name="priceLabel_${idx}" value="${field.label}" placeholder="Label (e.g., Hourly Rate)" class="flex-1 px-2 py-1 border rounded text-xs" />
-        <input type="number" name="priceValue_${idx}" value="${field.value}" placeholder="${field.unit ? '0.00' : 'Ask for price'}" class="w-20 px-2 py-1 border rounded text-xs" step="0.01" />
-        <select name="priceUnit_${idx}" class="px-2 py-1 border rounded text-xs bg-background">
-          ${units.map(u => `<option value="${u.value}" ${u.value === field.unit ? 'selected' : ''}>${u.label}</option>`).join('')}
-        </select>
-        <button type="button" class="remove-price-field text-red-500 hover:text-red-600 p-1" ${idx === 0 ? 'style="visibility:hidden"' : ''}>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-    `).join('');
-
+    const html = buildPriceFieldsHtml(productType, existingFields);
+    container.innerHTML = html;
     // Store field count
-    document.getElementById('price-fields-container').dataset.fieldCount = existingFields.length;
+    document.getElementById('price-fields-container').dataset.fieldCount = String(existingFields.length || 1);
   }
-
-  // Add new price field
+  // Add new price field (uses event delegation - no direct handler needed)
   document.getElementById('add-price-field')?.addEventListener('click', () => {
     const container = document.getElementById('price-fields-container');
     const count = parseInt(container.dataset.fieldCount || '1') + 1;
     const productType = document.getElementById('sku-service-type')?.value || 'product';
-    const units = getPriceUnitsForServiceType(productType);
-
-    const row = document.createElement('div');
-    row.className = 'flex gap-2 items-center price-field-row';
-    row.dataset.index = String(count - 1);
-    row.innerHTML = `
-      <input type="text" name="priceLabel_${count - 1}" placeholder="Label (e.g., Weekend Rate)" class="flex-1 px-2 py-1 border rounded text-xs" />
-      <input type="number" name="priceValue_${count - 1}" placeholder="0.00" class="w-20 px-2 py-1 border rounded text-xs" step="0.01" />
-      <select name="priceUnit_${count - 1}" class="px-2 py-1 border rounded text-xs bg-background">
-        ${units.map(u => `<option value="${u.value}">${u.label}</option>`).join('')}
-      </select>
-      <button type="button" class="remove-price-field text-red-500 hover:text-red-600 p-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    `;
-    document.getElementById('price-fields').appendChild(row);
+    const html = buildNewPriceFieldHtml(productType, count - 1);
+    document.getElementById('price-fields')?.insertAdjacentHTML('beforeend', html);
     container.dataset.fieldCount = String(count);
-  });
-
-  // Remove price field (event delegation)
-  document.getElementById('price-fields')?.addEventListener('click', (e) => {
-    const btn = e.target.closest('.remove-price-field');
-    if (btn) {
-      const row = btn.closest('.price-field-row');
-      row.remove();
-    }
   });
 
   // Service type change
@@ -488,84 +581,18 @@ const businessOptionsJson = JSON.stringify(businessOptions);
   });
 
   // Render specification fields based on service type
-  function renderSpecificationFields(productType = 'product', existingSpecs = {}) {
+  function renderSpecificationFields(productType = 'product', existingSpecs: Record<string, any> = {}) {
     const container = document.getElementById('specifications-container');
     const fieldsContainer = document.getElementById('specifications-fields');
     if (!container || !fieldsContainer) return;
-
     const fields = productConfig.getSpecificationFields(productType) || [];
-
     if (fields.length === 0) {
       container.classList.add('hidden');
       return;
     }
-
     container.classList.remove('hidden');
-
-    fieldsContainer.innerHTML = fields.map(field => {
-      const value = existingSpecs[field.key] || '';
-      const id = `spec-${field.key}`;
-
-      if (field.type === 'text') {
-        return `
-          <div>
-            <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${field.label}</label>
-            <input type="text" id="${id}" name="spec_${field.key}" value="${value}"
-              placeholder="${field.placeholder || ''}"
-              class="w-full px-3 py-2 border rounded-md text-sm" />
-          </div>
-        `;
-      }
-
-      if (field.type === 'number') {
-        return `
-          <div>
-            <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${field.label}</label>
-            <input type="number" id="${id}" name="spec_${field.key}" value="${value}"
-              placeholder="${field.placeholder || ''}"
-              class="w-full px-3 py-2 border rounded-md text-sm" />
-          </div>
-        `;
-      }
-
-      if (field.type === 'select') {
-        return `
-          <div>
-            <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${field.label}</label>
-            <select id="${id}" name="spec_${field.key}" class="w-full px-3 py-2 border rounded-md text-sm bg-background">
-              <option value="">Select...</option>
-              ${field.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt.charAt(0).toUpperCase() + opt.slice(1).replace('_', ' ')}</option>`).join('')}
-            </select>
-          </div>
-        `;
-      }
-
-      if (field.type === 'checkbox') {
-        return `
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="${id}" name="spec_${field.key}" value="true" ${value ? 'checked' : ''} class="w-4 h-4" />
-            <label for="${id}" class="text-sm">${field.label}</label>
-          </div>
-        `;
-      }
-
-      if (field.type === 'tags') {
-        const tagsValue = Array.isArray(value) ? value.join(', ') : value;
-        return `
-          <div>
-            <label for="${id}" class="block text-xs font-medium text-muted-foreground mb-1">${field.label}</label>
-            <input type="text" id="${id}" name="spec_${field.key}" value="${tagsValue}"
-              placeholder="${field.placeholder || 'Comma separated values'}"
-              class="w-full px-3 py-2 border rounded-md text-sm" />
-            <p class="text-xs text-muted-foreground mt-1">Separate with commas</p>
-          </div>
-        `;
-      }
-
-      return '';
-    }).join('');
+    fieldsContainer.innerHTML = fields.map(field => buildSpecFieldHtml(field, existingSpecs[field.key] || '')).join('');
   }
-
   // Auth fetch helper
   async function authFetch(url, options = {}) {
     return fetch(url, {
@@ -590,8 +617,7 @@ const businessOptionsJson = JSON.stringify(businessOptions);
 
     // Populate business filter options
     if (businessFilter) {
-      businessFilter.innerHTML = '<option value="">All Businesses</option>' +
-        businessOptions.map(b => `<option value="${b.value}">${escapeHtml(b.label)}</option>`).join('');
+      businessFilter.innerHTML = '<option value="">All Businesses</option>' + buildBusinessFilterOptions();
     }
 
     try {
@@ -648,22 +674,7 @@ const businessOptionsJson = JSON.stringify(businessOptions);
       } catch (e) {
         // ignore
       }
-
-      return `
-        <div class="flex items-center justify-between p-2 md:p-3 border rounded text-sm hover:bg-muted/30">
-          <div class="min-w-0 flex-1">
-            <p class="font-medium truncate">${escapeHtml(sku.title)}</p>
-            <p class="text-xs text-muted-foreground">
-              ${priceDisplay} - ${bizMap.get(sku.businessId) || 'Unknown'}
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 text-xs rounded-full ${sku.productType === 'product' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'}">${sku.productType || 'product'}</span>
-            <button class="edit-sku text-primary hover:text-primary/80 text-xs px-2 py-1" data-id="${sku.id}">Edit</button>
-            <button class="delete-sku text-red-500 hover:text-red-600 text-xs px-2 py-1" data-id="${sku.id}">Del</button>
-          </div>
-        </div>
-      `;
+      return buildSkuItemHtml(sku, priceDisplay, bizMap.get(sku.businessId) || 'Unknown');
     }).join('');
 
     // Edit handlers

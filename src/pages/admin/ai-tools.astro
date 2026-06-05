@@ -7,7 +7,7 @@ import Textarea from '@components/ui/Textarea.astro';
 import Input from '@components/ui/Input.astro';
 import Select from '@components/ui/Select.astro';
 import Button from '@components/ui/Button.astro';
----
+import Badge from '@/components/ui/Badge.astro';
 
 <AdminLayout title="AI Tools">
   <div class="container py-6 px-4">
@@ -20,34 +20,18 @@ import Button from '@components/ui/Button.astro';
     <!-- Tab Navigation -->
     <div class="mb-6 border-b border-border">
       <nav class="-mb-px flex space-x-6">
-        <button
-          id="tab-listing"
-          class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-primary text-primary"
-          data-tab="listing"
-        >
+        <Button id="tab-listing" variant="ghost" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-primary text-primary" data-tab="listing">
           Listing Generator
-        </button>
-        <button
-          id="tab-sku"
-          class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground"
-          data-tab="sku"
-        >
+        </Button>
+        <Button id="tab-sku" variant="ghost" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground" data-tab="sku">
           Product/SKU Generator
-        </button>
-        <button
-          id="tab-blog"
-          class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground"
-          data-tab="blog"
-        >
+        </Button>
+        <Button id="tab-blog" variant="ghost" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground" data-tab="blog">
           Blog Article Generator
-        </button>
-        <button
-          id="tab-landing"
-          class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground"
-          data-tab="landing"
-        >
+        </Button>
+        <Button id="tab-landing" variant="ghost" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-muted-foreground hover:text-foreground" data-tab="landing">
           Landing Page Generator
-        </button>
+        </Button>
       </nav>
     </div>
 
@@ -109,8 +93,12 @@ import Button from '@components/ui/Button.astro';
             <div>
               <label class="block text-sm font-medium mb-1">Tags (comma-separated)</label>
               <Input type="text" id="listing-tags" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="coffee, wifi, local" />
-              Generate Listing
-            </Button>
+            </div>
+            <div>
+              <Button type="submit" variant="default" class="w-full">
+                Generate Listing
+              </Button>
+            </div>
           </form>
         </div>
 
@@ -146,12 +134,13 @@ import Button from '@components/ui/Button.astro';
               <p id="preview-listing-tags" class="text-sm"></p>
             </div>
             <div class="flex gap-2 pt-4">
-              <button id="listing-preview-btn" class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md font-medium hover:opacity-90">
+              <Button id="listing-preview-btn" type="button" variant="default" class="flex-1">
                 Preview
-              </button>
-              <button id="listing-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
+              </Button>
+              <Button id="listing-save-btn" type="button" variant="default" class="flex-1">
                 Save Listing
-              </button>
+              </Button>
+              <Button id="listing-copy-btn" type="button" variant="outline" class="flex-1">
                 Copy
               </Button>
             </div>
@@ -205,12 +194,13 @@ import Button from '@components/ui/Button.astro';
                 <Input type="text" id="sku-price-unit" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="/hour, /day" />
               </div>
             </div>
-              Generate SKU
-            </Button>
+            <div>
+              <Button type="submit" variant="default" class="w-full">
+                Generate SKU
+              </Button>
+            </div>
           </form>
         </div>
-
-        <!-- Preview Panel -->
         <div class="bg-card border rounded-lg p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold">Generated Preview</h2>
@@ -238,9 +228,10 @@ import Button from '@components/ui/Button.astro';
               <p id="preview-sku-desc" class="text-sm"></p>
             </div>
             <div class="flex gap-2 pt-4">
-              <button id="sku-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
+              <Button id="sku-save-btn" type="button" variant="default" class="flex-1">
                 Save SKU
-              </button>
+              </Button>
+              <Button id="sku-copy-btn" type="button" variant="outline" class="flex-1">
                 Copy JSON
               </Button>
             </div>
@@ -287,11 +278,13 @@ import Button from '@components/ui/Button.astro';
               <label class="block text-sm font-medium mb-1">Additional Requirements</label>
               <Textarea id="blog-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key points to cover, specific businesses to mention..." />
             </div>
-              Generate Article
-            </Button>
+            <div>
+              <Button type="submit" variant="default" class="w-full">
+                Generate Article
+              </Button>
+            </div>
           </form>
         </div>
-
         <!-- Preview Panel -->
         <div class="bg-card border rounded-lg p-6">
           <div class="flex items-center justify-between mb-4">
@@ -316,15 +309,16 @@ import Button from '@components/ui/Button.astro';
               <div id="preview-blog-content" class="text-sm max-h-64 overflow-y-auto"></div>
             </div>
             <div class="flex gap-2 pt-4">
-              <button id="blog-preview-btn" class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md font-medium hover:opacity-90">
+              <Button id="blog-preview-btn" type="button" variant="default" class="flex-1">
                 Preview
-              </button>
-              <button id="blog-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
+              </Button>
+              <Button id="blog-save-btn" type="button" variant="default" class="flex-1">
                 Save Draft
-              </button>
-              <button id="blog-copy-btn" class="py-2 px-4 border rounded-md font-medium hover:bg-muted">
+              </Button>
+              <Button id="blog-copy-btn" type="button" variant="outline" class="flex-1">
                 Copy
               </Button>
+            </div>
           </div>
           <div id="blog-empty" class="py-12 text-center text-muted-foreground">
             <p>Fill the form and click Generate</p>
@@ -360,11 +354,13 @@ import Button from '@components/ui/Button.astro';
               <label class="block text-sm font-medium mb-1">Requirements for AI</label>
               <Textarea id="landing-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key message, target audience, specific products..." />
             </div>
-              Generate Landing Page
-            </Button>
+            <div>
+              <Button type="submit" variant="default" class="w-full">
+                Generate Landing Page
+              </Button>
+            </div>
           </form>
         </div>
-
         <!-- Preview Panel -->
         <div class="bg-card border rounded-lg p-6">
           <div class="flex items-center justify-between mb-4">
@@ -393,12 +389,13 @@ import Button from '@components/ui/Button.astro';
               <ul id="preview-landing-features" class="text-sm list-disc pl-4"></ul>
             </div>
             <div class="flex gap-2 pt-4">
-              <button id="landing-preview-btn" class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md font-medium hover:opacity-90">
+              <Button id="landing-preview-btn" type="button" variant="default" class="flex-1">
                 Preview
-              </button>
-              <button id="landing-save-btn" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-md font-medium hover:opacity-90">
+              </Button>
+              <Button id="landing-save-btn" type="button" variant="default" class="flex-1">
                 Save Page
-              </button>
+              </Button>
+              <Button id="landing-copy-btn" type="button" variant="outline" class="flex-1">
                 Copy
               </Button>
             </div>
