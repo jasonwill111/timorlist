@@ -1,3 +1,4 @@
+import Textarea from '../../components/ui/Textarea.astro'
 ---
 // This page needs SSR for personalized business data
 export const prerender = false;
@@ -170,13 +171,12 @@ import CardContent from '../../components/ui/CardContent.astro'
           
           <div>
             <label for="address" class="block text-sm font-medium mb-1">Address</label>
-            <textarea 
-              id="address" 
+            <Textarea
+              id="address"
               name="address"
-              rows="2"
-              class="w-full px-3 py-2 border rounded-lg bg-background"
+              rows={2}
               placeholder="Street, City, Timor-Leste"
-            ></textarea>
+            />
           </div>
         </CardContent>
       </Card>
@@ -188,13 +188,12 @@ import CardContent from '../../components/ui/CardContent.astro'
           <CardDescription>Tell customers more about what you offer</CardDescription>
         </CardHeader>
         <CardContent>
-          <textarea 
-            id="aboutUs" 
+          <Textarea
+            id="aboutUs"
             name="aboutUs"
-            rows="5"
-            class="w-full px-3 py-2 border rounded-lg bg-background"
+            rows={5}
             placeholder="Describe your business, products, and services..."
-          ></textarea>
+          />
         </CardContent>
       </Card>
 
