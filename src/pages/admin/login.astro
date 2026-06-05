@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import Button from '@components/ui/Button.astro';
+import Input from '@components/ui/Input.astro';
 import '../../styles/globals.css';
 ---
 
@@ -32,7 +33,7 @@ import '../../styles/globals.css';
         <form id="login-form" class="space-y-4">
           <div>
             <label for="email" class="block text-sm font-medium mb-1">Email</label>
-            <input
+            <Input
               type="email"
               id="email"
               name="email"
@@ -45,7 +46,7 @@ import '../../styles/globals.css';
           <div>
             <label for="password" class="block text-sm font-medium mb-1">Password</label>
             <div class="relative">
-              <input
+              <Input
                 type="password"
                 id="password"
                 name="password"

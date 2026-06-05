@@ -1,8 +1,8 @@
----
 import Layout from '../layouts/Layout.astro';
 import Button from '@components/ui/Button.astro';
 import Textarea from '@components/ui/Textarea.astro';
 import Select from '@components/ui/Select.astro';
+import Input from '@components/ui/Input.astro';
 
 export const prerender = true;
 ---
@@ -27,7 +27,7 @@ export const prerender = true;
         <form id="contact-form" class="space-y-4">
           <div>
             <label for="name" class="block text-sm font-medium mb-1">Name *</label>
-            <input
+            <Input
               type="text"
               id="name"
               name="name"
@@ -38,7 +38,7 @@ export const prerender = true;
           </div>
           <div>
             <label for="email" class="block text-sm font-medium mb-1">Email *</label>
-            <input
+            <Input
               type="email"
               id="email"
               name="email"
