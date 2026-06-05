@@ -3,6 +3,7 @@
 // Categories rarely change - 1h cache
 import { getDb } from '@/lib/db';
 import { businessCategories } from '@/db/schema';
+import Select from '@/components/ui/Select.astro';
 
 const db = await getDb();
 
@@ -24,26 +25,20 @@ const categoriesData = db
   : [];
 
 const categoryParam = Astro.url.searchParams.get('category') || '';
----
 
+const selectOptions = [
+  { value: '', label: 'All Categories' },
+  ...categoriesData.map((cat: { id: number; name: string; slug: string }) => ({
+    value: cat.slug,
+    label: cat.name,
+  })),
+];
+---
 <div class="flex items-center gap-2">
   <label for="category-filter" class="text-sm text-muted-foreground whitespace-nowrap">Category:</label>
-  <select
+  <Select
     id="category-filter"
     name="category"
-    class="h-10 px-3 rounded-md border border-input bg-background text-sm"
-  >
-    <option value="">All Categories</option>
-    {categoriesData.map((cat: { id: number; name: string; slug: string }) => (
-      <option value={cat.slug} selected={cat.slug === categoryParam}>
-        {cat.name}
-      </option>
-    ))}
-  </select>
+    options={selectOptions}
+  />
 </div>
-
-<style>
-  select {
-    min-width: 140px;
-  }
-</style>
