@@ -433,8 +433,8 @@ const userId = Astro.locals.user?.id || 'system';
           </p>
         </div>
         <div class="flex gap-1 shrink-0">
-          <button onclick="window.editPost('${post.id}')" class="px-2 py-1 text-xs border rounded hover:bg-muted">Edit</button>
-          <button onclick="window.deletePost('${post.id}')" class="px-2 py-1 text-xs border rounded hover:bg-red-50 hover:text-red-500">Delete</button>
+          <Button onclick="window.editPost('${post.id}')" class="px-2 py-1 text-xs border rounded hover:bg-muted">Edit</Button>
+          <Button onclick="window.deletePost('${post.id}')" class="px-2 py-1 text-xs border rounded hover:bg-red-50 hover:text-red-500">Delete</Button>
         </div>
       </div>
     `).join('');
