@@ -1,3 +1,4 @@
+import Button from '@components/ui/Button.astro';
 ---
 export const prerender = true;
 ---
@@ -67,8 +68,7 @@ export const prerender = true;
       <h1>Something went wrong</h1>
       <p>We're sorry, but something unexpected happened on our server. Our team has been notified.</p>
       <div>
-        <a href="/" class="btn btn-primary">Go Home</a>
-        <button onclick="history.back()" class="btn btn-secondary">Go Back</button>
+        <Button onclick="history.back()" variant="secondary">Go Back</Button>
       </div>
     </div>
   </body>
