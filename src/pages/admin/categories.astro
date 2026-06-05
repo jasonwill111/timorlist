@@ -6,6 +6,7 @@ import Tabs from '@components/ui/Tabs.astro';
 import TabsList from '@components/ui/TabsList.astro';
 import TabsTrigger from '@components/ui/TabsTrigger.astro';
 import Select from '@components/ui/Select.astro';
+import Textarea from '@components/ui/Textarea.astro';
 ---
 
 <AdminLayout title="Categories">
@@ -271,16 +272,15 @@ import Select from '@components/ui/Select.astro';
         </div>
         <div>
           <label for="cat-desc" class="block text-sm font-medium mb-1">Description</label>
-          <textarea id="cat-desc" rows="2" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Brief description..."></textarea>
+          <Textarea id="cat-desc" rows="2" class="w-full" placeholder="Brief description..." />
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" id="cat-active" checked class="rounded" />
           <label for="cat-active" class="text-sm">Active</label>
         </div>
         <!-- formFields - only for listing and product categories -->
-        <div id="formfields-section" class="hidden">
           <label for="cat-formfields" class="block text-sm font-medium mb-1">Form Fields (JSON)</label>
-          <textarea id="cat-formfields" rows="4" class="w-full px-3 py-2 border rounded-md text-sm font-mono" placeholder='[{"name":"price","type":"number","label":"Price","required":true}]'></textarea>
+          <Textarea id="cat-formfields" rows="4" class="w-full font-mono" placeholder='[{"name":"price","type":"number","label":"Price","required":true}]' />
           <p class="text-xs text-muted-foreground mt-1">Define custom form fields for this category. Format: JSON array of field definitions.</p>
         </div>
         <div class="flex gap-2 justify-end pt-2">

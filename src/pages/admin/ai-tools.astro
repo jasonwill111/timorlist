@@ -3,6 +3,7 @@
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import { actions } from 'astro:actions';
+import Textarea from '@components/ui/Textarea.astro';
 import Select from '@components/ui/Select.astro';
 ---
 
@@ -101,7 +102,7 @@ import Select from '@components/ui/Select.astro';
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">About Us</label>
-              <textarea id="listing-about" rows="3" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Tell customers about your business..."></textarea>
+              <Textarea id="listing-about" rows="3" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Tell customers about your business..." />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Tags (comma-separated)</label>
@@ -189,7 +190,7 @@ import Select from '@components/ui/Select.astro';
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Description</label>
-              <textarea id="sku-description" rows="3" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Product description..."></textarea>
+              <Textarea id="sku-description" rows="3" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Product description..." />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Price Label</label>
@@ -287,7 +288,7 @@ import Select from '@components/ui/Select.astro';
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Additional Requirements</label>
-              <textarea id="blog-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key points to cover, specific businesses to mention..."></textarea>
+              <Textarea id="blog-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key points to cover, specific businesses to mention..." />
             </div>
             <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate Article
@@ -358,11 +359,11 @@ import Select from '@components/ui/Select.astro';
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Description</label>
-              <textarea id="landing-description" rows="2" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Brief description..."></textarea>
+              <Textarea id="landing-description" rows="2" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Brief description..." />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Requirements for AI</label>
-              <textarea id="landing-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key message, target audience, specific products..."></textarea>
+              <Textarea id="landing-prompt" rows="4" class="w-full px-3 py-2 border rounded-md text-sm" placeholder="Key message, target audience, specific products..." />
             </div>
             <button type="submit" class="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90">
               Generate Landing Page

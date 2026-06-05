@@ -1,3 +1,4 @@
+import Textarea from '@components/ui/Textarea.astro';
 import Select from '@components/ui/Select.astro';
 ---
 export const prerender = false;
@@ -85,9 +86,8 @@ const userId = Astro.locals.user?.id || 'system';
 
           <div class="md:col-span-2">
             <label class="block text-sm font-medium mb-1">Excerpt</label>
-            <textarea id="post-excerpt" rows="2"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              placeholder="Short summary (optional)"></textarea>
+            <Textarea id="post-excerpt" rows={2}
+              placeholder="Short summary (optional)" />
           </div>
 
           <div class="md:col-span-2">
@@ -148,9 +148,8 @@ const userId = Astro.locals.user?.id || 'system';
 
           <div class="md:col-span-2">
             <label class="block text-sm font-medium mb-1">Meta Description</label>
-            <textarea id="post-meta-description" rows="2" maxlength="160"
-              class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              placeholder="SEO description (max 160 chars)"></textarea>
+            <Textarea id="post-meta-description" rows={2} maxlength="160"
+              placeholder="SEO description (max 160 chars)" />
             <p class="text-xs text-muted-foreground mt-1">Recommended: 120-160 characters</p>
           </div>
 
