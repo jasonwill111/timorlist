@@ -2,8 +2,9 @@
 // Server Island: Listings list with client-side filtering
 // Uses is:defer for streaming, renders immediately with fallback
 import { getDb } from '@/lib/db';
-import { listings, listingCategories } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
+import Select from '@/components/ui/Select.astro';
+import { listings, listingCategories } from '@/db/schema';
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('q') || '';
 const type = searchParams.get('type') || '';
@@ -92,9 +93,7 @@ const entities = allListings.slice(offset, offset + LIMIT);
       <input name="q" type="search" placeholder="Search listings..." value={search}
         class="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" />
     </div>
-    <div class="flex gap-2">
-      <select name="type" onchange="this.form.submit()"
-        class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
+      <Select name="type" onchange="this.form.submit()" class="h-11 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors">
         <option value="">All Types</option>
         <option value="product" selected={type === 'product'}>Product</option>
         <option value="vehicle" selected={type === 'vehicle'}>Vehicle</option>
@@ -102,8 +101,7 @@ const entities = allListings.slice(offset, offset + LIMIT);
         <option value="job" selected={type === 'job'}>Job</option>
         <option value="service" selected={type === 'service'}>Service</option>
         <option value="wanted" selected={type === 'wanted'}>Wanted</option>
-      </select>
-    </div>
+      </Select>
   </div>
 </form>
 
