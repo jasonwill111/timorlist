@@ -1,3 +1,4 @@
+import Button from './Button.astro';
 ---
 /**
  * FileUpload - Reusable upload component with automatic compression
@@ -53,12 +54,12 @@ const {
     <!-- Preview grid populated by JS -->
   </div>
 
-  <button type="button" id={`${id}-btn`} class="upload-btn">
+  <Button type="button" id={`${id}-btn`} size="sm" class="upload-btn">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
     </svg>
     <span>{label}</span>
-  </button>
+  </Button>
 </div>
 
 <script define:vars={{ id, type, typeId, accept, maxFiles, maxSizeMB, maxWidthOrHeight }}>

@@ -1,3 +1,4 @@
+import Button from '@/components/ui/Button.astro';
 ---
 interface Props {
   images: { id: string; url: string; alt?: string }[];
@@ -38,34 +39,40 @@ const galleryId = `gallery-${Math.random().toString(36).slice(2, 8)}`;
       aria-modal="true"
       aria-label={`${title} photo gallery`}
       tabindex="-1"
-    >
-      <button
+      >
+      <Button
         id={`${galleryId}-close`}
-        class="absolute top-4 right-4 w-11 h-11 text-white hover:bg-white/20 rounded-lg transition-colors flex items-center justify-center"
+        variant="ghost"
+        size="icon"
+        class="absolute top-4 right-4 text-white hover:bg-white/20"
         aria-label="Close gallery"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
-      </button>
-      <button
+      </Button>
+      <Button
         id={`${galleryId}-prev`}
-        class="absolute left-4 w-11 h-11 text-white hover:bg-white/20 rounded-lg transition-colors flex items-center justify-center"
+        variant="ghost"
+        size="icon"
+        class="absolute left-4 text-white hover:bg-white/20"
         aria-label="Previous photo"
       >
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
-      </button>
-      <button
+      </Button>
+      <Button
         id={`${galleryId}-next`}
-        class="absolute right-4 w-11 h-11 text-white hover:bg-white/20 rounded-lg transition-colors flex items-center justify-center"
+        variant="ghost"
+        size="icon"
+        class="absolute right-4 text-white hover:bg-white/20"
         aria-label="Next photo"
       >
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
-      </button>
+      </Button>
       <img id={`${galleryId}-image`} src="" aria-hidden="true" alt="" class="max-w-full max-h-[85vh] object-contain" />
       <div id={`${galleryId}-counter`} class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm" aria-live="polite"></div>
     </div>

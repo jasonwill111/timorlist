@@ -1,3 +1,4 @@
+import Button from '@/components/ui/Button.astro';
 import Select from '@/components/ui/Select.astro';
 ---
 // Server Island: Fetches dynamic content on the homepage
@@ -312,10 +313,10 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
               ))}
             </div>
             <div class="mt-6 text-center">
-              <a href="/businesses" class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+              <Button variant="default">
                 View All Businesses
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </a>
+              </Button>
             </div>
           </>
         ) : (
@@ -345,10 +346,10 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
               ))}
             </div>
             <div class="mt-6 text-center">
-              <a href="/listings" class="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors">
+              <Button variant="default">
                 View All Listings
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </a>
+              </Button>
             </div>
           </>
         ) : (
@@ -378,10 +379,10 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
               ))}
             </div>
             <div class="mt-6 text-center">
-              <a href="/public-sectors" class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors">
+              <Button variant="default">
                 View All Public Sectors
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </a>
+              </Button>
             </div>
           </>
         ) : (
@@ -413,10 +414,10 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
               ))}
             </div>
             <div class="mt-6 text-center">
-              <a href="/non-profits" class="inline-flex items-center gap-2 px-6 py-2.5 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition-colors">
+              <Button variant="default">
                 View All Non-Profits
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </a>
+              </Button>
             </div>
           </>
         ) : (
@@ -431,7 +432,9 @@ const hasContent = featuredBusinesses.length > 0 || featuredListings.length > 0 
 ) : (
   <div class="text-center py-16">
     <p class="text-muted-foreground mb-4">No content available yet. Be the first to add something!</p>
-    <a href="/businesses/create" class="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">Get Started</a>
+    <a href="/businesses/create">
+      <Button>Get Started</Button>
+    </a>
   </div>
 )}
 

@@ -1,3 +1,4 @@
+import Button from '@/components/ui/Button.astro';
 import Input from '@/components/ui/Input.astro';
 ---
 // Server-rendered Products list with proper pagination
@@ -164,9 +165,9 @@ const buildUrl = (pageNum: number) => {
     <option value="recent" selected={sort === 'recent'}>Recent</option>
     <option value="name" selected={sort === 'name'}>Name A-Z</option>
   </Select>
-  <button type="submit" class="h-10 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium">
+  <Button type="submit">
     Filter
-  </button>
+  </Button>
 </form>
 
 <!-- Products Grid -->
