@@ -1,0 +1,115 @@
+---
+/**
+ * Starwind-style Pagination component
+ * Standardized pagination for list pages.
+ *
+ * Usage:
+ * <Pagination
+ *   currentPage={page}
+ *   totalPages={totalPages}
+ *   baseUrl="/admin/listings"
+ * />
+ */
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+  class?: string;
+}
+
+const { currentPage, totalPages, baseUrl, class: className = '' } = Astro.props;
+
+if (totalPages <= 1) {
+  // No pagination needed
+}
+
+function getPageUrl(page: number): string {
+  if (page === 1) return baseUrl;
+  const separator = baseUrl.includes('?') ? '&' : '?';
+  return `${baseUrl}${separator}page=${page}`;
+}
+
+// Generate visible page numbers (max 7 with ellipsis)
+function getVisiblePages(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages: (number | 'ellipsis')[] = [];
+  pages.push(1);
+  if (current > 3) pages.push('ellipsis');
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+    pages.push(i);
+  }
+  if (current < total - 2) pages.push('ellipsis');
+  pages.push(total);
+  return pages;
+}
+
+const visiblePages = getVisiblePages(currentPage, totalPages);
+const hasPrev = currentPage > 1;
+const hasNext = currentPage < totalPages;
+---
+
+{totalPages > 1 && (
+  <nav
+    class={`flex items-center justify-center gap-1 ${className}`}
+    aria-label="Pagination"
+    data-pagination
+    data-current={currentPage}
+    data-total={totalPages}
+  >
+    {hasPrev ? (
+      <a
+        href={getPageUrl(currentPage - 1)}
+        data-action="pagination-prev"
+        class="px-3 py-2 text-sm rounded-md border border-input hover:bg-accent transition-colors"
+        aria-label="Previous page"
+      >
+        ← Previous
+      </a>
+    ) : (
+      <span class="px-3 py-2 text-sm rounded-md border border-input opacity-50 cursor-not-allowed">
+        ← Previous
+      </span>
+    )}
+
+    {visiblePages.map((page) =>
+      page === 'ellipsis' ? (
+        <span class="px-3 py-2 text-sm text-muted-foreground">…</span>
+      ) : page === currentPage ? (
+        <span
+          class="px-3 py-2 text-sm rounded-md bg-primary text-primary-foreground font-semibold"
+          aria-current="page"
+        >
+          {page}
+        </span>
+      ) : (
+        <a
+          href={getPageUrl(page)}
+          data-action="pagination-page"
+          data-page={page}
+          class="px-3 py-2 text-sm rounded-md border border-input hover:bg-accent transition-colors"
+          aria-label={`Page ${page}`}
+        >
+          {page}
+        </a>
+      )
+    )}
+
+    {hasNext ? (
+      <a
+        href={getPageUrl(currentPage + 1)}
+        data-action="pagination-next"
+        class="px-3 py-2 text-sm rounded-md border border-input hover:bg-accent transition-colors"
+        aria-label="Next page"
+      >
+        Next →
+      </a>
+    ) : (
+      <span class="px-3 py-2 text-sm rounded-md border border-input opacity-50 cursor-not-allowed">
+        Next →
+      </span>
+    )}
+  </nav>
+)}
