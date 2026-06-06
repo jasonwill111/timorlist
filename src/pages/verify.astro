@@ -10,6 +10,8 @@ import CardTitle from '../components/ui/CardTitle.astro';
 import CardDescription from '../components/ui/CardDescription.astro';
 import CardContent from '../components/ui/CardContent.astro';
 import CardFooter from '../components/ui/CardFooter.astro';
+import ToastContainer from '../components/ui/toast/ToastContainer.astro';
+
 ---
 
 <Layout title="Verify Email - TimorUp">
@@ -34,8 +36,9 @@ import CardFooter from '../components/ui/CardFooter.astro';
   </div>
 </Layout>
 
+<ToastContainer />
 <script>
-  import { toast } from '@/components/starwind/toast';
+  import { toast } from '@/lib/toast';
   import { actions } from 'astro:actions';
 
   const statusContainer = document.getElementById('verification-status');
