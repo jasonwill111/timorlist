@@ -1,27 +1,36 @@
 {
   "id": "0125",
-  "title": "PasswordInput SSR Fix",
+  "title": "Astro Frontmatter Syntax Errors - SSR Failures",
   "status": "completed",
   "created": "2026-06-06",
   "completed": "2026-06-06",
   "branch": "feat/comp-A-delete-dead",
-  "commit": "8ca864ab",
+  "commit": "801aca6e",
   "type": "bugfix",
   "domain": "frontend",
-  "summary": "Fixed login page blank - PasswordInput.astro had dual frontmatter blocks causing SSR compilation to embed source code into template string instead of rendering HTML",
+  "summary": "Fixed 18 .astro files with imports outside frontmatter fence causing: empty homepage main, contact page raw source, className is not defined errors",
   "testResults": {
     "passed": 7,
     "failed": 0,
     "total": 7,
     "duration": "26.8s"
   },
+  "affectedComponents": [
+    "CarouselBanner.astro",
+    "LocationMap.astro",
+    "Modal.astro",
+    "ShareDialog.astro",
+    "HomepageContent.astro",
+    "ProductsIsland.astro"
+  ],
   "affectedPages": [
-    "login",
-    "register",
-    "admin/login"
+    "homepage",
+    "contact",
+    "admin/* (10 pages)"
   ],
   "fix": {
-    "rootCause": "PasswordInput.astro had two separate frontmatter blocks (--- ... --- --- ... ---) which confused Astro's compiler",
-    "solution": "Merged into single frontmatter block with correct import order"
+    "rootCause": "18 .astro files had imports placed before opening --- fence, creating invalid dual-frontmatter pattern",
+    "solution": "Moved all imports inside single frontmatter block for each affected file",
+    "filesFixed": 18
   }
 }
