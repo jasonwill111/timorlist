@@ -38,6 +38,44 @@ import HomepageContent from '@/components/islands/HomepageContent.astro';
 ```
 
 **Rule**: For every `.astro` component imported by another `.astro` component, import it in the **using page's** frontmatter. This ensures the component is available in both SSR and client hydration contexts.
+---
+
+**Astro Frontmatter Syntax Rules (2026-06-06)**
+
+All `.astro` files MUST have exactly ONE frontmatter block delimited by `---`. ALL imports, exports, interfaces, and executable code MUST be inside this block.
+
+```astro
+---
+// ✅ Correct - everything inside single frontmatter
+import Button from '@/components/ui/Button.astro';
+import Input from '@/components/ui/Input.astro';
+
+interface Props { name: string; }
+const { name } = Astro.props;
+export const prerender = true;
+---
+
+<template>...</template>
+```
+
+```astro
+<!-- ❌ Wrong - imports outside frontmatter fence -->
+import Button from '@/components/ui/Button.astro';
+---
+---
+// This creates invalid dual-frontmatter pattern!
+import Input from '@/components/ui/Input.astro';
+---
+
+<template>...</template>
+```
+
+**Rule**: Only ONE `---`...`---` pair per `.astro` file. All code must be inside. Multiple `---` blocks or code outside causes:
+- Runtime `className is not defined` errors during SSR
+- Empty `<main>` on pages (truncated HTML output)
+- Raw source code visible instead of rendered HTML (on prerendered pages)
+
+**History**: This bug affected 18 files and caused homepage to show empty main tag and contact page to show raw source. Build time improved from 5+ min (failing) to 1m17s (success) after fixes.
 
 **Windows Build Compatibility (2026-06-04)**
 
@@ -318,6 +356,41 @@ src/lib/geo.test.ts               — P1-O (test fix)
 - Cache stampede is ACCEPTABLE (low traffic, cache miss is tolerable)
 
 ---
+### 2026-06-06 — Increment 0125: Astro Frontmatter Syntax Errors
+
+**Problem**: 18 `.astro` files had imports placed OUTSIDE the frontmatter `---` fence, causing:
+- Homepage empty `<main>` tag (CarouselBanner was primary culprit)
+- Contact page showing raw source code (prerendered pages)
+- Runtime `className is not defined` errors during SSR
+- Build time 5+ minutes (failing) vs 1m17s (success)
+
+**Root cause**: Dual-frontmatter pattern confused Astro's SSR compiler, embedding source code as string literals instead of executing as code.
+
+**Files fixed** (18 total):
+| Component | Page/Component |
+|------------|-----------------|
+| CarouselBanner.astro | Homepage (primary culprit) |
+| LocationMap.astro | Admin pages |
+| Modal.astro | UI component |
+| ShareDialog.astro | UI component |
+| HomepageContent.astro | Homepage data |
+| ProductsIsland.astro | Products page |
+| admin/blogs.astro | Admin panel |
+| admin/businesses.astro | Admin panel |
+| admin/listings/index.astro | Admin panel |
+| admin/listings/new/index.astro | Admin panel |
+| admin/orders.astro | Admin panel |
+| admin/products.astro | Admin panel |
+| admin/reviews.astro | Admin panel |
+| admin/settings.astro | Admin panel |
+| admin/users.astro | Admin panel |
+| business/[slug]/product/new/index.astro | Product creation |
+| contact.astro | Contact page |
+| edit-business-page/[id].astro | Business editing |
+
+**Fix**: Moved all imports and code inside single `---`...`---` frontmatter block for each file.
+
+**Rule**: Only ONE `---`...`---` pair per `.astro` file. All code must be inside. Multiple `---` blocks cause malformed template strings in built output.
 
 ## Event Delegation Pattern (Increment 0113, 2026-06-05)
 

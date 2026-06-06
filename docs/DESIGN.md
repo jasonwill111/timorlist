@@ -76,4 +76,16 @@
 ### 2026-06-02 — Increment 0101: Security Audit & Best Practice Fixes
 
 **No frontend rendering changes** — all fixes are backend/infrastructure.\n+Security fixes do not affect design tokens, component APIs, or visual appearance.\n+See `docs/ARCHITECTURE.md` → Bug Fix Log for full technical details.\n+
+### 2026-06-06 — Increment 0125: Astro Frontmatter Syntax Errors
+
+**Problem**: 18 `.astro` files had imports outside frontmatter `---` fence, causing:
+- Homepage empty `<main>` tag (CarouselBanner was primary culprit)
+- Contact page showing raw source code
+- Runtime `className is not defined` errors in SSR
+
+**Solution**: Moved all imports and code inside single frontmatter block for each affected file.
+
+**Files fixed**: CarouselBanner.astro, LocationMap.astro, Modal.astro, ShareDialog.astro, HomepageContent.astro, ProductsIsland.astro, 10 admin pages, contact.astro, product/new/index.astro, edit-business-page/[id].astro
+
+**Result**: Build time 5+ min → 1m17s (success). Homepage renders "Explore Timor-Leste" correctly.
 ### 2026-06-02 — Increment 0100: E2E Testing and Bug Fixes
