@@ -1,0 +1,27 @@
+{
+  "id": "0125",
+  "title": "PasswordInput SSR Fix",
+  "status": "completed",
+  "created": "2026-06-06",
+  "completed": "2026-06-06",
+  "branch": "feat/comp-A-delete-dead",
+  "commit": "8ca864ab",
+  "type": "bugfix",
+  "domain": "frontend",
+  "summary": "Fixed login page blank - PasswordInput.astro had dual frontmatter blocks causing SSR compilation to embed source code into template string instead of rendering HTML",
+  "testResults": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "duration": "26.8s"
+  },
+  "affectedPages": [
+    "login",
+    "register",
+    "admin/login"
+  ],
+  "fix": {
+    "rootCause": "PasswordInput.astro had two separate frontmatter blocks (--- ... --- --- ... ---) which confused Astro's compiler",
+    "solution": "Merged into single frontmatter block with correct import order"
+  }
+}
