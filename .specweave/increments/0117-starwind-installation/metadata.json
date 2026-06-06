@@ -1,0 +1,29 @@
+{
+  "increment": "0117-starwind-installation",
+  "title": "Starwind UI 差异化组件",
+  "type": "feature",
+  "priority": "P1",
+  "status": "completed",
+  "created": "2026-06-05",
+  "completed": "2026-06-05",
+  "depends_on": "0115-design-tokens",
+  "epic": "0103",
+  "domains": ["frontend", "ui-library"],
+  "tasks_total": 3,
+  "tasks_done": 3,
+  "tasks_blocked": 0,
+  "risk": "low",
+  "test_mode": "build + manual",
+  "estimated_hours": 2,
+  "commits": [
+    "xxx - 0117-01 Starwind Toast",
+    "xxx - 0117-02 Pagination + Dropzone + Progress"
+  ],
+  "components_created": [
+    "src/components/starwind/toast.ts",
+    "src/components/starwind/Pagination.astro",
+    "src/components/starwind/Dropzone.astro",
+    "src/components/starwind/Progress.astro",
+    "src/components/custom/notify.ts"
+  ]
+}
