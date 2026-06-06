@@ -17,12 +17,66 @@ importers:
       '@better-auth/drizzle-adapter':
         specifier: ^1.6.13
         version: 1.6.13(@better-auth/core@1.6.13(@better-auth/utils@0.4.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260531.1)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(@better-auth/utils@0.4.1)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260531.1)(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(better-sqlite3@12.10.0)(kysely@0.28.17))
+      '@data-slot/accordion':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/alert-dialog':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/collapsible':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/combobox':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/command':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/dialog':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/dropdown-menu':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/hover-card':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/navigation-menu':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/popover':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/radio-group':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/select':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/slider':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/switch':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/tabs':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/toggle':
+        specifier: ^0.2.166
+        version: 0.2.166
+      '@data-slot/tooltip':
+        specifier: ^0.2.166
+        version: 0.2.166
       '@ffmpeg/ffmpeg':
         specifier: ^0.12.15
         version: 0.12.15
       '@ffmpeg/util':
         specifier: ^0.12.2
         version: 0.12.2
+      '@lexingtonthemes/seo':
+        specifier: ^0.2.0
+        version: 0.2.0(astro@6.4.4(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@libsql/client':
         specifier: ^0.17.3
         version: 0.17.3
@@ -95,6 +149,9 @@ importers:
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
+      lucide-static:
+        specifier: ^1.17.0
+        version: 1.17.0
       nanoid:
         specifier: ^5.1.11
         version: 5.1.11
@@ -104,6 +161,9 @@ importers:
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
+      simple-icons:
+        specifier: ^16.22.0
+        version: 16.22.0
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
@@ -703,6 +763,60 @@ packages:
   '@csstools/css-tokenizer@4.0.0':
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
+
+  '@data-slot/accordion@0.2.166':
+    resolution: {integrity: sha512-MViSr1Nikj5PqL8aFTQMonG/9SHXYskWK0DTc8OyUvLBg5x2mwTQVTwlPxy114ZH4BMOAYlTXpZ+XuvOrDgH9Q==}
+
+  '@data-slot/alert-dialog@0.2.166':
+    resolution: {integrity: sha512-o+ne7Yjc56hteXai6KU/KsHjY0DunpOImHgrS3+K9KEhtUNtM6UAKhkA1C2FBOvHCvasZ8qdCPeWa6wME7MiAA==}
+
+  '@data-slot/collapsible@0.2.166':
+    resolution: {integrity: sha512-C1QhlaGVkV0OhB5Xa7bj/U4SZLbtMaotgZgxoq/3FXmtFbkEzU1dvumNdYWs5+6Wnwb4Pr+KfJdxfVBN1ofT1w==}
+
+  '@data-slot/combobox@0.2.166':
+    resolution: {integrity: sha512-BPF4WKfTFeiksrlp8kyU7g3iEuICY9EBoWzrrzDWmq8di3nDI3phAO2f42M6xG7JSNf6Rvu9K8IsXzOyZk5DXA==}
+
+  '@data-slot/command@0.2.166':
+    resolution: {integrity: sha512-+RRwXkjspJeD7gHYgVUXxvF/CkGFJS6OvRauUNhxvbaMxdCLf3KkOinFv/RKtzRFaOEEkjpanFy/DrO9agy3Cw==}
+
+  '@data-slot/core@0.2.166':
+    resolution: {integrity: sha512-/DuzMFIqiefdjheX5fMhaqs4YPp0/t+/pN9EgnB2jLSDk8384WkBCPGq76T/Ypb0MjVlHFiexKDnx9+k+bdcjw==}
+
+  '@data-slot/dialog@0.2.166':
+    resolution: {integrity: sha512-ioMkbfCMVt4x8VrNEa0V32ncs57Q3GEVqEn+uDUBoOU6Qyv2q1ebI0IMkK/54kSeUHut7FilECGUJzuvc7TJAQ==}
+
+  '@data-slot/dropdown-menu@0.2.166':
+    resolution: {integrity: sha512-8U9jUWlufUmHf75+w/10GHVNDc9XjfJCjVKuBWhkFbTFq68ROCzb+g/DugI/uXxz08qZWmky4nQK9kStjlet5A==}
+
+  '@data-slot/hover-card@0.2.166':
+    resolution: {integrity: sha512-ravzEp74MzWDNY83y4nPoBpScEmzRsV1QnXS6+SB4fypUIfB7OiVwlEUQ0NfCM5CgqDFrx3nZsmUzqcJRxQKxA==}
+
+  '@data-slot/navigation-menu@0.2.166':
+    resolution: {integrity: sha512-1yttL2tjMFsvQ4dfNMqC6MG5yABI7DGgK2Un89NGEXAG37uPmai5/KTf+68VO9gQhhLlmUkmvokyIFBFoBkF/A==}
+
+  '@data-slot/popover@0.2.166':
+    resolution: {integrity: sha512-NW35Efz0oEquMec1X4y/nVxTGOYPWEkcoErN3/wtj7QqRZtpyJnQMP2rxm59+il9kvUIdUCAgtWl9CyIg55CXw==}
+
+  '@data-slot/radio-group@0.2.166':
+    resolution: {integrity: sha512-0CDJD3e+ap2o7REO5KPj8hkB75V/d3okiCaUmg3bDo+xzOkIxJ1qnif/I4QG5rRok9QBOcDjLYoyfY2Zjm9cVg==}
+
+  '@data-slot/select@0.2.166':
+    resolution: {integrity: sha512-8HVsjcs9LqjXfYRfK7SiuTuZirjx5DQWbSrrdifynWOwif0C9eXYrah6FR5kla9jr2/CsaoUEBlHHVsNnosNqg==}
+
+  '@data-slot/slider@0.2.166':
+    resolution: {integrity: sha512-VuQmb1+xn9X05vSDvaz4PIbvH23K0U1azLgwUyOeUyr8WSCxcUObTbvpEPcXyGsQQySt9GEO5bX3qYLdgaMyWA==}
+
+  '@data-slot/switch@0.2.166':
+    resolution: {integrity: sha512-2AipHTGEiCfCOCGjKzlo2jAJ9hEN8+YbI90PrLLG8Q71TB8kNRWSdvE6hJhRzLJI0Ymdi89bVvd/DGEN38JVtA==}
+
+  '@data-slot/tabs@0.2.166':
+    resolution: {integrity: sha512-nM+kE5IgZeyX+fUq+LUiDQrbB1F47WcLtmwTngVShsMJcjFUJPrLI8snadcWJ2xD34yi6Jeq3X7iNFjK9tYfXQ==}
+
+  '@data-slot/toggle@0.2.166':
+    resolution: {integrity: sha512-L9ejpPH75UA8zdbr1wb3DYF/nD7h+VdyyvYgJjGzjQ6J65O5s6qn8jEbPHQPlSQwyjoHyqMWvNoU359j648+BA==}
+
+  '@data-slot/tooltip@0.2.166':
+    resolution: {integrity: sha512-tpt0oqhiMhp0AeTG23S0iW27SGrRcaUZt0h3IK7H6z/a1LwCItl+8PUqqaSaHKUKlOc4oyccES4ZxlsOxW1jvA==}
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -1683,6 +1797,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@lexingtonthemes/seo@0.2.0':
+    resolution: {integrity: sha512-+Sio0AL1jyAFi0SPLyUMNkbawolZzTmyDVz19OT1M12KO8Q5Xx/jaRKhDXZ1YPDoV2zznd5nlIatQH80EUISow==}
+    peerDependencies:
+      astro: ^1.2.1 || ^2.0.0 || ^3.0.0-beta.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
 
   '@libsql/client@0.17.3':
     resolution: {integrity: sha512-HXk9wiAoJbKFbyBH4O+aEhN6ir5ERXuXvwE5OD2eR4/5RUa3Pw/8L9zrnVdU+iNJitRvisPWaIwmhkO3bH7giA==}
@@ -3820,6 +3939,9 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
+  lucide-static@1.17.0:
+    resolution: {integrity: sha512-VORJmPqi4DZ5lf4/n2qqcIz1nTKGFReS83DJINcK5nXY7z+4P3G6CW/7SXpzlGllEI0vHKFH24eSM+aMFaK5zw==}
+
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
@@ -4562,6 +4684,10 @@ packages:
 
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
+
+  simple-icons@16.22.0:
+    resolution: {integrity: sha512-/raPcEWh89R2O2IMmHum6W2dF99NNX3yWikVXKUalkDIWz3Rw/S2S+oDPTgJcIGsRh+25m0y8vj4aBaV/KPz3Q==}
+    engines: {node: '>=0.12.18'}
 
   sirv@3.0.2:
     resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
@@ -5738,6 +5864,76 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
+  '@data-slot/accordion@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/alert-dialog@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/collapsible@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/combobox@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/command@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/core@0.2.166': {}
+
+  '@data-slot/dialog@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/dropdown-menu@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/hover-card@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/navigation-menu@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/popover@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/radio-group@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/select@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/slider@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/switch@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/tabs@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/toggle@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
+  '@data-slot/tooltip@0.2.166':
+    dependencies:
+      '@data-slot/core': 0.2.166
+
   '@drizzle-team/brocli@0.10.2': {}
 
   '@emnapi/core@1.10.0':
@@ -6299,6 +6495,11 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lexingtonthemes/seo@0.2.0(astro@6.4.4(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+    dependencies:
+      astro: 6.4.4(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      html-escaper: 3.0.3
 
   '@libsql/client@0.17.3':
     dependencies:
@@ -8561,6 +8762,8 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
+  lucide-static@1.17.0: {}
+
   lz-string@1.5.0: {}
 
   magic-string@0.30.21:
@@ -9612,6 +9815,8 @@ snapshots:
       decompress-response: 6.0.0
       once: 1.4.0
       simple-concat: 1.0.1
+
+  simple-icons@16.22.0: {}
 
   sirv@3.0.2:
     dependencies:

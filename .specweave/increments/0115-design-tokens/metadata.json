@@ -1,0 +1,22 @@
+{
+  "increment": "0115-design-tokens",
+  "title": "设计 Token 基础层（Layer 2）",
+  "type": "foundation",
+  "priority": "P1",
+  "status": "completed",
+  "created": "2026-06-05",
+  "completed": "2026-06-05",
+  "depends_on": "0114-typography-refactor",
+  "epic": "0103",
+  "domains": ["frontend", "design-system"],
+  "tasks_total": 8,
+  "tasks_done": 8,
+  "tasks_blocked": 0,
+  "risk": "low",
+  "test_mode": "build + visual",
+  "estimated_hours": 2,
+  "commits": [
+    "addded31 - T-001 design token foundation layer",
+    "d44b24c6 - T-002 to T-007 install Fulldev and Starwind bases"
+  ]
+}
