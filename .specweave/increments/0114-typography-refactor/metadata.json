@@ -3,15 +3,21 @@
   "title": "Typography Refactor — 字体系统优化",
   "type": "refactor",
   "priority": "P2",
-  "status": "in_progress",
+  "status": "completed",
   "created": "2026-06-05",
+  "completed": "2026-06-05",
   "depends_on": "0113-dom-api-refactor",
   "epic": "0103",
   "domains": ["frontend", "design", "performance"],
   "tasks_total": 24,
-  "tasks_done": 1,
+  "tasks_done": 24,
   "tasks_blocked": 0,
   "risk": "medium",
   "test_mode": "visual-manual",
-  "estimated_hours": 7
+  "estimated_hours": 7,
+  "actual_commits": 2,
+  "commits": [
+    "6e0e9e88 - Phase 1: remove unused font weights",
+    "b009e5da - Phase 2-5: typography system complete"
+  ]
 }
