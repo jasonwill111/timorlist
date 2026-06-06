@@ -186,7 +186,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
   <div class="container py-4 px-2 md:py-6 max-w-7xl">
     <!-- Page Header -->
     <div class="mb-4 md:mb-6">
-      <h1 class="text-xl md:text-2xl font-bold">Dashboard</h1>
+      <h1 class="text-3xl font-bold leading-tight">Dashboard</h1>
       <p class="text-xs md:text-sm text-muted-foreground">Overview of your platform</p>
     </div>
 
@@ -245,7 +245,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
           </div>
           <div class="min-w-0">
             <p class="text-xl md:text-2xl font-bold text-amber-700 dark:text-amber-300 truncate" id="mtd-revenue">$0</p>
-            <p class="text-[10px] md:text-xs text-amber-600 dark:text-amber-400">MTD Revenue</p>
+            <p class="text-xs md:text-xs text-amber-600 dark:text-amber-400">MTD Revenue</p>
           </div>
         </div>
       </div>
@@ -260,7 +260,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
           </div>
           <div class="min-w-0">
             <p class="text-xl md:text-2xl font-bold text-purple-700 dark:text-purple-300" id="mtd-subs">0</p>
-            <p class="text-[10px] md:text-xs text-purple-600 dark:text-purple-400">MTD Subs</p>
+            <p class="text-xs md:text-xs text-purple-600 dark:text-purple-400">MTD Subs</p>
           </div>
         </div>
       </div>
@@ -275,7 +275,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
           </div>
           <div class="min-w-0">
             <p class="text-xl md:text-2xl font-bold text-blue-700 dark:text-blue-300" id="mtd-users">0</p>
-            <p class="text-[10px] md:text-xs text-blue-600 dark:text-blue-400">MTD Users</p>
+            <p class="text-xs md:text-xs text-blue-600 dark:text-blue-400">MTD Users</p>
           </div>
         </div>
       </div>
@@ -290,7 +290,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
           </div>
           <div class="min-w-0">
             <p class="text-xl md:text-2xl font-bold text-red-700 dark:text-red-300" id="stat-expiring">0</p>
-            <p class="text-[10px] md:text-xs text-red-600 dark:text-red-400">Expiring</p>
+            <p class="text-xs md:text-xs text-red-600 dark:text-red-400">Expiring</p>
           </div>
         </div>
       </a>
@@ -300,13 +300,13 @@ import AdminLayout from '@layouts/AdminLayout.astro';
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <!-- Revenue Bar Chart -->
       <div class="bg-card border rounded-xl p-3 md:p-4">
-        <h3 class="font-semibold text-sm md:text-base mb-2">Revenue (6 Months)</h3>
+        <h3 class="text-lg font-medium leading-snug mb-2">Revenue (6 Months)</h3>
         <div id="revenue-chart" class="flex items-end justify-between gap-1 h-24 md:h-32"></div>
       </div>
 
       <!-- Subscriptions Line Chart -->
       <div class="bg-card border rounded-xl p-3 md:p-4">
-        <h3 class="font-semibold text-sm md:text-base mb-2">New Subscriptions</h3>
+        <h3 class="text-lg font-medium leading-snug mb-2">New Subscriptions</h3>
         <div id="subscriptions-chart" class="h-24 md:h-32 relative">
           <svg class="w-full h-full" id="subscriptions-svg"></svg>
         </div>
@@ -314,7 +314,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
     </div>
 
     <div class="bg-card border rounded-xl p-3 md:p-4 mb-6">
-      <h3 class="font-semibold text-sm md:text-base mb-2">New Users (6 Months)</h3>
+      <h3 class="text-lg font-medium leading-snug mb-2">New Users (6 Months)</h3>
       <div id="users-chart" class="h-24 md:h-32 relative">
         <svg class="w-full h-full" id="users-svg"></svg>
       </div>
@@ -325,7 +325,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
       <!-- Recent Subscriptions -->
       <div class="bg-card border rounded-xl p-3 md:p-4">
         <div class="flex items-center justify-between mb-3 md:mb-4">
-          <h3 class="font-semibold text-sm md:text-base">Recent Subscriptions</h3>
+          <h3 class="text-lg font-medium leading-snug">Recent Subscriptions</h3>
           <a href="/admin/subscriptions" class="text-xs text-primary hover:underline">View All</a>
         </div>
         <div id="orders-list" class="space-y-2">
@@ -335,7 +335,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 
       <!-- Quick Actions -->
       <div class="bg-card border rounded-xl p-3 md:p-4">
-        <h3 class="font-semibold text-sm md:text-base mb-3 md:mb-4">Quick Actions</h3>
+        <h3 class="text-lg font-medium leading-snug mb-3 md:mb-4">Quick Actions</h3>
         <div class="grid grid-cols-2 gap-2">
           <a href="/admin/businesses" class="flex items-center gap-2 p-2 md:p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
             <svg class="w-4 h-4 md:w-5 md:h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

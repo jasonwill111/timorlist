@@ -95,7 +95,7 @@ const totalPages = Math.ceil(total / limit);
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
       <div class="min-w-0">
-        <h1 class="text-xl md:text-2xl font-bold truncate">Media Library</h1>
+        <h1 class="text-3xl font-bold leading-tight truncate">Media Library</h1>
         <p class="text-muted-foreground text-xs md:text-sm">
           {total} files • {totalSizeMB} MB total
         </p>
@@ -166,7 +166,7 @@ const totalPages = Math.ceil(total / limit);
     {mediaItems.length === 0 ? (
       <div class="bg-card border rounded-xl p-12 text-center">
         <div class="text-6xl mb-4">📁</div>
-        <h3 class="text-lg font-semibold mb-2">No media found</h3>
+        <h3 class="text-lg font-medium leading-snug mb-2">No media found</h3>
         <p class="text-muted-foreground">Upload some files to get started</p>
       </div>
     ) : (

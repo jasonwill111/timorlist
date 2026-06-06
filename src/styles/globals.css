@@ -93,6 +93,24 @@
   /* Font families */
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-heading: 'Sora', sans-serif;
+
+  /* Semantic Type Scale */
+  --text-meta: 10px;     /* compact card metadata */
+  --text-caption: 12px;  /* badges, meta */
+  --text-small: 14px;    /* current text-sm */
+  --text-body: 16px;     /* current text-base */
+  --text-h4: 18px;       /* current text-lg */
+  --text-h3: 20px;       /* current text-xl */
+  --text-h2: 24px;       /* current text-2xl */
+  --text-h1: 30px;       /* current text-3xl */
+  --text-display: 48px;  /* current text-5xl */
+
+  /* Semantic Line Height */
+  --leading-display: 1.1;
+  --leading-heading: 1.25;
+  --leading-snug: 1.375;
+  --leading-body: 1.5;
+  --leading-relaxed: 1.6;
 }
 
 /* Dark mode - Deep blue-black for better readability */

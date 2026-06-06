@@ -36,7 +36,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
         ← Back to Listings
       </a>
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold">Edit Listing</h1>
+        <h1 class="text-3xl font-bold leading-tight">Edit Listing</h1>
         <span class={`px-2 py-0.5 text-xs rounded-full ${
           listing.status === 'live' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
         }`}>
@@ -48,7 +48,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
     <form id="listing-form" class="space-y-6">
       <!-- Type (read-only) -->
       <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold mb-4">Listing Type</h2>
+        <h2 class="text-lg font-semibold leading-snug mb-4">Listing Type</h2>
         <div class="flex items-center gap-4">
           <span class="text-3xl">🏪</span>
           <div>
@@ -61,7 +61,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
 
       <!-- Basic Info -->
       <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
+        <h2 class="text-lg font-semibold leading-snug mb-4">Basic Information</h2>
         <div class="grid gap-4">
           <div>
             <label class="block text-sm font-medium mb-1">Title *</label>
@@ -83,7 +83,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
 
       <!-- Contact Info -->
       <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold mb-4">Contact Information</h2>
+        <h2 class="text-lg font-semibold leading-snug mb-4">Contact Information</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium mb-1">Contact Name</label>
@@ -116,7 +116,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
 
       <!-- About -->
       <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold mb-4">About</h2>
+        <h2 class="text-lg font-semibold leading-snug mb-4">About</h2>
         <div>
           <label class="block text-sm font-medium mb-1">About Us</label>
           <Textarea name="aboutUs" rows={4}>{listing.aboutUs || ''}</Textarea>
@@ -139,7 +139,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
 
       <!-- Status -->
       <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold mb-4">Status</h2>
+        <h2 class="text-lg font-semibold leading-snug mb-4">Status</h2>
         <div class="flex flex-wrap gap-4">
           <label class="flex items-center gap-2">
             <Input type="radio" name="status" value="draft" checked={listing.status === 'draft'} />
