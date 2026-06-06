@@ -8,6 +8,10 @@ import TabsTrigger from '@components/ui/TabsTrigger.astro';
 import Select from '@components/ui/Select.astro';
 import Textarea from '@components/ui/Textarea.astro';
 import Input from '@components/ui/Input.astro';
+import Table from '@components/ui/table/table.astro';
+import TableHeader from '@components/ui/table/table-header.astro';
+import TableRow from '@components/ui/table/table-row.astro';
+import TableHead from '@components/ui/table/table-head.astro';
 ---
 
 <AdminLayout title="Categories">
@@ -50,25 +54,23 @@ import Input from '@components/ui/Input.astro';
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-muted/50">
-                <tr>
-                  <th class="text-left p-3 font-medium">Category</th>
-                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
-                  <th class="text-left p-3 font-medium">Sort</th>
-                  <th class="text-right p-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="categories-list">
-                <tr>
-                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Category</TableHead>
+                <TableHead class="hidden md:table-cell">Entity</TableHead>
+                <TableHead class="hidden lg:table-cell">Level</TableHead>
+                <TableHead class="hidden lg:table-cell">Parent</TableHead>
+                <TableHead>Sort</TableHead>
+                <TableHead class="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <tbody id="categories-list">
+              <tr>
+                <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+              </tr>
+            </tbody>
+          </Table>
         </div>
       </TabsContent>
       <TabsContent value="non_profit">
@@ -92,25 +94,23 @@ import Input from '@components/ui/Input.astro';
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-muted/50">
-                <tr>
-                  <th class="text-left p-3 font-medium">Category</th>
-                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
-                  <th class="text-left p-3 font-medium">Sort</th>
-                  <th class="text-right p-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="categories-list-non_profit">
-                <tr>
-                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Category</TableHead>
+                <TableHead class="hidden md:table-cell">Entity</TableHead>
+                <TableHead class="hidden lg:table-cell">Level</TableHead>
+                <TableHead class="hidden lg:table-cell">Parent</TableHead>
+                <TableHead>Sort</TableHead>
+                <TableHead class="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <tbody id="categories-list-non_profit">
+              <tr>
+                <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+              </tr>
+            </tbody>
+          </Table>
         </div>
       </TabsContent>
       <TabsContent value="public_sector">
@@ -134,25 +134,23 @@ import Input from '@components/ui/Input.astro';
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-muted/50">
-                <tr>
-                  <th class="text-left p-3 font-medium">Category</th>
-                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
-                  <th class="text-left p-3 font-medium">Sort</th>
-                  <th class="text-right p-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="categories-list-public_sector">
-                <tr>
-                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Category</TableHead>
+                <TableHead class="hidden md:table-cell">Entity</TableHead>
+                <TableHead class="hidden lg:table-cell">Level</TableHead>
+                <TableHead class="hidden lg:table-cell">Parent</TableHead>
+                <TableHead>Sort</TableHead>
+                <TableHead class="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <tbody id="categories-list-public_sector">
+              <tr>
+                <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+              </tr>
+            </tbody>
+          </Table>
         </div>
       </TabsContent>
       <TabsContent value="listing">
@@ -176,25 +174,23 @@ import Input from '@components/ui/Input.astro';
         </div>
         <!-- Categories List -->
         <div class="bg-card border rounded-lg">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-muted/50">
-                <tr>
-                  <th class="text-left p-3 font-medium">Category</th>
-                  <th class="text-left p-3 font-medium hidden md:table-cell">Entity</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Level</th>
-                  <th class="text-left p-3 font-medium hidden lg:table-cell">Parent</th>
-                  <th class="text-left p-3 font-medium">Sort</th>
-                  <th class="text-right p-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="categories-list-listing">
-                <tr>
-                  <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Category</TableHead>
+                <TableHead class="hidden md:table-cell">Entity</TableHead>
+                <TableHead class="hidden lg:table-cell">Level</TableHead>
+                <TableHead class="hidden lg:table-cell">Parent</TableHead>
+                <TableHead>Sort</TableHead>
+                <TableHead class="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <tbody id="categories-list-listing">
+              <tr>
+                <td colspan="6" class="text-center p-8 text-muted-foreground">Loading...</td>
+              </tr>
+            </tbody>
+          </Table>
         </div>
       </TabsContent>
     </Tabs>

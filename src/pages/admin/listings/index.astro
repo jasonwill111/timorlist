@@ -62,16 +62,16 @@ export const prerender = false;
     </div>
 
     <!-- Listings Table -->
-    <div class="bg-card rounded-lg border overflow-hidden">
-      <table class="w-full">
-        <thead class="bg-muted/50">
-          <tr>
-            <th class="text-left px-4 py-3 text-sm font-medium">Title</th>
-            <th class="text-left px-4 py-3 text-sm font-medium">Status</th>
-            <th class="text-left px-4 py-3 text-sm font-medium">Price</th>
-            <th class="text-right px-4 py-3 text-sm font-medium">Actions</th>
-          </tr>
-        </thead>
+    <div class="bg-card rounded-lg border">
+      <Table class="divide-y">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Title</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead class="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
         <tbody id="listings-body" class="divide-y">
           <tr>
             <td colspan="4" class="text-center py-8 text-muted-foreground">
@@ -81,7 +81,7 @@ export const prerender = false;
             </td>
           </tr>
         </tbody>
-      </table>
+      </Table>
 
       <div id="no-results" class="hidden text-center py-12 text-muted-foreground">
         No listings found
