@@ -1,31 +1,52 @@
 # components
-
 **Path**: `src/components`
-
 ## Purpose
-
-Astro components and UI elements. Includes business cards, product cards, CSS animations, and islands.
-
+Astro components and UI elements. Includes business cards, product cards, CSS animations, and islands. **All component patterns standardized for Astro 5+ with event delegation (Increment 0113, 2026-06-05).**
 ## Directory Structure
-
 ```
 src/components/
-├── ui/
-│   ├── CSSAnimations.astro   # CSS-based animations (Tailwind-first)
+├── ui/                      # Reusable UI components (32 files)
+│   ├── Button.astro         # Primary button (variant: default, ghost, outline, destructive)
+│   ├── Input.astro          # Text input
+│   ├── Select.astro         # Dropdown select
+│   ├── Textarea.astro       # Multi-line text input
+│   ├── Badge.astro          # Status badge (adopted: account.astro, service-packages.astro)
+│   ├── Accordion.astro      # Collapsible section (adopted: faq.astro)
+│   ├── Card + subcomponents # Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription
+│   ├── Modal.astro          # Modal dialog
 │   ├── LucideIcon.astro     # Unified Lucide icon component
 │   ├── ThemeToggle.astro    # Dark/light mode toggle
-│   ├── ToastContainer.astro  # Toast notifications
+│   ├── ToastContainer.astro # Toast notifications
 │   ├── BusinessCard.astro   # Business listing card
 │   ├── ProductCard.astro    # Product/SKU card
-│   ├── FileUpload.astro    # Media upload component
 │   ├── CarouselBanner.astro # Banner carousel component
-│   └── TiptapEditor.astro  # Rich text editor
-├── islands/                  # Astro Islands (hydrated)
-│   ├── HomepageContent.astro # Homepage dynamic content
-│   └── ListingContent.astro  # Listings dynamic content
-└── Header.astro              # Site header
-    Footer.astro              # Site footer
+│   └── TiptapEditor.astro   # Rich text editor
+├── islands/                 # Astro Islands (hydrated)
+│   └── HomepageContent.astro # Homepage dynamic content (uses event delegation)
+├── forms/                   # Form-specific components (3 files)
+│   ├── AuthCard.astro       # Auth form container
+│   ├── FormMessage.astro    # Form error/success message
+│   └── PasswordInput.astro  # Password input with show/hide
+├── business/                # Business-specific components
+└── Header.astro, Footer.astro  # Site header/footer (Header uses event delegation for mobile menu)
 ```
+### Deleted in Increment 0113 (2026-06-05)
+The following 13 dead-code components were removed:
+| File | Reason |
+|------|--------|
+| `ui/FileUpload.astro` | Zero usage, replaced by direct file input + actions |
+| `ui/ConfirmDialog.astro` | Zero usage, redundant with native confirm() |
+| `ui/IconPicker.astro` | Zero usage |
+| `ui/CSSAnimations.astro` | Replaced by `lib/css-animations.ts` |
+| `ui/Pagination.astro` | Zero usage, replaced by inline pagination |
+| `PhotoGallery.astro` | Zero usage, duplicate of MediaGallery.astro |
+| `islands/ListingListNew.astro` | Never imported, orphan |
+| `islands/BusinessListNew.astro` | Never imported, orphan |
+| `islands/CategoryFilter.astro` | Never imported |
+| `islands/GracePeriodModal.astro` | Zero usage, dead code |
+| `islands/BusinessList.astro` | Never imported, duplicate server-island |
+| `islands/ListingContent.astro` | Never imported, duplicate server-island |
+| `forms/FormField.astro` | Zero usage, redundant |
 
 ## CSS Animations (Tailwind-first)
 

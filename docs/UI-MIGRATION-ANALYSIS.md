@@ -315,3 +315,30 @@ Phase 5 — 清理      →  删除废弃文件、build 验证
 ────────────────────────────────────
 Phase 6 — 复用优化  →  三卡片合一、islands 分离、Dialog 统一、TabSwitch
 ```
+Phase 6 — 复用优化  →  三卡片合一、islands 分离、Dialog 统一、TabSwitch
+```
+
+---
+
+## Migration Status (2026-06-05, Increment 0113)
+
+All UI migration phases complete. Final adoption status:
+
+| Component | Adopted | Files |
+|-----------|---------|-------|
+| Button | 151 instances | 67 files |
+| Input | 120 instances | 47 files |
+| Select | 53 instances | 30 files |
+| Textarea | 21 instances | 19 files |
+| Badge | 2 pages | account.astro, service-packages.astro |
+| Accordion | 1 page | faq.astro |
+
+### Deleted Components (13 total, Increment 0113)
+
+- `ui/FileUpload`, `ui/ConfirmDialog`, `ui/IconPicker`
+- `ui/CSSAnimations`, `ui/Pagination`, `PhotoGallery`
+- `islands/ListingListNew`, `islands/BusinessListNew`, `islands/CategoryFilter`
+- `islands/GracePeriodModal`, `islands/BusinessList`, `islands/ListingContent`
+- `forms/FormField`
+
+### Status: Complete

@@ -125,6 +125,69 @@ export async function requireAdmin(cookies) {
 { "success": false, "error": { "code": "ERROR_CODE", "message": "..." } }
 ```
 
+## Event Delegation Pattern (Increment 0113, 2026-06-05)
+
+All admin pages use **single document-level event delegation** instead of per-element `addEventListener` loops.
+
+### Pattern
+
+```astro
+<!-- HTML: data-action attribute -->
+<Button data-action="edit-listing" data-id={listing.id}>Edit</Button>
+<Button data-action="delete-listing" data-id={listing.id}>Delete</Button>
+<Button data-action="toggle-status" data-id={listing.id} data-status={listing.status}>
+  {listing.status === 'published' ? 'Unpublish' : 'Publish'}
+</Button>
+```
+
+```typescript
+// JavaScript: single document listener
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  const el = target.closest('[data-action]');
+  if (!el) return;
+
+  const { action, id, status } = el.dataset;
+  switch (action) {
+    case 'edit-listing':
+      window.location.href = `/admin/listings/${id}/edit`;
+      break;
+    case 'delete-listing':
+      handleDelete(id);
+      break;
+    case 'toggle-status':
+      handleToggle(id, status);
+      break;
+  }
+});
+```
+
+### Why Event Delegation?
+
+1. **Memory efficiency** - Single listener instead of N listeners (one per row)
+2. **Dynamic content** - Works for content added after page load (e.g., via innerHTML)
+3. **Maintainability** - All event routing logic in one place
+4. **Performance** - One closure vs N closures
+
+### Migration Status
+
+All admin pages have been migrated to event delegation. See `ARCHITECTURE.md > Event Delegation Pattern` for the complete list.
+
+## Component Usage in Pages
+
+Increment 0113 also migrated static HTML elements to components:
+
+| Component | Pages Using |
+|-----------|-------------|
+| `<Button>` | 151 instances across 67 files |
+| `<Input>` | 120 instances across 47 files |
+| `<Select>` | 53 instances across 30 files |
+| `<Textarea>` | 21 instances across 19 files |
+
+### Remaining Native Elements
+
+22 buttons and 47 inputs remain as native HTML in consumer pages — **all inside JS template strings** (`<script>` backtick strings). These are architecturally locked and require a separate refactor to convert from string generation to DOM API calls.
+
 ## Analysis Summary
 
 - **Files Analyzed**: 56
@@ -133,4 +196,4 @@ export async function requireAdmin(cookies) {
 - **Total Exports**: 127
 
 ---
-*Updated 2026-05-31*
+*Updated 2026-06-05 (Increment 0113)*

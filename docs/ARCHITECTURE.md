@@ -310,10 +310,96 @@ src/mastra/index.ts                — P2-J
 src/lib/media/validator.ts         — P1-F
 src/lib/geo.test.ts               — P1-O (test fix)
 ```
-
 **Architecture decisions**:
 - DB singleton pattern in `db.ts` is CORRECT for Cloudflare Workers (isolate = single-threaded)
 - Auth singleton in `auth.ts` is CORRECT (same reason)
 - FFmpeg WASM module-level globals are CORRECT (performance optimization, isolate lifetime)
 - KV rate limiter race condition is ACCEPTABLE (low concurrency, check-then-set window is small)
 - Cache stampede is ACCEPTABLE (low traffic, cache miss is tolerable)
+
+---
+
+## Event Delegation Pattern (Increment 0113, 2026-06-05)
+
+All admin pages and islands use a **single document-level event delegation listener** instead of per-element `addEventListener` loops. This reduces listener count, eliminates memory leaks, and unifies event handling.
+
+### Pattern
+
+```typescript
+// ✅ Correct - Single document listener with data-action routing
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  const el = target.closest('[data-action]');
+  if (!el) return;
+
+  const { action, id, status } = el.dataset;
+  switch (action) {
+    case 'edit-listing': window.location.href = `/admin/listings/${id}/edit`; break;
+    case 'delete-listing': handleDelete(id); break;
+    case 'toggle-status': handleToggle(id, status); break;
+  }
+});
+```
+
+```astro
+<!-- ✅ Correct - HTML uses data-action attribute -->
+<Button data-action="edit-listing" data-id={listing.id}>Edit</Button>
+<Button data-action="delete-listing" data-id={listing.id}>Delete</Button>
+
+<!-- ❌ Wrong - inline onclick handler -->
+<Button onclick="handleEdit(123)">Edit</Button>
+
+<!-- ❌ Wrong - per-row addEventListener loop -->
+<script>
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', handleEdit);
+  });
+</script>
+```
+
+### Implementation Status
+
+| File | Event Pattern | Status |
+|------|--------------|--------|
+| `admin/listings/index.astro` | data-action + single listener | ✅ |
+| `admin/users.astro` | data-action + single listener | ✅ |
+| `admin/products.astro` | data-action + single listener | ✅ |
+| `admin/businesses.astro` | data-action + single listener | ✅ |
+| `admin/non-profits.astro` | data-action + single listener | ✅ |
+| `admin/public-sectors.astro` | data-action + single listener | ✅ |
+| `admin/categories.astro` | data-action + single listener | ✅ |
+| `admin/blogs.astro` | data-action + single listener | ✅ |
+| `admin/orders.astro` | data-action + single listener | ✅ |
+| `admin/media.astro` | data-action + single listener | ✅ |
+| `admin/service-packages.astro` | data-action + single listener | ✅ |
+| `admin/ad-banners.astro` | data-action + single listener | ✅ |
+| `business/[slug]/edit/index.astro` | data-action + change listener | ✅ |
+| `Header.astro` (mobile menu) | data-action + single listener | ✅ |
+| `components/islands/HomepageContent.astro` | data-action + batch update | ✅ |
+
+### When to Use Batch DOM Updates
+
+Some patterns require `querySelectorAll` for batch DOM updates (NOT event listener attachment):
+
+```typescript
+// ✅ Correct - batch update after event delegation
+case 'tab-switch': {
+  const tab = el.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.setAttribute('data-active', b.getAttribute('data-tab') === tab ? 'true' : 'false');
+  });
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.toggle('hidden', panel.getAttribute('data-panel') !== tab);
+  });
+  break;
+}
+```
+
+This is acceptable because:
+1. It runs inside a delegated event handler, not on page load
+2. It updates existing DOM state, not attaches new listeners
+3. The cost is O(n) per click, but n is small (4-8 elements)
+
+### Rule
+
+**Never use `querySelectorAll + addEventListener` in a loop.** Use event delegation with `data-action` attributes.
