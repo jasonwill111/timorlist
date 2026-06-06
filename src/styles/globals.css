@@ -29,29 +29,7 @@
   font-display: swap;
   src: url('/fonts/plus-jakarta-sans-latin-700-normal.woff2') format('woff2');
 }
-@font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('/fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2');
-}
-
 /* Sora (heading font) */
-@font-face {
-  font-family: 'Sora';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/sora-latin-400-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Sora';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/sora-latin-500-normal.woff2') format('woff2');
-}
 @font-face {
   font-family: 'Sora';
   font-style: normal;
@@ -65,13 +43,6 @@
   font-weight: 700;
   font-display: swap;
   src: url('/fonts/sora-latin-700-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Sora';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('/fonts/sora-latin-800-normal.woff2') format('woff2');
 }
 
 /* Custom Theme Colors - YELLOW THEME */

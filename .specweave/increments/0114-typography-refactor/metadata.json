@@ -1,0 +1,17 @@
+{
+  "increment": "0114-typography-refactor",
+  "title": "Typography Refactor — 字体系统优化",
+  "type": "refactor",
+  "priority": "P2",
+  "status": "in_progress",
+  "created": "2026-06-05",
+  "depends_on": "0113-dom-api-refactor",
+  "epic": "0103",
+  "domains": ["frontend", "design", "performance"],
+  "tasks_total": 24,
+  "tasks_done": 1,
+  "tasks_blocked": 0,
+  "risk": "medium",
+  "test_mode": "visual-manual",
+  "estimated_hours": 7
+}
