@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '@layouts/AdminLayout.astro';
+import Button from '@components/ui/Button.astro';
+import Tabs from '@components/ui/Tabs.astro';
+import TabsList from '@components/ui/TabsList.astro';
+import TabsTrigger from '@components/ui/TabsTrigger.astro';
+import Select from '@components/ui/Select.astro';
+import Textarea from '@components/ui/Textarea.astro';
+import Input from '@components/ui/Input.astro';
+import Table from '@components/ui/table';
+---

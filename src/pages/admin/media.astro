@@ -6,9 +6,9 @@ import { media, users } from '@/db/schema';
 import { eq, like, sql, desc, isNull, and } from 'drizzle-orm';
 import { actions } from 'astro:actions';
 import { getAdminUser } from '@/lib/admin-auth';
-import Select from '@/components/ui/Select.astro';
-import Input from '@/components/ui/Input.astro';
-import Button from '@/components/ui/Button.astro';
+import { Select } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 
 // Check admin auth using KV session

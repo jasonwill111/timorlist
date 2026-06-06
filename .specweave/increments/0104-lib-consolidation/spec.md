@@ -7,7 +7,7 @@ status: pending
 created: 2026-06-04
 project: TimorUp
 parent: 0103-fulldev-migration-refactor
-dependsOn: ["0103-security-fixes"]
+dependsOn: ["0103-fulldev-migration-refactor"]
 ---
 
 # Increment 0104: Lib Consolidation - Foundation Layer

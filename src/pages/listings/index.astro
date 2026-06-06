@@ -2,8 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import CarouselBanner from '../../components/ui/CarouselBanner.astro';
 import ListingCard from '../../components/business/ListingCard.astro';
-import Input from '../../components/ui/Input.astro';
-import Select from '../../components/ui/Select.astro';
+import { Input } from '../../components/ui/input';
+import { Select } from '../../components/ui/select';
 import { getRawDb } from '@/lib/db';
 
 const searchParams = Astro.url.searchParams;

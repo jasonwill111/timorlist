@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getDb } from '@/lib/db';
 import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { getAdminUser } from '@/lib/admin-auth';
+import { requireAdmin } from '@/lib/admin-auth';
 import { createErrorResponse, ErrorCode } from '@/lib/errors';
 
 
@@ -12,10 +12,10 @@ export const deleteProduct = defineAction({
   input: z.object({
     id: z.string(),
   }),
-  handler: async (input, { request }) => {
-    const user = await getAdminUser(request);
-    if (!user) {
-      return { success: false, error: { code: 'UNAUTHORIZED', message: 'Admin access required' } };
+  handler: async (input, { cookies }) => {
+    const authResult = await requireAdmin(cookies);
+    if ('error' in authResult) {
+      return { success: false, error: { code: authResult.error, message: 'Admin access required' } };
     }
 
     const db = await getDb();

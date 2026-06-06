@@ -1,10 +1,10 @@
 ---
-import Textarea from '@components/ui/Textarea.astro';
-import Select from '@components/ui/Select.astro';
-import Input from '@components/ui/Input.astro';
+import { Textarea } from '@components/ui/textarea';
+import { Select } from '@components/ui/select';
+import { Input } from '@components/ui/input';
 export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
-import Button from '@components/ui/Button.astro';
+import { Button } from '@components/ui/button';
 import { actions } from 'astro:actions';
 
 const userId = Astro.locals.user?.id || 'system';

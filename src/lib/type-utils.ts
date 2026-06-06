@@ -1,6 +1,7 @@
 /**
  * Type Utilities for Cloudflare Workers + Astro SSR
- * Provides safe type assertions and guards for strict mode
+ * Provides safe type assertions and guards for strict mode.
+ * Merged from former src/lib/type-guards.ts.
  */
 
 /**
@@ -89,11 +90,6 @@ export type DeepRequired<T> = T extends object
   : T;
 
 /**
- * Re-export Result type from canonical location to maintain backward compatibility.
- * New code should import directly from '@/lib/result'.
- */
-export { type Result, toResult } from './result';
-/**
  * Assert environment variable is set
  */
 export function requireEnv(key: string): string {
@@ -104,14 +100,45 @@ export function requireEnv(key: string): string {
   return val;
 }
 
+// ─── Type Guards (merged from former src/lib/type-guards.ts) ─────────────────
+
 /**
- * Re-export of type guards from the legacy type-guards module.
- * New code should use these directly.
+ * Check if value is a valid object
  */
-export {
-  isObject,
-  isNonEmptyString,
-  isValidEnv,
-  hasProperty,
-  castToType,
-} from './type-guards';
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Check if value is a non-empty string
+ */
+export function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0;
+}
+
+/**
+ * Check if env object is valid
+ */
+export function isValidEnv(env: unknown): env is Record<string, unknown> {
+  return isObject(env) && Object.keys(env).length > 0;
+}
+
+/**
+ * Check if API response has expected shape
+ */
+export function hasProperty<T extends object, K extends string>(
+  obj: T,
+  key: K
+): obj is T & Record<K, unknown> {
+  return key in obj;
+}
+
+/**
+ * Validate and cast with type guard
+ */
+export function castToType<T>(
+  value: unknown,
+  guard: (v: unknown) => v is T
+): T | undefined {
+  return guard(value) ? value : undefined;
+}

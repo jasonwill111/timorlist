@@ -5,7 +5,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { canEditBusiness } from '@/lib/subscription';
-import { getAdminUser } from '@/lib/admin-auth';
+import { requireAdmin } from '@/lib/admin-auth';
 import { createErrorResponse, ErrorCode } from '@/lib/errors';
 
 const VALID_PRODUCT_TYPES = [
@@ -41,15 +41,14 @@ const parseJsonField = (val: string): unknown => {
 
 export const updateProduct = defineAction({
   input: UpdateProductSchema,
-  handler: async (input, { request }) => {
-    const user = await getAdminUser(request);
-    if (!user) {
-      return { success: false, error: { code: 'UNAUTHORIZED', message: 'Admin access required' } };
+  handler: async (input, { cookies }) => {
+    const authResult = await requireAdmin(cookies);
+    if ('error' in authResult) {
+      return { success: false, error: { code: authResult.error, message: 'Admin access required' } };
     }
 
     const db = await getDb();
-if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not available");
-
+    if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not available");
     try {
       // Check grace period if updating business association
       if (input.businessId) {

@@ -45,3 +45,9 @@
 - [x] T-603: wrangler deploy (Version 6bc84f3f-3138-448f-aaa8-6506517c0323)
 - [x] T-604: Post-deploy curl verification PASS
 - [x] T-605: No 500 errors in production
+
+## Phase 7: Action Consolidation (Bonus)
+- [x] T-701: Fix malformed `if (!db)` indentation in src/actions/products/update.ts:51
+- [x] T-702: Standardize auth pattern in src/actions/products/delete.ts (getAdminUser → requireAdmin)
+- [x] T-703: Verify build exits 0
+Note: Phases 3-5 remain deferred per spec. jsonResponse and error helpers consolidated.

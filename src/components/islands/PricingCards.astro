@@ -2,7 +2,7 @@
 // Pricing Page - Reads from service_packages table (admin managed)
 // Schema: service_type + service_relation_to
 import { getRawDb } from '@/lib/db';
-import Button from '@/components/ui/Button.astro';
+import { Button } from '@/components/ui/button';
 
 // Get raw D1 database for direct queries (bypasses Drizzle ORM issues)
 const rawDb = await getRawDb();

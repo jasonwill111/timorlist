@@ -11,12 +11,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Re-export sanitization utilities from the canonical location.
- * New code should import directly from '@/lib/sanitize'.
- */
-export { escapeHtml, sanitizeForAttribute, sanitizeForInnerHtml } from './sanitize';
-
-/**
  * Format a number as USD currency
  */
 export function formatCurrency(amount: number): string {

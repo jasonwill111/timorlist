@@ -1,13 +1,13 @@
 ---
-import Select from '@components/ui/Select.astro';
+import { Select } from '@components/ui/select';
 // New Product page - for creating products
 export const prerender = false;
 
 import Layout from '@layouts/Layout.astro';
-import Button from '@components/ui/Button.astro';
-import Input from '@components/ui/Input.astro';
-import Label from '@components/ui/Label.astro';
-import Card from '@components/ui/Card.astro';
+import { Button } from '@components/ui/button';
+import { Input } from '@components/ui/input';
+import { Label } from '@components/ui/label';
+import { Card } from '@components/ui/card';
 import { getDb } from '@/lib/db';
 import { productCategories } from '@/db/schema';
 import { actions } from 'astro:actions';

@@ -15,7 +15,7 @@ interface Props {
 
 const { updates = [], slug, isOwner = false } = Astro.props;
 import { actions } from 'astro:actions';
-import Button from './ui/Button.astro';
+import { Button } from './ui/button';
 import Textarea from './ui/Textarea.astro';
 
 // Parse SKU mentions: @SKU-XXX -> link
