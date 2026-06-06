@@ -109,8 +109,40 @@
   --leading-display: 1.1;
   --leading-heading: 1.25;
   --leading-snug: 1.375;
-  --leading-body: 1.5;
   --leading-relaxed: 1.6;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius scale */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadow scale */
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.08);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.12);
+  --shadow-xl: 0 24px 64px oklch(0 0 0 / 0.16);
+
+  /* Duration scale */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* Easing */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* Dark mode - Deep blue-black for better readability */
@@ -214,5 +246,38 @@
 @media (min-width: 1024px) {
   .container {
     padding-inline: 2rem;
+  }
+}
+/* Library compatibility aliases (Fulldev + Starwind) */
+@layer base {
+  /* Fulldev aliases */
+  :root {
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --card: var(--color-card);
+    --card-foreground: var(--color-card-foreground);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-primary-foreground);
+    --secondary: var(--color-secondary);
+    --secondary-foreground: var(--color-secondary-foreground);
+    --muted: var(--color-muted);
+    --muted-foreground: var(--color-muted-foreground);
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-accent-foreground);
+    --destructive: var(--color-destructive);
+    --destructive-foreground: var(--color-destructive-foreground);
+    --border: var(--color-border);
+    --input: var(--color-input);
+    --ring: var(--color-ring);
+    --radius: var(--radius-md);
+  }
+
+  /* Starwind aliases (separate namespace to avoid conflicts) */
+  :root {
+    --starwind-primary: var(--color-primary);
+    --starwind-primary-foreground: var(--color-primary-foreground);
+    --starwind-radius: var(--radius-md);
+    --starwind-duration: var(--duration-normal);
+    --starwind-ease: var(--ease-out);
   }
 }
