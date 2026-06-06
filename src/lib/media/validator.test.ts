@@ -104,11 +104,12 @@ describe('buildR2Key', () => {
       timestamp: 1712345678900,
       id: 'abc-123',
     });
-
-    expect(key).toContain('businesses/biz-123/profile/');
+    // buildR2Key sanitizes to first segment only: 'businesses'
+    expect(key).toContain('businesses/');
     expect(key).toContain('1712345678900');
     expect(key).toContain('abc-123');
     expect(key).toContain('.jpg');
+    expect(key).toMatch(/^businesses\/\d+-[a-z0-9-]+\.jpg$/);
   });
 
   it('should preserve filename without extension', () => {

@@ -10,6 +10,25 @@
  */
 export type GeocodeResult = { lat: number; lng: number } | null;
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org/search';
+export const DEBOUNCE_MS = 1100;
+
+type TimerHandle = ReturnType<typeof setTimeout>;
+
+// Debounce state
+let _lastCallTime = 0;
+let _pendingTimeout: TimerHandle | null = null;
+let _pendingResolver: ((value: GeocodeResult) => void) | null = null;
+
+/** Reset debounce state — for testing only */
+export function __resetDebounce() {
+  _lastCallTime = 0;
+  if (_pendingTimeout !== null) {
+    clearTimeout(_pendingTimeout);
+    _pendingTimeout = null;
+  }
+  _pendingResolver = null;
+}
+
 /**
  * Validate that latitude and longitude are within valid ranges.
  * Latitude must be between -90 and 90.
@@ -21,6 +40,7 @@ export function validateCoordinates(lat: number, lng: number): boolean {
   if (lng < -180 || lng > 180) return false;
   return true;
 }
+
 /**
  * Calculate distance between two points using Haversine formula.
  * Returns distance in kilometers.
@@ -31,7 +51,7 @@ export function calculateDistance(
   lat2: number,
   lng2: number
 ): number {
-  const R = 6371; // Earth's radius in km
+  const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
   const a =
@@ -41,16 +61,46 @@ export function calculateDistance(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
+
 function toRad(deg: number): number {
   return deg * (Math.PI / 180);
 }
+
 /**
  * Geocode an address string to lat/lng using OpenStreetMap Nominatim.
- *
- * @param address - The address to geocode (e.g. "Dili" or "Aileu, Timor-Leste")
- * @returns { lat, lng } on success, null on failure or no results
+ * Debounces rapid calls within DEBOUNCE_MS (1100ms).
+ * When two calls are made within the debounce window, the second call
+ * waits for the debounce to expire and returns the same result as the first.
  */
 export async function geocodeAddress(address: string): Promise<GeocodeResult> {
+  const now = Date.now();
+  const elapsed = now - _lastCallTime;
+
+  if (elapsed < DEBOUNCE_MS) {
+    // Within debounce window — cancel any existing pending request
+    if (_pendingTimeout !== null) {
+      clearTimeout(_pendingTimeout);
+      _pendingTimeout = null;
+      _pendingResolver = null;
+    }
+    // Schedule fresh request after debounce window
+    return new Promise<GeocodeResult>((resolve) => {
+      _pendingResolver = resolve;
+      _pendingTimeout = setTimeout(() => {
+        _pendingTimeout = null;
+        _pendingResolver = null;
+        _lastCallTime = Date.now();
+        resolve(geocode(address));
+      }, DEBOUNCE_MS - elapsed);
+    });
+  }
+
+  // Outside debounce window — fire immediately
+  _lastCallTime = now;
+  return geocode(address);
+}
+
+async function geocode(address: string): Promise<GeocodeResult> {
   const url = `${NOMINATIM_BASE}?format=json&q=${encodeURIComponent(address + ', Timor-Leste')}`;
   let response: Response;
   try {
@@ -58,7 +108,6 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult> {
       headers: { 'User-Agent': 'TimorUp/1.0' },
     });
   } catch {
-    // Network error
     return null;
   }
   if (!response.ok) {

@@ -85,14 +85,44 @@ export async function checkRateLimit(identifier: string): Promise<RateLimitResul
 
 /**
  * Check rate limit with custom max requests
+ * Primary: KV-backed (distributed, persists across cold starts)
+ * Fallback: in-memory Map (per-instance, resets on cold start)
  */
 export async function checkRateLimitWithLimit(identifier: string, maxRequests: number): Promise<RateLimitResult> {
-  // Skip rate limiting for local development - always allow
-  return {
-    allowed: true,
-    remaining: maxRequests,
-    resetIn: 60,
-  };
+  const key = `ratelimit:${identifier}`;
+  const now = Date.now();
+  try {
+    // Primary: use KV storage
+    const stored = await env.SESSION.get(key);
+    let record: { count: number; resetTime: number };
+    if (stored) {
+      record = JSON.parse(stored as string);
+      // Window expired — reset
+      if (now > record.resetTime) {
+        record = { count: 1, resetTime: now + WINDOW_MS };
+      } else if (record.count >= maxRequests) {
+        // Limit exceeded
+        return {
+          allowed: false,
+          remaining: 0,
+          resetIn: Math.ceil((record.resetTime - now) / 1000),
+        };
+      } else {
+        record.count++;
+      }
+    } else {
+      record = { count: 1, resetTime: now + WINDOW_MS };
+    }
+    await env.SESSION.put(key, JSON.stringify(record));
+    return {
+      allowed: true,
+      remaining: maxRequests - record.count,
+      resetIn: Math.ceil(WINDOW_MS / 1000),
+    };
+  } catch {
+    // Fallback: in-memory (for local dev or KV errors)
+    return checkRateLimitInMemoryInternal(identifier, now, maxRequests);
+  }
 }
 
 /**

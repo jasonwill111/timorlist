@@ -21,6 +21,7 @@ describe('getSubscriptionDashboard', () => {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       get: vi.fn().mockResolvedValue(null)
     };
@@ -38,16 +39,16 @@ describe('getSubscriptionDashboard', () => {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       get: vi.fn()
     };
-
     // Business exists query
     mockDb.get
       .mockResolvedValueOnce({ id: 'biz-123' })
       // Order query - active paid order
       .mockResolvedValueOnce({
-        servicePackageId: 'basic-monthly',
+        servicePackageId: 'sp-basic-monthly',
         planExpiresAt: futureExpiry,
         paidDate: now,
         variantSnapshot: null,
@@ -55,7 +56,9 @@ describe('getSubscriptionDashboard', () => {
       })
       // SKU count
       .mockResolvedValueOnce({ count: 5 })
-      // Plan limits
+      // Plan slug lookup (servicePackage by id)
+      .mockResolvedValueOnce({ slug: 'basic-monthly' })
+      // Plan limits lookup (servicePackage by slug)
       .mockResolvedValueOnce({
         variants: JSON.stringify([{
           limits: { skuLimit: 10, maxImages: 16, maxVideos: 2 }
@@ -77,6 +80,7 @@ describe('getSubscriptionDashboard', () => {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       get: vi.fn()
     };
@@ -101,12 +105,14 @@ describe('getSubscriptionDashboard', () => {
 
   it('should handle expired subscription', async () => {
     const now = Date.now();
-    const pastExpiry = now - 86400000; // 1 day ago
+    // 31 days ago — past the 30-day grace period so status = 'expired'
+    const pastExpiry = now - (31 * 86400000);
 
     const mockDb = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       get: vi.fn()
     };
@@ -114,13 +120,16 @@ describe('getSubscriptionDashboard', () => {
     mockDb.get
       .mockResolvedValueOnce({ id: 'biz-expired' })
       .mockResolvedValueOnce({
-        servicePackageId: 'basic-monthly',
+        servicePackageId: 'sp-basic-monthly',
         planExpiresAt: pastExpiry,
         paidDate: pastExpiry - 86400000,
         variantSnapshot: null,
         status: 'paid'
       })
       .mockResolvedValueOnce({ count: 3 })
+      // Plan slug lookup (servicePackage by id)
+      .mockResolvedValueOnce({ slug: 'basic-monthly' })
+      // Plan limits lookup (servicePackage by slug) - returns null for expired (no plan)
       .mockResolvedValueOnce(null);
 
     getDbMock.mockResolvedValue(mockDb);

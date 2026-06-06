@@ -4,21 +4,22 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { checkRateLimit, checkRateLimitInMemory } from '@/lib/rate-limit';
 
-import type { RateLimitResult } from '@/lib/rate-limit';
+// Use vi.hoisted so mocks are available before vi.mock factory runs
+const { mockSessionGet, mockSessionPut } = vi.hoisted(() => ({
+  mockSessionGet: vi.fn(),
+  mockSessionPut: vi.fn(),
+}));
 
-// Mock cloudflare:workers for KV access - use factory to avoid hoisting issues
 vi.mock('cloudflare:workers', () => ({
   env: {
     SESSION: {
-      get: vi.fn(),
-      put: vi.fn(),
+      get: mockSessionGet,
+      put: mockSessionPut,
     },
   },
 }));
-
-// Import after mock
-import { checkRateLimit, checkRateLimitInMemory } from '@/lib/rate-limit';
 
 describe('signIn action - GREEN tests (rate limiting)', () => {
   beforeEach(() => {
@@ -27,117 +28,93 @@ describe('signIn action - GREEN tests (rate limiting)', () => {
 
   describe('TC-01: checkRateLimit should use KV namespace', () => {
     it('should store rate limit in KV when available', async () => {
-      // Arrange
-      const { env } = await import('cloudflare:workers');
       const identifier = 'signin:test@example.com';
-      // count=5 means 5 requests already made, so after incrementing: count=6
+      // count=5 already made, after incrementing: count=6
+      // MAX_REQUESTS_PER_WINDOW = 1000, so remaining = 1000 - 6 = 994
       const stored = { count: 5, resetTime: Date.now() + 60000 };
 
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(JSON.stringify(stored));
-      (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      mockSessionGet.mockResolvedValue(JSON.stringify(stored));
+      mockSessionPut.mockResolvedValue(undefined);
 
-      // Act
       const result = await checkRateLimit(identifier);
 
-      // Assert - after 6th request, remaining = 100 - 6 = 94
-      expect(env.SESSION.get).toHaveBeenCalledWith(`ratelimit:${identifier}`);
+      expect(mockSessionGet).toHaveBeenCalledWith(`ratelimit:${identifier}`);
       expect(result.allowed).toBe(true);
-      expect(result.remaining).toBe(94);
+      expect(result.remaining).toBe(994);
     });
 
-    it('should return allowed:false when limit exceeded (100 requests)', async () => {
-      // Arrange
-      const { env } = await import('cloudflare:workers');
+    it('should return allowed:false when limit exceeded (1000 requests)', async () => {
       const identifier = 'signin:test@example.com';
-      // count=100 means 100 requests already made - next should be blocked
-      const stored = { count: 100, resetTime: Date.now() + 60000 };
+      // count=1000 means 1000 requests already made - next should be blocked
+      const stored = { count: 1000, resetTime: Date.now() + 60000 };
 
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(JSON.stringify(stored));
+      mockSessionGet.mockResolvedValue(JSON.stringify(stored));
 
-      // Act
       const result = await checkRateLimit(identifier);
 
-      // Assert
       expect(result.allowed).toBe(false);
       expect(result.remaining).toBe(0);
     });
 
     it('should create new record when no existing record', async () => {
-      // Arrange
-      const { env } = await import('cloudflare:workers');
       const identifier = 'signin:test@example.com';
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-      (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      mockSessionGet.mockResolvedValue(null);
+      mockSessionPut.mockResolvedValue(undefined);
 
-      // Act
       const result = await checkRateLimit(identifier);
 
-      // Assert
-      expect(env.SESSION.put).toHaveBeenCalled();
+      expect(mockSessionPut).toHaveBeenCalled();
       expect(result.allowed).toBe(true);
-      expect(result.remaining).toBe(99);
+      expect(result.remaining).toBe(999);
     });
   });
 
   describe('TC-02: Rate limiting window and limits', () => {
     it('should use 60 second window by default', async () => {
-      // Arrange
-      const { env } = await import('cloudflare:workers');
       const identifier = 'signin:test@example.com';
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-      (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      mockSessionGet.mockResolvedValue(null);
+      mockSessionPut.mockResolvedValue(undefined);
 
-      // Act
       const result = await checkRateLimit(identifier);
 
-      // Assert - resetIn should be ~60 seconds
       expect(result.resetIn).toBe(60);
     });
 
     it('should track remaining requests accurately', async () => {
-      // Arrange
-      const { env } = await import('cloudflare:workers');
       const identifier = 'signin:test@example.com';
-      // count=50 means 50 already made, after 51st request: remaining = 49
+      // count=50 already made, after 51st: remaining = 1000 - 51 = 949
       const stored = { count: 50, resetTime: Date.now() + 60000 };
 
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(JSON.stringify(stored));
-      (env.SESSION.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      mockSessionGet.mockResolvedValue(JSON.stringify(stored));
+      mockSessionPut.mockResolvedValue(undefined);
 
-      // Act
       const result = await checkRateLimit(identifier);
 
-      // Assert - after 51st request, remaining = 100 - 51 = 49
-      expect(result.remaining).toBe(49);
+      expect(result.remaining).toBe(949);
     });
   });
 
   describe('TC-03: KV fallback to in-memory', () => {
     it('should fall back to in-memory when KV throws', async () => {
-      // Arrange
-      const { env } = await import('cloudflare:workers');
       const identifier = 'signin:test@example.com';
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('KV unavailable'));
-      (env.SESSION.put as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('KV unavailable'));
+      mockSessionGet.mockRejectedValue(new Error('KV unavailable'));
+      mockSessionPut.mockRejectedValue(new Error('KV unavailable'));
 
-      // Act
       const result = await checkRateLimit(identifier);
 
-      // Assert - should still return allowed (fallback works)
+      // Should still return allowed (fallback works)
       expect(result.allowed).toBe(true);
     });
 
     it('should use in-memory when KV is not available', async () => {
-      // Arrange - KV returns undefined (not available)
-      const { env } = await import('cloudflare:workers');
-      (env.SESSION.get as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+      // KV returns undefined (not available)
+      mockSessionGet.mockResolvedValue(undefined);
 
-      // Act - first request on fresh in-memory store: remaining = 100 - 1 = 99
+      // First request on fresh in-memory store: remaining = 1000 - 1 = 999
       const result = await checkRateLimit('signin:new@example.com');
 
-      // Assert
       expect(result.allowed).toBe(true);
-      expect(result.remaining).toBe(99);
+      expect(result.remaining).toBe(999);
     });
   });
 });
@@ -146,20 +123,19 @@ describe('checkRateLimitInMemory for testing', () => {
   it('should return allowed:true for first request', () => {
     const result = checkRateLimitInMemory('test:memory@example.com');
     expect(result.allowed).toBe(true);
-    expect(result.remaining).toBe(99);
+    // Default MAX_REQUESTS_PER_WINDOW = 1000, first request: remaining = 999
+    expect(result.remaining).toBe(999);
   });
 
   it('should track requests in memory', () => {
     const identifier = 'test:memory2@example.com';
-    // First request
     const first = checkRateLimitInMemory(identifier);
     expect(first.allowed).toBe(true);
-    expect(first.remaining).toBe(99);
+    expect(first.remaining).toBe(999);
 
-    // Second request
     const second = checkRateLimitInMemory(identifier);
     expect(second.allowed).toBe(true);
-    expect(second.remaining).toBe(98);
+    expect(second.remaining).toBe(998);
   });
 });
 
@@ -183,13 +159,10 @@ describe('getErrorMessage in utils.ts', () => {
   });
 
   it('signIn.ts should handle errors gracefully', async () => {
-    // signIn.ts uses better-auth's built-in error handling
-    // The action returns structured error responses via createErrorResponse
     const fs = await import('fs');
     const signInPath = `${process.cwd()}/src/actions/auth/signIn.ts`;
     const content = fs.readFileSync(signInPath, 'utf-8');
 
-    // Should have try-catch with structured error response
     const hasTryCatch = content.includes('try {') && content.includes('catch (error)');
     const hasErrorResponse = content.includes('createErrorResponse') && content.includes('ErrorCode');
 

@@ -2,7 +2,7 @@
 // Uses orders table for subscription state (not cached on businesses)
 import { getDb } from './db';
 import { businesses, products, servicePackages, orders } from '@/db/schema';
-import { eq, count, desc } from 'drizzle-orm';
+import { eq, and, count, desc } from 'drizzle-orm';
 
 export interface PlanLimits {
   skuLimit: number;
