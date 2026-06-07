@@ -1,0 +1,11 @@
+{
+  "id": "0131-passwordinput-ssr-safe",
+  "title": "PasswordInput Label + LucideIcon migration",
+  "type": "refactor",
+  "status": "in-progress",
+  "priority": "P2",
+  "created": "2026-06-07",
+  "updated": "2026-06-07",
+  "owner": "team",
+  "tags": ["ui", "forms", "password", "ssr", "high-risk"]
+}

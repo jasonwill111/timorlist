@@ -6,6 +6,7 @@ interface Props {
   size?: number;
   class?: string;
   strokeWidth?: number;
+  id?: string;
 }
 
 const {
@@ -13,8 +14,9 @@ const {
   size = 24,
   class: className = '',
   strokeWidth = 2,
+  id,
 } = Astro.props;
 
 const Icon = LucideIcons[name as keyof typeof LucideIcons] || LucideIcons['HelpCircle'];
 ---
-<Icon size={size} class={className} strokeWidth={strokeWidth} />
+<Icon id={id} size={size} class={className} strokeWidth={strokeWidth} />
