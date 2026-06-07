@@ -1,5 +1,4 @@
 // Admin actions index
-export { adminCategories as categories } from './categories';
 export { servicePackagesAdmin } from './servicePackagesAdmin';
 export { subscriptions } from './subscriptions';
 export { blogs } from './blogs';

@@ -37,9 +37,7 @@ export const PERMISSIONS = {
   canEditOwnProduct: ['editor', 'admin', 'super_admin'] as Role[],
   canEditAnyProduct: ['admin', 'super_admin'] as Role[],
 
-  // Categories - admin+ only
-  canManageCategories: ['admin', 'super_admin'] as Role[],
-
+  
   // Banners - admin+ only
   canManageBanners: ['admin', 'super_admin'] as Role[],
 
@@ -79,7 +77,6 @@ export const ADMIN_NAV_ITEMS = [
   { href: '/admin/products', label: 'Products/SKUs', icon: 'tag', minRole: 'editor' as Role },
   { href: '/admin/blogs', label: 'Blogs', icon: 'newspaper', minRole: 'editor' as Role },
   { href: '/admin/orders', label: 'Subscriptions', icon: 'document', minRole: 'admin' as Role },
-  { href: '/admin/categories', label: 'Categories', icon: 'folder', minRole: 'admin' as Role },
   { href: '/admin/ad-banners', label: 'Heroes', icon: 'image', minRole: 'admin' as Role },
   { href: '/admin/service-packages', label: 'Plans', icon: 'credit-card', minRole: 'admin' as Role },
   { href: '/admin/media', label: 'Media', icon: 'photo', minRole: 'admin' as Role },
