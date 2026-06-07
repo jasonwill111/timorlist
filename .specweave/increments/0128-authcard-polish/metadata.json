@@ -1,0 +1,11 @@
+{
+  "id": "0128-authcard-polish",
+  "title": "AuthCard footer link use Button variant=link",
+  "type": "polish",
+  "status": "in-progress",
+  "priority": "P3",
+  "created": "2026-06-07",
+  "updated": "2026-06-07",
+  "owner": "team",
+  "tags": ["ui", "auth", "polish", "low-risk"]
+}
