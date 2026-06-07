@@ -25,8 +25,8 @@
 
 ## Definition of Done
 
-- [ ] FormMessage uses ui/Alert primitives
-- [ ] Footer uses Separator
-- [ ] `pnpm build` exit 0
-- [ ] window.__formMessage API preserved
-- [ ] No visual regression
+- [x] FormMessage uses ui/Alert primitives
+- [x] Footer uses Separator
+- [x] `pnpm build` exit 0
+- [x] window.__formMessage API preserved
+- [x] No visual regression
