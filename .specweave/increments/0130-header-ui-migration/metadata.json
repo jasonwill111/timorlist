@@ -1,0 +1,11 @@
+{
+  "id": "0130-header-ui-migration",
+  "title": "Header desktop avatar use ui/Avatar",
+  "type": "refactor",
+  "status": "in-progress",
+  "priority": "P2",
+  "created": "2026-06-07",
+  "updated": "2026-06-07",
+  "owner": "team",
+  "tags": ["ui", "header", "avatar", "low-risk-scope"]
+}

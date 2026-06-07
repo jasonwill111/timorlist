@@ -1,7 +1,26 @@
 ---
+/**
+ * Header - Main site navigation
+ * Migrated to compose ui/* primitives:
+ * - Desktop nav dropdowns → DropdownMenu (click trigger)
+ * - Mobile menu → Sheet (right side panel)
+ * - Avatar → Avatar + AvatarFallback
+ *
+ * All imports must be inside the single frontmatter block (SSR safety, see 0125).
+ */
 import ThemeToggle from './ui/ThemeToggle.astro';
-import LucideIcon from './ui/LucideIcon.astro';
 import { Button } from './ui/button';
+import { Avatar } from './ui/avatar';
+import { AvatarFallback } from './ui/avatar';
+import { DropdownMenu } from './ui/dropdown-menu';
+import { DropdownMenuTrigger } from './ui/dropdown-menu';
+import { DropdownMenuContent } from './ui/dropdown-menu';
+import { Sheet } from './ui/sheet';
+import { SheetTrigger } from './ui/sheet';
+import { SheetContent } from './ui/sheet';
+import { SheetHeader } from './ui/sheet';
+import { SheetTitle } from './ui/sheet';
+import { SheetDescription } from './ui/sheet';
 
 interface Props {
   currentPath?: string;
@@ -24,21 +43,23 @@ const urlParams = new URL(Astro.request.url).searchParams;
         <span class="font-bold text-xl hidden sm:inline-block">TimorUp</span>
       </a>
 
-      <!-- Desktop Navigation - ALL buttons 44px height -->
+      <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-0">
         <!-- Dropdown: Business -->
-        <div class="relative group">
-          <Button variant="ghost" size="sm" class="flex items-center text-muted-foreground">
+        <DropdownMenu>
+          <DropdownMenuTrigger class="inline-flex items-center justify-center h-9 px-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
             Business
-            <LucideIcon name="ChevronDown" size={12} class="ml-0.5" />
-          </Button>
-          <!-- Hover bridge: invisible area to prevent dropdown from disappearing when mouse moves down -->
-          <div class="absolute left-0 right-0 h-2 -mb-1 -mt-0.5 cursor-default"></div>
-          <div class="hidden group-hover:block absolute left-0 mt-1 w-48 bg-background border rounded-lg shadow-lg py-1 z-50">
-            <a href="/businesses" class="block px-3 py-2 text-sm hover:bg-muted">Business Directories</a>
-            <a href="/products-services" class="block px-3 py-2 text-sm hover:bg-muted">Products & Services</a>
-          </div>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent class="w-48">
+            <a href="/businesses" data-slot="dropdown-menu-item" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
+              Business Directories
+            </a>
+            <a href="/products-services" data-slot="dropdown-menu-item" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
+              Products & Services
+            </a>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <a
           href="/listings"
           class:list={[
@@ -48,19 +69,22 @@ const urlParams = new URL(Astro.request.url).searchParams;
         >
           Classified Ads
         </a>
+
         <!-- Dropdown: Govs & NGOs -->
-        <div class="relative group">
-          <Button variant="ghost" size="sm" class="flex items-center text-muted-foreground">
+        <DropdownMenu>
+          <DropdownMenuTrigger class="inline-flex items-center justify-center h-9 px-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
             Govs & NGOs
-            <LucideIcon name="ChevronDown" size={12} class="ml-0.5" />
-          </Button>
-          <!-- Hover bridge: invisible area to prevent dropdown from disappearing when mouse moves down -->
-          <div class="absolute left-0 right-0 h-2 -mb-1 -mt-0.5 cursor-default"></div>
-          <div class="hidden group-hover:block absolute left-0 mt-1 w-40 bg-background border rounded-lg shadow-lg py-1 z-50">
-            <a href="/public-sectors" class="block px-3 py-2 text-sm hover:bg-muted">Public Sectors</a>
-            <a href="/non-profits" class="block px-3 py-2 text-sm hover:bg-muted">Non-Profits</a>
-          </div>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent class="w-40">
+            <a href="/public-sectors" data-slot="dropdown-menu-item" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
+              Public Sectors
+            </a>
+            <a href="/non-profits" data-slot="dropdown-menu-item" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
+              Non-Profits
+            </a>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <a
           href="/pricing"
           class:list={[
@@ -87,22 +111,28 @@ const urlParams = new URL(Astro.request.url).searchParams;
         </a>
       </nav>
 
-      <!-- Right Side - ALL buttons 44px height -->
+      <!-- Right Side -->
       <div class="flex items-center gap-2">
         <ThemeToggle />
 
         <div id="desktop-auth" class="hidden md:flex items-center gap-2">
           {isLoggedIn ? (
-            <div class="relative">
-              <Button id="avatar-dropdown-btn" variant="ghost" size="default" class="w-11 h-10 rounded-lg bg-brand-500 flex items-center justify-center hover:opacity-80 transition-opacity p-0">
-                <span class="text-white text-sm font-medium">?</span>
-              </Button>
-              <div id="avatar-dropdown" class="hidden absolute right-0 mt-2 w-40 bg-background border rounded-lg shadow-lg py-1 z-50">
-                <a href="/account" class="block px-4 py-3 text-sm hover:bg-muted">My Account</a>
-                <hr class="my-1 border-muted" />
-                <Button id="logout-btn" variant="ghost" class="block w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-muted rounded-none" />
-              </div>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger class="w-11 h-10 rounded-lg bg-brand-500 hover:opacity-80 transition-opacity p-0 inline-flex items-center justify-center">
+                <Avatar class="w-full h-full bg-brand-500">
+                  <AvatarFallback class="bg-brand-500 text-white text-sm font-medium">?</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" class="w-40">
+                <a href="/account" data-slot="dropdown-menu-item" class="relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
+                  My Account
+                </a>
+                <div data-slot="dropdown-menu-separator" class="bg-muted -mx-1 my-1 h-px"></div>
+                <button id="logout-btn" data-slot="dropdown-menu-item" data-variant="destructive" class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none text-red-500 hover:bg-destructive/10">
+                  Log Out
+                </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <a href="/login" class="text-sm font-medium text-muted-foreground hover:text-primary px-2 sm:px-3 h-7 rounded-md hover:bg-muted transition-colors flex items-center py-0.5">
@@ -115,125 +145,67 @@ const urlParams = new URL(Astro.request.url).searchParams;
           )}
         </div>
 
-        <!-- Mobile Menu Button -->
-        <Button
-          id="mobile-menu-btn"
-          data-action="mobile-menu-open"
-          variant="ghost"
-          size="icon"
-          class="md:hidden w-11 h-10 rounded-md hover:bg-muted transition-colors flex items-center justify-center"
-          aria-label="Open menu"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </Button>
+        <!-- Mobile Menu (Sheet) -->
+        <Sheet>
+          <SheetTrigger class="md:hidden w-11 h-10 rounded-md hover:bg-muted transition-colors" aria-label="Open menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </SheetTrigger>
+          <SheetContent side="right" class="w-full max-w-xs p-0">
+            <SheetHeader class="p-4 border-b">
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription>Navigate to a section</SheetDescription>
+            </SheetHeader>
+            <nav class="flex flex-col p-4 space-y-1">
+              <a href="/businesses" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/businesses') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                Business Directories
+              </a>
+              <a href="/products-services" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/products-services') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                Products & Services
+              </a>
+              <a href="/listings" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/listings') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                Classified Ads
+              </a>
+              <a href="/public-sectors" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/public-sectors') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                Public Sectors
+              </a>
+              <a href="/non-profits" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/non-profits') ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                Non-Profits
+              </a>
+              <a href="/pricing" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/pricing' ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                Pricing
+              </a>
+              <a href="/faq" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/faq' ? "bg-muted text-primary" : "text-muted-foreground"]}>
+                FAQ
+              </a>
+              <a href="/listings/create" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium bg-primary text-primary-foreground text-center flex items-center justify-center">
+                + Create Listing
+              </a>
+              <div id="mobile-auth" class="border-t pt-2 mt-2 space-y-2">
+                {isLoggedIn ? (
+                  <>
+                    <a href="/account" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-muted-foreground flex items-center">My Account</a>
+                    <Button id="mobile-logout" data-action="mobile-logout" variant="ghost" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center" />
+                  </>
+                ) : (
+                  <>
+                    <a href="/login" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center border border-primary text-primary hover:bg-primary/5 flex items-center justify-center">Log in</a>
+                    <a href="/register" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center bg-primary text-primary-foreground flex items-center justify-center">Sign Up</a>
+                  </>
+                )}
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
     </div>
-  </div>
-
-  <!-- Mobile Menu -->
-  <div id="mobile-menu" class="hidden md:hidden border-t">
-    <nav class="container max-w-6xl py-4 space-y-2">
-      <a href="/businesses" data-action="mobile-nav" data-href="/businesses" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/businesses') ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        Business Directories
-      </a>
-      <a href="/products-services" data-action="mobile-nav" data-href="/products-services" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/products-services') ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        Products & Services
-      </a>
-      <a href="/listings" data-action="mobile-nav" data-href="/listings" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/listings') ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        Classified Ads
-      </a>
-      <a href="/public-sectors" data-action="mobile-nav" data-href="/public-sectors" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/public-sectors') ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        Public Sectors
-      </a>
-      <a href="/non-profits" data-action="mobile-nav" data-href="/non-profits" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath.startsWith('/non-profits') ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        Non-Profits
-      </a>
-      <a href="/pricing" data-action="mobile-nav" data-href="/pricing" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/pricing' ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        Pricing
-      </a>
-      <a href="/faq" data-action="mobile-nav" data-href="/faq" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium flex items-center", currentPath === '/faq' ? "bg-muted text-primary" : "text-muted-foreground"]}>
-        FAQ
-      </a>
-      <a href="/listings/create" data-action="mobile-nav" data-href="/listings/create" class:list={["block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium bg-primary text-primary-foreground text-center flex items-center justify-center", currentPath === '/listings/create' ? "bg-primary/90" : ""]}>
-        + Create Listing
-      </a>
-      <div id="mobile-auth" class="border-t pt-2 mt-2 space-y-2">
-        {isLoggedIn ? (
-          <>
-            <a href="/account" data-action="mobile-nav" data-href="/account" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-muted-foreground flex items-center">My Account</a>
-            <Button id="mobile-logout" data-action="mobile-logout" variant="ghost" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center" />
-          </>
-        ) : (
-          <>
-            <a href="/login" data-action="mobile-nav" data-href="/login" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center border border-primary text-primary hover:bg-primary/5 flex items-center justify-center">Log in</a>
-            <a href="/register" data-action="mobile-nav" data-href="/register" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-center bg-primary text-primary-foreground flex items-center justify-center">Sign Up</a>
-          </>
-        )}
-      </div>
-    </nav>
   </div>
 </header>
 
 <script>
   import { actions } from 'astro:actions';
-  const mobileMenu = document.getElementById('mobile-menu');
-  let isMenuOpen = false;
-  // Event delegation for mobile menu
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    const actionEl = target.closest('[data-action]');
-    const action = actionEl?.getAttribute('data-action');
-    if (action === 'mobile-menu-open') {
-      e.preventDefault();
-      if (!mobileMenu) return;
-      isMenuOpen = !isMenuOpen;
-      if (isMenuOpen) {
-        mobileMenu.classList.remove('hidden');
-        const mobileNav = mobileMenu.querySelector('nav');
-        if (mobileNav) {
-          mobileNav.classList.add('animate-in');
-        }
-      } else {
-        mobileMenu.classList.add('hidden');
-      }
-    }
-    if (action === 'mobile-menu-close') {
-      e.preventDefault();
-      isMenuOpen = false;
-      mobileMenu?.classList.add('hidden');
-    }
-    if (action === 'mobile-nav') {
-      const href = actionEl?.getAttribute('data-href') || (actionEl as HTMLAnchorElement)?.getAttribute('href');
-      if (href) {
-        // Close menu on navigation
-        isMenuOpen = false;
-        mobileMenu?.classList.add('hidden');
-      }
-    }
-    if (action === 'mobile-logout') {
-      handleLogout();
-    }
-  });
-  // Dropdown menu animations via CSS classes - ONLY target nav dropdown groups, not all .group elements
-  const dropdownGroups = document.querySelectorAll('nav .group');
-  dropdownGroups.forEach(group => {
-    const dropdown = group.querySelector('div:last-child');
-    if (dropdown) {
-      group.addEventListener('mouseenter', () => {
-        dropdown.classList.remove('hidden');
-        dropdown.classList.add('dropdown-enter');
-      });
-      group.addEventListener('mouseleave', () => {
-        dropdown.classList.remove('dropdown-enter');
-        dropdown.classList.add('dropdown-exit');
-        setTimeout(() => {
-          dropdown.classList.add('hidden');
-          dropdown.classList.remove('dropdown-exit');
-        }, 150);
-      });
-    }
-  });
+
+  // Logout handler for both desktop and mobile
   async function handleLogout() {
     try { await actions.auth.signOut(); }
     catch (e) { console.error('Logout error:', e); }
@@ -243,6 +215,19 @@ const urlParams = new URL(Astro.request.url).searchParams;
       window.location.href = '/';
     }
   }
+
+  // Wire up logout buttons (desktop + mobile) via event delegation
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const actionEl = target.closest('[data-action]');
+    const action = actionEl?.getAttribute('data-action');
+    if (action === 'mobile-logout') {
+      handleLogout();
+    }
+    if (target.closest('#logout-btn')) {
+      handleLogout();
+    }
+  });
 
   function updateAuthState() {
     const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
@@ -254,30 +239,49 @@ const urlParams = new URL(Astro.request.url).searchParams;
     if (userId) {
       if (desktopAuth) {
         desktopAuth.innerHTML = `
-          <div class="relative">
-            <button id="avatar-dropdown-btn" class="w-11 h-10 rounded-lg bg-brand-500 flex items-center justify-center hover:opacity-80 transition-opacity">
-              <span class="text-white text-sm font-medium">${initial}</span>
+          <div data-slot="dropdown-menu" class="relative">
+            <button data-slot="dropdown-menu-trigger" id="avatar-dropdown-btn" class="w-11 h-10 rounded-lg bg-brand-500 hover:opacity-80 transition-opacity p-0 inline-flex items-center justify-center">
+              <div data-slot="avatar" data-size="default" class="after:border-border group/avatar relative flex size-8 shrink-0 overflow-hidden rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:mix-blend-darken dark:after:mix-blend-lighten">
+                <div data-slot="avatar-fallback" class="bg-brand-500 text-muted-foreground absolute inset-0 z-0 flex size-full items-center justify-center rounded-full text-sm group-data-[size=sm]/avatar:text-xs">
+                  <span class="text-white font-medium">${initial}</span>
+                </div>
+              </div>
             </button>
-            <div id="avatar-dropdown" class="hidden absolute right-0 mt-2 w-40 bg-background border rounded-lg shadow-lg py-1 z-50">
-              <a href="/account" class="block px-4 py-3 text-sm hover:bg-muted">My Account</a>
-              <hr class="my-1 border-muted" />
-              <button id="logout-btn" class="block w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-muted">Log Out</button>
+            <div data-slot="dropdown-menu-portal" class="hidden absolute right-0 mt-2 z-50">
+              <div data-slot="dropdown-menu-positioner" data-side="bottom" data-align="end" class="isolate z-50 outline-none">
+                <div data-slot="dropdown-menu-content" hidden class="bg-popover text-popover-foreground z-50 min-w-32 overflow-x-hidden overflow-y-auto rounded-md p-1 shadow-md ring-1 ring-foreground/10 w-40">
+                  <a href="/account" data-slot="dropdown-menu-item" class="relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground">My Account</a>
+                  <div data-slot="dropdown-menu-separator" class="bg-muted -mx-1 my-1 h-px"></div>
+                  <button id="logout-btn" data-slot="dropdown-menu-item" data-variant="destructive" class="relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none text-red-500 hover:bg-destructive/10">Log Out</button>
+                </div>
+              </div>
             </div>
           </div>
         `;
         setTimeout(() => {
-          document.getElementById('avatar-dropdown-btn')?.addEventListener('click', (e) => {
+          const btn = document.getElementById('avatar-dropdown-btn');
+          const portal = btn?.closest('[data-slot="dropdown-menu"]')?.querySelector('[data-slot="dropdown-menu-portal"]');
+          const content = portal?.querySelector('[data-slot="dropdown-menu-content"]') as HTMLElement | null;
+          btn?.addEventListener('click', (e) => {
             e.stopPropagation();
-            document.getElementById('avatar-dropdown')?.classList.toggle('hidden');
+            if (content) {
+              content.hidden = !content.hidden;
+              portal?.classList.toggle('hidden', content.hidden);
+            }
+          });
+          document.addEventListener('click', () => {
+            if (content && !content.hidden) {
+              content.hidden = true;
+              portal?.classList.add('hidden');
+            }
           });
           document.getElementById('logout-btn')?.addEventListener('click', () => handleLogout());
-          document.addEventListener('click', () => document.getElementById('avatar-dropdown')?.classList.add('hidden'));
         }, 0);
       }
       if (mobileAuth) {
         mobileAuth.innerHTML = `
-          <a href="/account" data-action="mobile-nav" data-href="/account" class="block px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground">My Account</a>
-          <button id="mobile-logout" data-action="mobile-logout" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-500">Log Out</button>
+          <a href="/account" class="block px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-muted-foreground flex items-center">My Account</a>
+          <button id="mobile-logout" data-action="mobile-logout" class="block w-full text-left px-3 py-3 min-h-[44px] rounded-lg text-base sm:text-sm font-medium text-red-500 flex items-center">Log Out</button>
         `;
       }
     }
