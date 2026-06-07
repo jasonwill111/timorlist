@@ -6,6 +6,7 @@ import { reviews as reviewsTable, businesses } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getAdminUser } from '@/lib/admin-auth';
 import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { getRatingStats } from '@/lib/rating';
 
 const listSchema = z.object({
   page: z.number().int().positive().default(1),
@@ -72,17 +73,9 @@ export const adminReviews = {
         .run();
 
       // Recalculate business rating
-      const remainingReviews = await db.select()
-        .from(reviewsTable)
-        .where(eq(reviewsTable.businessId, businessId));
-
-      let newAvg = 0;
-      let newCount = 0;
-      if (remainingReviews.length > 0) {
-        const sum = remainingReviews.reduce((acc, r) => acc + r.rating, 0);
-        newAvg = sum / remainingReviews.length;
-        newCount = remainingReviews.length;
-      }
+      const stats = await getRatingStats(businessId);
+      const newAvg = stats.avgRating ?? 0;
+      const newCount = stats.reviewCount;
 
       // Update business rating
       await db.update(businesses)
