@@ -1,0 +1,333 @@
+---
+/**
+ * ReviewsIsland - Admin reviews management island
+ * Server-fetched reviews with client-side filter + pagination
+ */
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+
+interface ReviewData {
+  id: string;
+  businessId: string | null;
+  userId: string | null;
+  rating: number | null;
+  comment: string | null;
+  reply: string | null;
+  isEdited: boolean | null;
+  createdAt: number | null;
+  businessTitle?: string;
+  userName?: string;
+  userEmail?: string;
+}
+
+interface Props {
+  reviews: ReviewData[];
+  total?: number;
+}
+
+const { reviews, total } = Astro.props;
+
+function renderStars(rating: number): string {
+  return Array.from({ length: 5 }, (_, i) =>
+    i < rating
+      ? '<span class="text-yellow-500">★</span>'
+      : '<span class="text-gray-300 dark:text-gray-600">★</span>'
+  ).join('');
+}
+
+function formatDate(ts: number | null): string {
+  return ts ? new Date(ts * 1000).toLocaleDateString() : 'N/A';
+}
+---
+
+<div class="reviews-island" data-page="reviews">
+  <!-- Search & Filters -->
+  <div class="bg-card border rounded-lg p-3 md:p-4 mb-4">
+    <div class="flex flex-col md:flex-row gap-3">
+      <Input
+        type="text"
+        id="search-input"
+        placeholder="Search by business name, user, or comment..."
+        class="w-full px-3 py-2 border rounded-lg text-sm"
+      />
+      <div class="flex gap-2">
+        <Select
+          id="rating-filter"
+          options={[
+            { value: "", label: "All Ratings" },
+            { value: "5", label: "5 Stars" },
+            { value: "4", label: "4 Stars" },
+            { value: "3", label: "3 Stars" },
+            { value: "2", label: "2 Stars" },
+            { value: "1", label: "1 Star" },
+          ]}
+        />
+        <Input type="date" id="from-date" class="px-3 py-2 border rounded-lg text-sm" />
+        <Input type="date" id="to-date" class="px-3 py-2 border rounded-lg text-sm" />
+        <Button
+          id="search-btn"
+          class="px-4 py-2 bg-primary text-black rounded-lg text-sm font-medium hover:bg-primary/90"
+        >
+          Search
+        </Button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews List -->
+  <div class="bg-card border rounded-lg p-3 md:p-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-sm md:text-base">All Reviews</h3>
+      <span id="reviews-count" class="text-xs text-muted-foreground">{total ?? reviews.length} reviews</span>
+    </div>
+    <div id="reviews-list" class="space-y-2">
+      {reviews.length === 0 ? (
+        <p class="text-center text-muted-foreground py-8">No reviews found</p>
+      ) : (
+        reviews.map((review) => (
+          <div class="p-3 border rounded text-sm">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <!-- Header -->
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                  <span class="font-medium">{review.businessTitle || 'Unknown Business'}</span>
+                  <span class="text-xs text-muted-foreground">by {review.userName || review.userEmail || 'Unknown'}</span>
+                  {review.reply && (
+                    <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">Replied</span>
+                  )}
+                </div>
+                <!-- Stars -->
+                <div class="flex items-center gap-1 mb-2" set:html={renderStars(review.rating ?? 0)} />
+                <!-- Comment -->
+                <p class="text-muted-foreground text-xs mb-2 break-words">{review.comment || 'No comment'}</p>
+                <!-- Meta -->
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-muted-foreground">{formatDate(review.createdAt)}</span>
+                  {review.isEdited && <span class="text-xs text-yellow-600">(edited)</span>}
+                  {review.reply && (
+                    <span class="text-xs text-green-600">Replied: {review.reply.slice(0, 30)}{review.reply.length > 30 ? '...' : ''}</span>
+                  )}
+                </div>
+              </div>
+              <!-- Delete button -->
+              <button
+                class="text-red-500 hover:text-red-600 text-xs px-2 py-1 border border-red-200 dark:border-red-800 rounded shrink-0"
+                data-action="delete-review"
+                data-id={review.id}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+    <!-- Pagination -->
+    <div id="pagination" class="flex items-center justify-between mt-4 pt-4 border-t">
+      <span id="page-info" class="text-sm text-muted-foreground"></span>
+      <div class="flex gap-2">
+        <Button id="prev-btn" variant="outline" class="px-3 py-1 text-sm" disabled>Previous</Button>
+        <Button id="next-btn" variant="outline" class="px-3 py-1 text-sm" disabled>Next</Button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-background rounded-lg p-6 max-w-sm w-full mx-4">
+      <h3 class="text-lg font-semibold mb-2">Delete Review</h3>
+      <p class="text-muted-foreground mb-4">Are you sure you want to delete this review? This action cannot be undone.</p>
+      <input type="hidden" id="delete-review-id" value="" />
+      <div class="flex gap-2 justify-end">
+        <Button id="delete-cancel" variant="outline" class="px-4 py-2 text-sm">Cancel</Button>
+        <Button id="delete-confirm" variant="destructive" class="px-4 py-2 text-sm">Delete</Button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { toast } from '@/lib/toast';
+
+  let currentPage = 1;
+  const pageSize = 20;
+
+  async function authFetch(url: string, options: RequestInit = {}) {
+    return fetch(url, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+        ...options.headers,
+      },
+    });
+  }
+
+  async function loadReviews() {
+    const search = (document.getElementById('search-input') as HTMLInputElement)?.value || '';
+    const rating = (document.getElementById('rating-filter') as HTMLSelectElement)?.value || '';
+    const fromDate = (document.getElementById('from-date') as HTMLInputElement)?.value || '';
+    const toDate = (document.getElementById('to-date') as HTMLInputElement)?.value || '';
+
+    let url = `/api/admin/reviews?page=${currentPage}&limit=${pageSize}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    if (rating) url += `&rating=${rating}`;
+    if (fromDate) url += `&from=${fromDate}`;
+    if (toDate) url += `&to=${toDate}`;
+
+    try {
+      const res = await authFetch(url);
+      const data = await res.json();
+
+      const container = document.getElementById('reviews-list');
+      const countEl = document.getElementById('reviews-count');
+      const pageInfo = document.getElementById('page-info');
+      const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
+      const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
+      if (!container || !countEl) return;
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted-foreground py-8">No reviews found</p>';
+        countEl.textContent = '0 reviews';
+        if (pageInfo) pageInfo.textContent = '';
+        return;
+      }
+
+      const total = data.total || data.data.length;
+      countEl.textContent = `${total} review${total !== 1 ? 's' : ''} total`;
+
+      if (pageInfo) {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(currentPage * pageSize, total);
+        pageInfo.textContent = `Showing ${start}-${end} of ${total}`;
+      }
+
+      if (prevBtn) prevBtn.disabled = currentPage <= 1;
+      if (nextBtn) nextBtn.disabled = currentPage * pageSize >= total;
+
+      container.textContent = '';
+      data.data.forEach((review: any) => {
+        const reviewDiv = document.createElement('div');
+        reviewDiv.className = 'p-3 border rounded text-sm';
+
+        const stars = Array.from({ length: 5 }, (_, i) =>
+          i < (review.rating || 0)
+            ? '<span class="text-yellow-500">★</span>'
+            : '<span class="text-gray-300 dark:text-gray-600">★</span>'
+        ).join('');
+
+        const replyBadge = review.reply
+          ? `<span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">Replied</span>`
+          : '';
+        const editedSpan = review.isEdited
+          ? `<span class="text-xs text-yellow-600">(edited)</span>`
+          : '';
+        const replyInfo = review.reply
+          ? `<span class="text-xs text-green-600">Replied: ${review.reply.slice(0, 30)}${review.reply.length > 30 ? '...' : ''}</span>`
+          : '';
+        const createdAt = review.createdAt
+          ? new Date(review.createdAt * 1000).toLocaleDateString()
+          : 'N/A';
+
+        reviewDiv.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2 mb-1">
+                <span class="font-medium">${review.businessTitle || 'Unknown Business'}</span>
+                <span class="text-xs text-muted-foreground">by ${review.userName || review.userEmail || 'Unknown'}</span>
+                ${replyBadge}
+              </div>
+              <div class="flex items-center gap-1 mb-2">${stars}</div>
+              <p class="text-muted-foreground text-xs mb-2 break-words">${review.comment || 'No comment'}</p>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-muted-foreground">${createdAt}</span>
+                ${editedSpan}
+                ${replyInfo}
+              </div>
+            </div>
+            <button class="text-red-500 hover:text-red-600 text-xs px-2 py-1 border border-red-200 dark:border-red-800 rounded shrink-0" data-action="delete-review" data-id="${review.id}">Delete</button>
+          </div>
+        `;
+        container.appendChild(reviewDiv);
+      });
+    } catch (err) {
+      console.error('Error loading reviews:', err);
+      toast.error('Failed to load reviews');
+    }
+  }
+
+  function showDeleteModal(id: string) {
+    const modal = document.getElementById('delete-modal');
+    const input = document.getElementById('delete-review-id') as HTMLInputElement;
+    if (modal && input) {
+      input.value = id;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function hideDeleteModal() {
+    const modal = document.getElementById('delete-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  async function confirmDelete() {
+    const input = document.getElementById('delete-review-id') as HTMLInputElement;
+    const id = input?.value;
+    if (!id) return;
+    try {
+      const res = await authFetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Review deleted');
+        hideDeleteModal();
+        loadReviews();
+      } else {
+        toast.error(data.error?.message || 'Failed to delete review');
+      }
+    } catch (err) {
+      toast.error('Error deleting review');
+    }
+  }
+
+  // Search
+  document.getElementById('search-btn')?.addEventListener('click', () => {
+    currentPage = 1;
+    loadReviews();
+  });
+  document.getElementById('search-input')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { currentPage = 1; loadReviews(); }
+  });
+  document.getElementById('rating-filter')?.addEventListener('change', () => {
+    currentPage = 1;
+    loadReviews();
+  });
+
+  // Pagination
+  document.getElementById('prev-btn')?.addEventListener('click', () => {
+    if (currentPage > 1) { currentPage--; loadReviews(); }
+  });
+  document.getElementById('next-btn')?.addEventListener('click', () => {
+    currentPage++;
+    loadReviews();
+  });
+
+  // Delete
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const action = target.closest('[data-action]')?.getAttribute('data-action');
+    if (action === 'delete-review') {
+      const id = target.closest('[data-action]')?.getAttribute('data-id');
+      if (id) showDeleteModal(id);
+    }
+  });
+  document.getElementById('delete-cancel')?.addEventListener('click', hideDeleteModal);
+  document.getElementById('delete-confirm')?.addEventListener('click', confirmDelete);
+  document.getElementById('delete-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('delete-modal')) hideDeleteModal();
+  });
+</script>
