@@ -1,41 +1,48 @@
 ---
-// FormMessage - Success/Error message display
+/**
+ * FormMessage - Success/Error message display
+ * Migrated to compose ui/Alert primitives.
+ * Preserves window.__formMessage.show/hide API for callers.
+ */
+import { Alert } from '@/components/ui/alert';
+import { AlertDescription } from '@/components/ui/alert';
+
 interface Props {
   id?: string;
   type?: 'success' | 'error';
 }
 
 const { id = 'form-message', type = 'error' } = Astro.props;
-
-const styles = type === 'success'
-  ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
-  : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800';
 ---
 
-<div
+<Alert
   id={id}
+  variant={type === 'error' ? 'destructive' : 'default'}
   class:list={[
-    'hidden p-3 text-sm rounded-lg border',
-    styles
+    'hidden',
+    type === 'success' && 'border-green-500 text-green-700 dark:text-green-400 [&_[data-slot=alert-description]]:text-green-700/90 dark:[&_[data-slot=alert-description]]:text-green-400/90'
   ]}
   role="alert"
 >
-  <slot />
-</div>
+  <AlertDescription>
+    <slot />
+  </AlertDescription>
+</Alert>
 
 <script define:vars={{ id }}>
   function showMessage(message, isSuccess = false) {
     const el = document.getElementById(id);
     if (!el) return;
-
     if (isSuccess) {
-      el.className = el.className.replace(/bg-red-\d+/g, 'bg-green-50');
-      el.className = el.className.replace(/text-red-\d+/g, 'text-green-700');
-      el.className = el.className.replace(/dark:bg-red-\d+/g, 'dark:bg-green-900/20');
-      el.className = el.className.replace(/dark:text-red-\d+/g, 'dark:text-green-400');
+      el.classList.remove('hidden', 'border-destructive', 'text-destructive', '[&_[data-slot=alert-description]]:text-destructive/90');
+      el.classList.add('border-green-500', 'text-green-700', 'dark:text-green-400');
+    } else {
+      el.classList.remove('hidden', 'border-green-500', 'text-green-700', 'dark:text-green-400');
+      el.classList.add('border-destructive', 'text-destructive', '[&_[data-slot=alert-description]]:text-destructive/90');
     }
-
-    el.textContent = message;
+    // Set text content inside the alert-description child
+    const desc = el.querySelector('[data-slot=alert-description]');
+    if (desc) desc.textContent = message;
     el.classList.remove('hidden');
   }
 
