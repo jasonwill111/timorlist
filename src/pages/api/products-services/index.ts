@@ -26,9 +26,8 @@ export async function GET({ request }: { request: Request }) {
 
     const url = new URL(request.url);
     const businessId = url.searchParams.get('businessId');
-    const isAdmin = url.searchParams.get('isAdmin') === 'true';
 
-    console.log('[Products API] businessId:', businessId, 'isAdmin:', isAdmin);
+    console.log('[Products API] businessId:', businessId);
 
     // Simple query - just get all products first
     let allProducts;
