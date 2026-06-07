@@ -3,9 +3,9 @@
 - Doc path: D:\Dev Projects\timorup\.specweave\state\handoff-latest.md
 - Doc link: [D:\Dev Projects\timorup\.specweave\state\handoff-latest.md](D:\Dev Projects\timorup\.specweave\state\handoff-latest.md)
 - Diff file: D:\Dev Projects\timorup\.specweave\state\handoff-latest.diff
-- Generated: 2026-06-04T01:54:46.374Z
+- Generated: 2026-06-07T02:26:00.919Z
 - Workspace: D:\Dev Projects\timorup (SpecWeave)
-- Git: branch `feat/comp-A-delete-dead` @ `2bb4c756`
+- Git: branch `feat/comp-A-delete-dead` @ `ea1e68bd`
 
 ## Where I Left Off
 
@@ -29,38 +29,32 @@ _No decisions recorded._
 **UNCOMMITTED** — commit, stash, or keep editing BEFORE doing anything destructive.
 
 ```
-D .specweave/state/auto-mode.json
- M .specweave/state/banner-last-check.json
- M worker-configuration.d.ts
+M .specweave/state/banner-last-check.json
+ D .specweave/state/context-pressure.json
+ M .specweave/state/event-queue/pending.jsonl
+ M .specweave/state/handoff-latest.diff
+ M .specweave/state/handoff-latest.md
+ D .specweave/state/prompt-health-alert.json
+ M .specweave/state/prompt-health.json
+ M CLAUDE.md
+ M CLAUDE.md.bak
+ M vskill.lock
 ?? .codegraph/daemon.pid
-?? .specweave/state/handoff-latest.diff
-?? .specweave/state/handoff-latest.md
-?? CLAUDE.md.bak
-?? UI-MIGRATION-PLAN.md
-?? drizzle.config.ts
-?? tmp-db-check.cjs
-?? tmp-http-test.cjs
-?? tmp-test-routes.mjs
-?? ttmp-test-routes.mjs
-?? vskill.lock
 ```
 
 ```
-.codegraph/daemon.pid                   |    6 +
- .specweave/state/auto-mode.json         |   15 -
- .specweave/state/banner-last-check.json |    8 +-
- .specweave/state/handoff-latest.diff    | 3541 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- .specweave/state/handoff-latest.md      |  109 ++++
- CLAUDE.md.bak                           |  404 +++++++++++++
- UI-MIGRATION-PLAN.md                    |  317 ++++++++++
- drizzle.config.ts                       |   10 +
- tmp-db-check.cjs                        |   11 +
- tmp-http-test.cjs                       |   29 +
- tmp-test-routes.mjs                     |   16 +
- ttmp-test-routes.mjs                    |   38 ++
- vskill.lock                             |   11 +
- worker-configuration.d.ts               |  149 ++++-
- 14 files changed, 4628 insertions(+), 36 deletions(-)
+.codegraph/daemon.pid                      |     6 +
+ .specweave/state/banner-last-check.json    |     6 +-
+ .specweave/state/context-pressure.json     |     1 -
+ .specweave/state/event-queue/pending.jsonl |    40 -
+ .specweave/state/handoff-latest.diff       | 25686 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------
+ .specweave/state/handoff-latest.md         |    54 +-
+ .specweave/state/prompt-health-alert.json  |     1 -
+ .specweave/state/prompt-health.json        |     2 +-
+ CLAUDE.md                                  |    64 +-
+ CLAUDE.md.bak                              |   162 +-
+ vskill.lock                                |     4 +-
+ 11 files changed, 21425 insertions(+), 4601 deletions(-)
 ```
 
 Full uncommitted diff: `D:\Dev Projects\timorup\.specweave\state\handoff-latest.diff` — read it or run `git apply --check` against it to see the exact edits.
