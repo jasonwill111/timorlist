@@ -12,6 +12,7 @@ import Table from '@components/ui/table/table.astro';
 import TableHeader from '@components/ui/table/table-header.astro';
 import TableRow from '@components/ui/table/table-row.astro';
 import TableHead from '@components/ui/table/table-head.astro';
+import Modal from '@components/ui/Modal.astro';
 ---
 
 <AdminLayout title="Categories">
@@ -289,9 +290,17 @@ import TableHead from '@components/ui/table/table-head.astro';
   </div>
 </AdminLayout>
 
+<!-- Delete confirmation modal — static, content injected via data attributes -->
+<Modal id="delete-category-dialog" title="Delete Item?" size="sm">
+  <p id="delete-modal-message" class="text-sm text-muted-foreground"></p>
+  <div class="flex gap-2 pt-4">
+    <Button variant="outline" class="flex-1" id="delete-modal-cancel">Cancel</Button>
+    <Button variant="destructive" class="flex-1" id="delete-modal-confirm">Delete</Button>
+  </div>
+</Modal>
+
 <script>
   import { actions } from 'astro:actions';
-  import { injectModal, createDeleteDialog, showModal, hideModal } from '@/lib/modal';
   interface Category {
     id: string;
     name: string;
@@ -673,11 +682,11 @@ import TableHead from '@components/ui/table/table-head.astro';
       }
     }
   });
-  // Initialize delete confirmation modal
-  const deleteModalHtml = createDeleteDialog({ id: 'delete-category-dialog', itemName: '' });
-  const deleteModal = injectModal(deleteModalHtml);
+  // Delete confirmation modal — content injected via data attributes
   let deleteTargetId: string | null = null;
-  (deleteModal.querySelector('[data-confirm-btn]') as HTMLButtonElement)?.addEventListener('click', async () => {
+  const deleteModal = document.getElementById('delete-category-dialog')!;
+  const deleteMsg = document.getElementById('delete-modal-message')!;
+  document.getElementById('delete-modal-confirm')!.addEventListener('click', async () => {
     if (!deleteTargetId) return;
     try {
       const result = await actions.admin.categories.delete({ id: deleteTargetId });
@@ -697,11 +706,7 @@ import TableHead from '@components/ui/table/table-head.astro';
   window.deleteCategory = function(id: string) {
     deleteTargetId = id;
     const cat = allCategories.find((c: Category) => c.id === id);
-    const modal = document.getElementById('delete-category-dialog');
-    if (modal) {
-      const msgEl = modal.querySelector('.modal-body p');
-      if (msgEl) msgEl.textContent = `Are you sure you want to delete "${cat?.name || 'this category'}"? This action cannot be undone.`;
-    }
+    deleteMsg.textContent = `Are you sure you want to delete "${cat?.name || 'this category'}"? This action cannot be undone.`;
     showModal('delete-category-dialog');
   };
   // Update parent dropdown for modal (uses all categories)

@@ -4,8 +4,7 @@
  *
  * Replaces duplicate escapeHtml implementations in:
  * - src/lib/utils.ts (escapeHtml, escapeHtmlServer)
- * - src/lib/modal.ts (escapeHtml)
- * - Inline <script> tag duplicates in client components
+  * - Inline <script> tag duplicates in client components
  */
 import DOMPurify from 'dompurify';
 

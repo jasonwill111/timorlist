@@ -1,5 +1,4 @@
 ---
-import { Button } from './button';
 /**
  * Reusable Modal Component
  * Props:
@@ -56,9 +55,8 @@ const maxWidth = maxWidthMap[size];
         {title || ''}
       </h2>
       {showClose && (
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
+          type="button"
           class="p-1 hover:bg-muted rounded transition-colors"
           aria-label="Close modal"
           onclick={`hideModal('${id}')`}
@@ -66,7 +64,7 @@ const maxWidth = maxWidthMap[size];
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
-        </Button>
+        </button>
       )}
     </div>
 
