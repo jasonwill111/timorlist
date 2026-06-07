@@ -28,25 +28,21 @@ const slides = [
 ---
 
 <div
-  class={`carousel-banner w-full rounded-xl shadow-2xl ${className}`}
+  class={`carousel-banner w-full rounded-xl shadow-2xl relative overflow-hidden ${className}`}
   data-position={position}
-  style="position: relative; overflow: hidden;"
 >
   <!-- Track wrapper -->
   <div
-    class={`carousel-track-wrapper ${heightClasses}`}
-    style="position: relative; overflow: hidden; width: 100%;"
+    class={`carousel-track-wrapper ${heightClasses} relative overflow-hidden w-full`}
   >
     <div
-      class="carousel-track"
+      class="carousel-track flex w-full"
       id={`carousel-track-${position}`}
-      style="display: flex; width: 100%;"
     >
       {slides.map((slide, index) => (
         <div
-          class={`carousel-slide ${heightClasses} bg-gradient-to-r ${slide.bgColor} flex items-center justify-center`}
+          class={`carousel-slide ${heightClasses} bg-gradient-to-r ${slide.bgColor} flex items-center justify-center shrink-0 w-full h-full`}
           data-slide-index={index}
-          style="flex-shrink: 0; width: 100%; height: 100%;"
         >
           <div class="absolute inset-0 opacity-10">
             <div class="absolute top-10 left-[10%] w-40 h-40 sm:w-60 sm:h-60 bg-white rounded-full blur-3xl"></div>
@@ -55,7 +51,10 @@ const slides = [
           <div class="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 border-t-4 border-r-4 border-white/20 rounded-bl-full"></div>
           <div class="absolute bottom-0 left-0 w-24 h-24 sm:w-36 sm:h-36 border-b-4 border-l-4 border-white/10 rounded-tr-full"></div>
           <div class="relative z-10 text-center text-white px-6 max-w-3xl">
-            <h3 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 drop-shadow-lg" style="font-family: var(--font-heading)">{slide.title}</h3>
+            <h3
+              class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 drop-shadow-lg"
+              style="font-family: var(--font-heading);"
+            >{slide.title}</h3>
             <p class="text-sm sm:text-base md:text-lg lg:text-xl opacity-90">{slide.subtitle}</p>
           </div>
         </div>
@@ -65,9 +64,8 @@ const slides = [
     <Button
       variant="ghost"
       size="icon"
-      class="carousel-prev"
+      class="carousel-prev absolute left-2 top-1/2 -translate-y-1/2 z-20"
       aria-label="Previous slide"
-      style="position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); z-index: 20;"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
@@ -76,9 +74,8 @@ const slides = [
     <Button
       variant="ghost"
       size="icon"
-      class="carousel-next"
+      class="carousel-next absolute right-2 top-1/2 -translate-y-1/2 z-20"
       aria-label="Next slide"
-      style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); z-index: 20;"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
@@ -86,13 +83,15 @@ const slides = [
     </Button>
 
     <!-- Indicators -->
-    <div class="flex gap-1.5" style="position: absolute; bottom: 0.75rem; left: 50%; transform: translateX(-50%); z-index: 20;">
+    <div class="flex gap-1.5 absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
       {slides.map((_, index) => (
         <button
-          class="carousel-dot rounded-full transition-all duration-300"
+          class:list={[
+            'carousel-dot rounded-full transition-all duration-300 min-w-2 min-h-2',
+            index === 0 ? 'w-4 bg-white' : 'w-2 bg-white/50',
+          ]}
           data-dot-index={index}
           aria-label={`Go to slide ${index + 1}`}
-          style={`min-width: 8px; min-height: 8px; ${index === 0 ? 'width: 16px; background-color: white;' : 'width: 8px; background-color: rgba(255,255,255,0.5);'}`}
         />
       ))}
     </div>

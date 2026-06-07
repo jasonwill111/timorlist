@@ -1,0 +1,254 @@
+---
+/**
+ * HomepageTabs — Pure presentation component
+ * Receives pre-fetched data, renders tab UI + panel cards.
+ * No DB access. No business logic. Tab interactivity handled by inline script.
+ */
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import BusinessCard from "@/components/business/BusinessCard.astro";
+import ListingCard from "@/components/business/ListingCard.astro";
+import type { HomepageContent } from "@/lib/db/queries/homepage";
+
+interface Props {
+  data: HomepageContent;
+}
+
+const { data } = Astro.props;
+const { businesses, listings, publicSectors, nonProfits } = data;
+
+const hasContent =
+  businesses.length > 0 ||
+  listings.length > 0 ||
+  publicSectors.length > 0 ||
+  nonProfits.length > 0;
+---
+
+{
+  hasContent ? (
+    <div class="space-y-8">
+      <!-- Tab Navigation (Desktop) -->
+      <div class="hidden md:flex items-center gap-1 border-b">
+        <Button
+          variant="ghost"
+          class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
+          data-action="tab-switch"
+          data-tab="businesses"
+          data-active="true"
+        >
+          Businesses
+        </Button>
+        <Button
+          variant="ghost"
+          class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
+          data-action="tab-switch"
+          data-tab="listings"
+          data-active="false"
+        >
+          Listings
+        </Button>
+        <Button
+          variant="ghost"
+          class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
+          data-action="tab-switch"
+          data-tab="public-sectors"
+          data-active="false"
+        >
+          Public Sectors
+        </Button>
+        <Button
+          variant="ghost"
+          class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:border-primary transition-colors"
+          data-action="tab-switch"
+          data-tab="non-profits"
+          data-active="false"
+        >
+          Non-Profits
+        </Button>
+      </div>
+
+      <!-- Mobile: Select dropdown instead of tabs -->
+      <div class="md:hidden">
+        <Select
+          id="content-select"
+          options={[
+            { value: "businesses", label: "Businesses" },
+            { value: "listings", label: "Listings" },
+            { value: "public-sectors", label: "Public Sectors" },
+            { value: "non-profits", label: "Non-Profits" },
+          ]}
+        />
+      </div>
+
+      <div id="tab-panels">
+        <div class="tab-panel" data-panel="businesses">
+          {businesses.length > 0 ? (
+            <>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+                {businesses.map((business) => (
+                  <BusinessCard
+                    title={business.title}
+                    slug={business.slug}
+                    category={business.category}
+                    thumbnail={null}
+                    rating={business.rating}
+                    likes={business.likes}
+                    reviews={business.reviews}
+                    location={business.location}
+                    tag={business.tag}
+                    entityType={business.entityType}
+                  />
+                ))}
+              </div>
+              <div class="mt-6 text-center">
+                <Button variant="default">
+                  View All Businesses
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div class="text-center py-12 bg-muted/30 rounded-xl">
+              <p class="text-muted-foreground mb-4">No featured businesses yet.</p>
+              <a href="/businesses/create" class="text-primary hover:underline">Add your business!</a>
+            </div>
+          )}
+        </div>
+
+        <div class="tab-panel hidden" data-panel="listings">
+          {listings.length > 0 ? (
+            <>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+                {listings.map((listing) => (
+                  <ListingCard
+                    title={listing.title}
+                    slug={listing.slug}
+                    price={listing.price}
+                    listingType={listing.listingType}
+                    location={listing.location}
+                    thumbnail={null}
+                    imageIds={listing.imageIds}
+                    likes={listing.likes}
+                  />
+                ))}
+              </div>
+              <div class="mt-6 text-center">
+                <Button variant="default">
+                  View All Listings
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div class="text-center py-12 bg-muted/30 rounded-xl">
+              <p class="text-muted-foreground mb-4">No classified ads yet.</p>
+              <a href="/listings/create" class="text-primary hover:underline">Post your ad!</a>
+            </div>
+          )}
+        </div>
+
+        <div class="tab-panel hidden" data-panel="public-sectors">
+          {publicSectors.length > 0 ? (
+            <>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+                {publicSectors.map((sector) => (
+                  <BusinessCard
+                    title={sector.title}
+                    slug={sector.slug}
+                    category={sector.category}
+                    thumbnail={null}
+                    rating={sector.rating}
+                    likes={sector.likes}
+                    location={sector.location}
+                    entityType={sector.entityType}
+                  />
+                ))}
+              </div>
+              <div class="mt-6 text-center">
+                <Button variant="default">
+                  View All Public Sectors
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div class="text-center py-12 bg-muted/30 rounded-xl">
+              <p class="text-muted-foreground mb-4">No public sectors available yet.</p>
+              <a href="/public-sectors" class="text-primary hover:underline">Explore public sectors!</a>
+            </div>
+          )}
+        </div>
+
+        <div class="tab-panel hidden" data-panel="non-profits">
+          {nonProfits.length > 0 ? (
+            <>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+                {nonProfits.map((nonprofit) => (
+                  <BusinessCard
+                    title={nonprofit.title}
+                    slug={nonprofit.slug}
+                    category={nonprofit.category}
+                    thumbnail={null}
+                    rating={nonprofit.rating}
+                    likes={nonprofit.likes}
+                    reviews={nonprofit.reviews}
+                    location={nonprofit.location}
+                    tag={nonprofit.tag}
+                    entityType={nonprofit.entityType}
+                  />
+                ))}
+              </div>
+              <div class="mt-6 text-center">
+                <Button variant="default">
+                  View All Non-Profits
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div class="text-center py-12 bg-muted/30 rounded-xl">
+              <p class="text-muted-foreground mb-4">No non-profits available yet.</p>
+              <a href="/non-profits" class="text-primary hover:underline">Explore non-profits!</a>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div class="text-center py-16">
+      <p class="text-muted-foreground mb-4">No content available yet. Be the first to add something!</p>
+      <a href="/businesses/create">
+        <Button>Get Started</Button>
+      </a>
+    </div>
+  )
+}
+
+<script>
+  // Tab switching via event delegation
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as Element).closest('[data-action="tab-switch"]');
+    if (!btn) return;
+    const tab = btn.getAttribute("data-tab");
+    if (!tab) return;
+    document.querySelectorAll(".tab-btn").forEach((b) => {
+      b.setAttribute("data-active", b.getAttribute("data-tab") === tab ? "true" : "false");
+    });
+    document.querySelectorAll(".tab-panel").forEach((panel) => {
+      panel.classList.toggle("hidden", panel.getAttribute("data-panel") !== tab);
+    });
+  });
+  // Mobile select handler
+  const mobileSelect = document.getElementById("content-select");
+  if (mobileSelect) {
+    mobileSelect.addEventListener("change", (e) => {
+      const tab = (e.target as HTMLSelectElement).value;
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("hidden", panel.getAttribute("data-panel") !== tab);
+      });
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.setAttribute("data-active", btn.getAttribute("data-tab") === tab ? "true" : "false");
+      });
+    });
+  }
+</script>
