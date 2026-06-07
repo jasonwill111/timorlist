@@ -3,8 +3,8 @@ export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import { getRawDb } from '@/lib/db';
 import { Eye, Heart, Bookmark } from '@lucide/astro';
-import ShareDialog from '@/components/ui/ShareDialog.astro';
-import TipTapRenderer from '../../components/ui/TipTapRenderer.astro';
+import { ShareDialog } from '@/components/ui/share-dialog';
+import { TipTapRenderer } from '@/components/ui/tip-tap-renderer';
 import { createBreadcrumbSchema } from '@/lib/seo';
 
 const { slug } = Astro.params;
