@@ -3,18 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 // Server-rendered Products list with proper pagination
 // All filtering, sorting, and pagination happens on the server
-import { getDb, getRawDb } from '@/lib/db';
-import { products, businesses } from '@/db/schema';
-import { desc, eq, like, asc, and } from 'drizzle-orm';
+// Data layer extracted to lib/db/queries/products-list.ts
+import { getProductList } from '@/lib/db/queries/products-list';
 import { Select } from '@/components/ui/select';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('search') || '';
 const businessId = searchParams.get('business') || '';
-const sort = searchParams.get('sort') || 'recent';
+const sort = (searchParams.get('sort') || 'recent') as 'recent' | 'name';
 const page = parseInt(searchParams.get('page') || '1', 10);
 const LIMIT = 12;
-const offset = (page - 1) * LIMIT;
 
 // Cache: Products page - 2min browser, 10min CDN
 Astro.response.headers.set(
@@ -22,91 +20,8 @@ Astro.response.headers.set(
   'public, max-age=120, s-maxage=600, stale-while-revalidate=1200'
 );
 
-// Fetch all businesses for filter dropdown
-let allBusinesses: { id: string; title: string; slug: string }[] = [];
-try {
-  const db = await getDb();
-  if (db) {
-    allBusinesses = await db
-      .select({
-        id: businesses.id,
-        title: businesses.title,
-        slug: businesses.slug,
-      })
-      .from(businesses)
-      .where(eq(businesses.status, 'active'))
-      .orderBy(asc(businesses.title))
-      .limit(100)
-      .all();
-  }
-} catch (e) {
-  console.error('Failed to fetch businesses:', e);
-}
-
-// Build WHERE conditions
-const conditions = [eq(products.active, 1)];
-
-if (search) {
-  conditions.push(like(products.title, `%${search}%`));
-}
-
-if (businessId) {
-  conditions.push(eq(products.businessId, businessId));
-}
-
-// Count total matching products - use raw D1Database.prepare()
-let total = 0;
-try {
-  const rawDb = await getRawDb();
-  console.log('[Products] rawDb available:', !!rawDb);
-  if (rawDb) {
-    const stmt = rawDb.prepare('SELECT COUNT(*) as count FROM products WHERE active = 1 AND deleted_at IS NULL');
-    const result = await stmt.first();
-    console.log('[Products] count result:', JSON.stringify(result));
-    total = (result as any)?.count ?? 0;
-    console.log('[Products] total set to:', total);
-  }
-} catch (e) { console.error('Count error:', e); }
-// Fetch paginated products
-let paginatedProducts: {
-  id: string;
-  title: string;
-  slug: string;
-  priceFields: string | null;
-  productType: string | null;
-  businessId: string | null;
-}[] = [];
-
-try {
-  const db = await getDb();
-  if (db) {
-    let query = db
-      .select({
-        id: products.id,
-        title: products.title,
-        slug: products.slug,
-        priceFields: products.priceFields,
-        productType: products.productType,
-        businessId: products.businessId,
-      })
-      .from(products)
-      .where(and(...conditions));
-
-    // Apply sorting
-    if (sort === 'name') {
-      query = query.orderBy(asc(products.title));
-    } else {
-      query = query.orderBy(desc(products.createdAt));
-    }
-
-    paginatedProducts = await query
-      .limit(LIMIT)
-      .offset(offset)
-      .all();
-  }
-} catch (e) {
-  console.error('Failed to fetch products:', e);
-}
+const { products: paginatedProducts, total, businesses: allBusinesses, totalPages } =
+  await getProductList({ search, businessId, sort, page, limit: LIMIT });
 
 // Parse price fields for display
 function parsePrice(priceFields: string | null): { min?: number; max?: number; currency?: string } {
@@ -117,8 +32,6 @@ function parsePrice(priceFields: string | null): { min?: number; max?: number; c
     return {};
   }
 }
-
-const totalPages = Math.ceil(total / LIMIT);
 
 // Build pagination URL helper
 const buildUrl = (pageNum: number) => {

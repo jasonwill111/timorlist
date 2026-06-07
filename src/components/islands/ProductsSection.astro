@@ -1,8 +1,6 @@
 ---
 import { Card } from '../../components/ui/card';
-import { getDb } from '@/lib/db';
-import { products } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { getProductsByBusiness } from '@/lib/db/queries/products-by-business';
 
 interface Props {
   businessId: string;
@@ -10,22 +8,7 @@ interface Props {
 }
 
 const { businessId } = Astro.props;
-const db = await getDb();
-
-// Guard: if db is null, show empty state
-if (!db) {
-  console.error('[ProductsSection] Database not available');
-}
-
-const businessProducts = db
-  ? await db.select()
-      .from(products)
-      .where(eq(products.businessId, businessId))
-      .orderBy(desc(products.createdAt))
-      .all()
-  : [];
-
-// Images stored via media table (entityType: 'products')
+const businessProducts = await getProductsByBusiness(businessId);
 ---
 
 <Card>
@@ -39,15 +22,9 @@ const businessProducts = db
       {businessProducts.map(product => (
         <a href={`/product/${product.slug}`} class="group flex items-center gap-4 p-3 hover:bg-muted/30 transition-colors -mx-3">
           <div class="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-            {product.specifications ? (
-              <div class="w-full h-full flex items-center justify-center text-xl font-bold text-muted-foreground bg-gradient-to-br from-amber-100 to-amber-200">
-                {product.title.charAt(0)}
-              </div>
-            ) : (
-              <div class="w-full h-full flex items-center justify-center text-xl font-bold text-muted-foreground bg-gradient-to-br from-amber-100 to-amber-200">
-                {product.title.charAt(0)}
-              </div>
-            )}
+            <div class="w-full h-full flex items-center justify-center text-xl font-bold text-muted-foreground bg-gradient-to-br from-amber-100 to-amber-200">
+              {product.title.charAt(0)}
+            </div>
           </div>
           <div class="flex-1 min-w-0">
             <h3 class="text-lg font-medium leading-snug group-hover:text-primary transition-colors line-clamp-1">{product.title}</h3>

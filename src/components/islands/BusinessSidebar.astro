@@ -1,14 +1,12 @@
 ---
 import { Card } from '../../components/ui/card';
 import { MapPin, Tag, Clock } from '@lucide/astro';
-import { getDb } from '@/lib/db';
-import { businessCategories, media } from '@/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { getBusinessSidebarData } from '@/lib/db/queries/business-sidebar';
 
-interface DayHours {
+type DayHours = {
   open: string;
   close: string;
-}
+};
 
 type OpeningHours = Record<string, DayHours | null>;
 
@@ -22,17 +20,8 @@ interface Props {
   openingHours: OpeningHours | null;
 }
 
-const { businessId, categoryId, locationLat, locationLng, address, tags, openingHours } = Astro.props;
-const db = await getDb();
-
-// Guard: if db is null, skip database queries
-if (!db) {
-  console.error('[BusinessSidebar] Database not available');
-}
-
-const category = db && categoryId
-  ? await db.select().from(businessCategories).where(eq(businessCategories.id, categoryId)).get()
-  : null;
+const { categoryId, locationLat, locationLng, address, tags, openingHours } = Astro.props;
+const { category } = await getBusinessSidebarData(categoryId);
 ---
 
 <!-- Category -->
