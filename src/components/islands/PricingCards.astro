@@ -1,110 +1,16 @@
 ---
-// Pricing Page - Reads from service_packages table (admin managed)
-// Schema: service_type + service_relation_to
-import { getRawDb } from '@/lib/db';
+/**
+ * Pricing Page - Reads from service_packages table (admin managed)
+ * Data layer extracted to lib/db/queries/pricing.ts
+ * Fallback data extracted to lib/data/pricing-fallback.ts
+ *
+ * Schema: service_type + service_relation_to
+ */
 import { Button } from '@/components/ui/button';
+import { getCategorizedPricingPlans } from '@/lib/db/queries/pricing';
 
-// Get raw D1 database for direct queries (bypasses Drizzle ORM issues)
-const rawDb = await getRawDb();
-
-type ServicePackage = {
-  id: string;
-  name: string;
-  slug: string;
-  service_type: string;
-  service_relation_to: string | null;
-  description: string | null;
-  variants: string;
-  is_active: number | null;
-  sort_order: number | null;
-};
-
-let allPackages: ServicePackage[] = [];
-let dbError = '';
-
-// Use raw D1 query to avoid Drizzle ORM compatibility issues
-try {
-  if (rawDb) {
-    const stmt = await rawDb.prepare('SELECT * FROM service_packages WHERE is_active = 1 ORDER BY sort_order ASC');
-    const result = await stmt.all();
-    allPackages = result as ServicePackage[];
-  } else {
-    dbError = 'Database not available';
-  }
-} catch (e) {
-  dbError = e instanceof Error ? e.message : String(e);
-  console.error('[PricingCards] DB Error:', dbError);
-}
-
-// Fallback data (used when DB unavailable)
-const fallbackPlans: ServicePackage[] = [
-  // Business Page Plans (subscription)
-  { id: 'sp-business-basic', name: 'Basic', slug: 'basic-monthly', service_type: 'subscription', service_relation_to: 'business', description: 'For small businesses', variants: JSON.stringify({ variants: [{ name: 'Basic Monthly', price: 39, currency: 'USD', durationUnit: 'month', durationValue: 1, limits: { skuLimit: 10 }, features: ['Up to 10 products', 'Business profile', 'Reviews & ratings'] }] }), is_active: 1, sort_order: 10 },
-  { id: 'sp-business-pro', name: 'Pro', slug: 'pro-monthly', service_type: 'subscription', service_relation_to: 'business', description: 'For growing businesses', variants: JSON.stringify({ variants: [{ name: 'Pro Monthly', price: 69, currency: 'USD', durationUnit: 'month', durationValue: 1, limits: { skuLimit: 30 }, features: ['Up to 30 products', 'Featured placement', 'Analytics'] }] }), is_active: 1, sort_order: 20 },
-  { id: 'sp-business-max', name: 'Max', slug: 'max-monthly', service_type: 'subscription', service_relation_to: 'business', description: 'For established businesses', variants: JSON.stringify({ variants: [{ name: 'Max Monthly', price: 99, currency: 'USD', durationUnit: 'month', durationValue: 1, limits: { skuLimit: 60 }, features: ['Up to 60 products', 'Top placement', 'Priority support'] }] }), is_active: 1, sort_order: 30 },
-  // Listing Renewals (listing_renewal)
-  { id: 'sp-listing-7days', name: '7-Day Listing', slug: '7-day-listing', service_type: 'listing_renewal', service_relation_to: 'listing', description: '7 days', variants: JSON.stringify({ variants: [{ name: '7 Days', price: 8, currency: 'USD', durationUnit: 'days', durationValue: 7, features: ['7-day visibility', 'Up to 4 images'] }] }), is_active: 1, sort_order: 100 },
-  { id: 'sp-listing-30days', name: '30-Day Listing', slug: '30-day-listing', service_type: 'listing_renewal', service_relation_to: 'listing', description: '30 days', variants: JSON.stringify({ variants: [{ name: '30 Days', price: 15, currency: 'USD', durationUnit: 'days', durationValue: 30, features: ['30-day visibility', 'Up to 6 images'] }] }), is_active: 1, sort_order: 110 },
-  { id: 'sp-listing-365days', name: '365-Day Listing', slug: '365-day-listing', service_type: 'listing_renewal', service_relation_to: 'listing', description: '365 days', variants: JSON.stringify({ variants: [{ name: '365 Days', price: 120, currency: 'USD', durationUnit: 'days', durationValue: 365, features: ['365-day visibility', 'Up to 8 images', 'Priority support'] }] }), is_active: 1, sort_order: 120 },
-];
-
-// Use DB data if available, otherwise fallback
-const packages = allPackages.length > 0 ? allPackages : fallbackPlans;
-
-// Parse and categorize (matches remote schema: service_type, service_relation_to)
-const businessPlans = packages
-  .filter(p => p.service_type === 'subscription' && p.service_relation_to === 'business')
-  .map(p => {
-    const parsed = JSON.parse(p.variants || '{}');
-    return {
-      ...p,
-      variants: parsed.variants || [],
-    };
-  });
-
-const listingPlans = packages
-  .filter(p => p.service_type === 'listing_renewal' && p.service_relation_to === 'listing')
-  .map(p => {
-    const parsed = JSON.parse(p.variants || '{}');
-    return {
-      ...p,
-      variants: parsed.variants || [],
-    };
-  });
-
-// Featured plans: remote uses service_type='listing' for listing featured, 'business_page' for homepage
-const featuredPlans = packages
-  .filter(p => (p.service_type === 'listing' && p.service_relation_to === 'listing_page') ||
-               (p.service_type === 'business_page' && p.service_relation_to === 'business_page'))
-  .map(p => {
-    const parsed = JSON.parse(p.variants || '{}');
-    return {
-      ...p,
-      variants: parsed.variants || [],
-    };
-  });
-
-// Add-ons: remote uses service_type='business_page' for add-ons
-const addonPlans = packages
-  .filter(p => p.service_type === 'business_page' && p.service_relation_to === 'business_product_page')
-  .map(p => {
-    const parsed = JSON.parse(p.variants || '{}');
-    return {
-      ...p,
-      variants: parsed.variants || [],
-    };
-  });
-
-// Banner ads: remote uses service_type='ad_banner'
-const bannerPlans = packages
-  .filter(p => p.service_type === 'ad_banner')
-  .map(p => {
-    const parsed = JSON.parse(p.variants || '{}');
-    return {
-      ...p,
-      variants: parsed.variants || [],
-    };
-  });
+const { businessPlans, listingPlans, featuredPlans, addonPlans, bannerPlans } =
+  await getCategorizedPricingPlans();
 ---
 
 <!-- ============================================

@@ -1,0 +1,11 @@
+{
+  "id": "0132-pricing-data-split",
+  "title": "PricingCards data layer extraction",
+  "type": "refactor",
+  "status": "in-progress",
+  "priority": "P2",
+  "created": "2026-06-07",
+  "updated": "2026-06-07",
+  "owner": "team",
+  "tags": ["ui", "pricing", "data-separation", "low-risk"]
+}
