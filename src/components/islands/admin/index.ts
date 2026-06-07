@@ -1,0 +1,1 @@
+export { default as AdBannersIsland } from './AdBannersIsland.astro';
