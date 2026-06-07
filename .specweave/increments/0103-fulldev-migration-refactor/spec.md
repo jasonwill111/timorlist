@@ -114,10 +114,10 @@ Comprehensive refactoring to:
 
 ### Verification
 
-- [ ] Modal migrated to @fulldev/dialog
-- [ ] DB queries templated where applicable
-- [ ] All pages render correctly
-- [ ] E2E tests pass: `pnpm test` (or manual verification)
+- [x] Modal migrated to @fulldev/dialog
+- [x] DB queries templated where applicable
+- [x] All pages render correctly
+- [x] E2E tests pass: `pnpm test` (or manual verification)
 
 ## User Stories
 
@@ -165,16 +165,16 @@ Comprehensive refactoring to:
 
 ## Acceptance Criteria
 
-- [ ] All security issues fixed and verified
-- [ ] @fulldev installed and components migrated
-- [ ] Domain logic separated from presentation
-- [ ] Lib utilities consolidated (0 duplicate functions)
-- [ ] Actions consolidated (0 duplicate logic)
-- [ ] DB queries templated where applicable
-- [ ] Modal migrated to @fulldev/dialog
-- [ ] Build passes: `pnpm build` exits 0
-- [ ] All pages render correctly
-- [ ] E2E tests pass
+- [x] All security issues fixed and verified
+- [x] @fulldev installed and components migrated
+- [x] Domain logic separated from presentation
+- [x] Lib utilities consolidated (0 duplicate functions)
+- [x] Actions consolidated (0 duplicate logic)
+- [x] DB queries templated where applicable
+- [x] Modal migrated to @fulldev/dialog
+- [x] Build passes: `pnpm build` exits 0
+- [x] All pages render correctly
+- [x] E2E tests pass
 
 ## Expected Outcomes
 

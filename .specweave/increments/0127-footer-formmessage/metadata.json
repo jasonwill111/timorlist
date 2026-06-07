@@ -2,7 +2,7 @@
   "id": "0127-footer-formmessage",
   "title": "Footer polish + FormMessage migrate to ui/alert",
   "type": "refactor",
-  "status": "in-progress",
+  "status": "completed",
   "priority": "P2",
   "created": "2026-06-07",
   "updated": "2026-06-07",

@@ -2,7 +2,7 @@
   "id": "0126-ui-component-replacement-cleanup",
   "title": "UI Component Replacement & Dead Code Cleanup",
   "type": "feature",
-  "status": "in-progress",
+  "status": "completed",
   "priority": "P2",
   "created": "2026-06-07",
   "updated": "2026-06-07",
