@@ -1,6 +1,5 @@
 ---
 import type { HTMLAttributes } from "astro/types"
-import { cn } from "@/lib/utils"
 
 type Props = Omit<HTMLAttributes<"svg">, "name" | "href"> & {
   href?: HTMLAttributes<"a">["href"]
@@ -78,7 +77,7 @@ const Comp = module?.default
       height={24}
       width={24}
       fill="currentColor"
-      class={cn("size-[1em] text-base", props.class)}
+      class="size-[1em] text-base"
       {...props}
     />
   )
@@ -86,6 +85,6 @@ const Comp = module?.default
 
 {
   Comp && foundPath()?.includes("lucide-static") && (
-    <Comp height={24} width={24} class={cn("size-[1em] text-base", props.class)} {...props} />
+    <Comp height={24} width={24} class="size-[1em] text-base" {...props} />
   )
 }

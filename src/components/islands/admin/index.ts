@@ -1,6 +1,12 @@
+export { default as DashboardIsland } from './DashboardIsland.astro';
+export { default as ServicePackagesIsland } from './ServicePackagesIsland.astro';
 export { default as AdBannersIsland } from './AdBannersIsland.astro';
 export { default as OrdersIsland } from './OrdersIsland.astro';
 export { default as ReviewsIsland } from './ReviewsIsland.astro';
 export { default as UsersIsland } from './UsersIsland.astro';
 export { default as BusinessesIsland } from './BusinessesIsland.astro';
 export { default as BlogsIsland } from './BlogsIsland.astro';
+export { default as ProductsIsland } from './ProductsIsland.astro';
+export { default as ListingsIsland } from './ListingsIsland.astro';
+export { default as NonProfitsIsland } from './NonProfitsIsland.astro';
+export { default as PublicSectorsIsland } from './PublicSectorsIsland.astro';

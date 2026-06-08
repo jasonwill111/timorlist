@@ -58,6 +58,10 @@ sw:sync-docs 0001
 - [FS-068: Admin UI Fix](FS-068/FEATURE.md)
 - [FS-078: UI/UX Optimization](FS-078/FEATURE.md)
 - [FS-099: Unified Card Rendering + Container Width Standardization](FS-099/FEATURE.md)
+- [FS-140: Starwind UI Installation](FS-140/FEATURE.md)
+- [FS-141: Marketing Pages to Fulldev Blocks](FS-141/FEATURE.md)
+- [FS-142: Slug Pages — Business Logic Extraction](FS-142/FEATURE.md)
+- [FS-145: 安装 Fulldev + Legacy 清理 + XSS 审计](FS-145/FEATURE.md)
 
 ---
 

@@ -1,11 +1,20 @@
 {
   "id": "0129-optimizedimage-error",
   "title": "OptimizedImage error handling + Skeleton fallback",
-  "type": "enhancement",
+  "type": "feature",
   "status": "completed",
   "priority": "P2",
   "created": "2026-06-07",
   "updated": "2026-06-07",
   "owner": "team",
-  "tags": ["ui", "image", "error-handling", "medium-risk"]
+  "tags": [
+    "ui",
+    "image",
+    "error-handling",
+    "medium-risk"
+  ],
+  "externalLinks": {},
+  "lastActivity": "2026-06-07",
+  "testMode": "test-after",
+  "coverageTarget": 80
 }

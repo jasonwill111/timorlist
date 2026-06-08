@@ -4,15 +4,17 @@ export const prerender = false;
 
 import Layout from '../../../layouts/Layout.astro';
 import { Button } from '../../../components/ui/button';
-import Input from '../../../components/ui/Input.astro';
-import Label from '../../../components/ui/Label.astro';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
 import { actions } from 'astro:actions';
 
-import Card from '../../../components/ui/Card.astro'
-import CardHeader from '../../../components/ui/CardHeader.astro'
-import CardTitle from '../../../components/ui/CardTitle.astro'
-import CardDescription from '../../../components/ui/CardDescription.astro'
-import CardContent from '../../../components/ui/CardContent.astro'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '../../../components/ui/card';
 ---
 
 <Layout title="Manage Products - TimorUp">
@@ -129,6 +131,8 @@ import CardContent from '../../../components/ui/CardContent.astro'
 </Layout>
 
 <script>
+  import DOMPurify from 'dompurify';
+
   // Get slug from URL
   const slug = window.location.pathname.split('/').filter(s => s)[2];
 
@@ -277,14 +281,14 @@ import CardContent from '../../../components/ui/CardContent.astro'
         const used = products.length;
         const total = subscriptionStatus.skuLimit;
         const percent = Math.round((used / total) * 100);
-        usageEl.innerHTML = `
+        usageEl.innerHTML = DOMPurify.sanitize(`
           <div class="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Products: ${used}/${total}</span>
             <div class="w-24 h-2 bg-muted rounded-full overflow-hidden">
               <div class="h-full ${percent >= 90 ? 'bg-red-500' : percent >= 70 ? 'bg-amber-500' : 'bg-primary'}" style="width: ${percent}%"></div>
             </div>
           </div>
-        `;
+        `);
       }
     }
 
@@ -330,19 +334,19 @@ import CardContent from '../../../components/ui/CardContent.astro'
       const card = document.createElement('div');
       card.className = 'border rounded-lg overflow-hidden hover:shadow-md transition-shadow';
 
-      card.innerHTML = `
+      card.innerHTML = DOMPurify.sanitize(`
         <div class="aspect-square bg-muted relative">
           ${firstImage
-            ? `<img src="${firstImage}" alt="${escapeHtml(product.title)}" class="w-full h-full object-cover" />`
+            ? `<img src="${DOMPurify.sanitize(firstImage)}" alt="${escapeHtml(product.title)}" class="w-full h-full object-cover" />`
             : `<div class="flex items-center justify-center h-full text-4xl font-bold text-muted-foreground">${escapeHtml(product.title.charAt(0))}</div>`
           }
           <div class="absolute top-2 right-2 flex gap-1">
-            <a href="/business/${slug}/product/${product.id}/edit" class="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-gray-100" title="Edit">
+            <a href="/business/${DOMPurify.sanitize(slug)}/product/${product.id}/edit" class="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-gray-100" title="Edit">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
             </a>
-            <a href="/business/${slug}/product/${product.id}" class="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-gray-100" title="View">
+            <a href="/business/${DOMPurify.sanitize(slug)}/product/${product.id}" class="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-gray-100" title="View">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -357,9 +361,9 @@ import CardContent from '../../../components/ui/CardContent.astro'
         </div>
         <div class="p-3">
           <h3 class="font-medium truncate">${escapeHtml(product.title)}</h3>
-          <p class="text-sm text-muted-foreground">${priceDisplay || 'No price set'}</p>
+          <p class="text-sm text-muted-foreground">${DOMPurify.sanitize(priceDisplay || 'No price set')}</p>
         </div>
-      `;
+      `);
       
       listEl.appendChild(card);
     });

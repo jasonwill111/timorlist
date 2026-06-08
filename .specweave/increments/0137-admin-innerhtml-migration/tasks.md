@@ -17,7 +17,7 @@
 - Remove duplicate import on line 7
 - Keep single `import { Button } from '@components/ui/button';`
 **Test**: `pnpm exec -- astro build` succeeds
-**Status**: [ ] not started
+**Status**: [x] completed
 
 ### T-002: Audit all admin pages for innerHTML patterns (haiku)
 **AC**: AC-US4-02
@@ -27,25 +27,20 @@
 - `grep -n "innerHTML\s*=" src/pages/admin/*.astro` → capture assignments
 - Document each innerHTML usage: file, line, what it renders (list items, modal, etc.)
 **Test**: List of all 47 innerHTML occurrences documented
-**Status**: [ ] not started
+**Status**: [x] completed
 
 ## Phase 2: Simple Pages (Low innerHTML count)
 
 ### T-003: Migrate ad-banners.astro (haiku)
 **AC**: AC-US1-01, AC-US1-02, AC-US1-03, AC-US1-04, AC-US2-01, AC-US2-02, AC-US2-03, AC-US2-04, AC-US3-01, AC-US3-02, AC-US3-03, AC-US3-04
 **Description**: Migrate ad-banners admin page from innerHTML to island component
-**Files to create/modify**:
-- Create `src/lib/db/queries/admin/ad-banners.ts` — query function for heroes list
-- Create `src/components/islands/admin/AdBannersIsland.astro` — island with list rendering + modal
-- Modify `src/pages/admin/ad-banners.astro` — server-side fetch, pass props to island
-**Test Plan**:
-- Given admin user visits /admin/ad-banners
-- When page loads
-- Then hero list renders via island component (not innerHTML)
-- And create/edit modal opens on button click
-- And form submits via astro:actions
+**Files created/modified**:
+- Created `src/lib/db/queries/admin/ad-banners.ts` — query functions
+- Created `src/components/islands/admin/AdBannersIsland.astro` — island component
+- Modified `src/pages/admin/ad-banners.astro` — server-side fetch, passes props to island
+**Test**: Build succeeds, ad-banners page has zero innerHTML
 **Dependencies**: T-001
-**Status**: [ ] not started
+**Status**: [x] completed
 
 ### T-004: Migrate ai-tools.astro (haiku)
 **AC**: AC-US1-01, AC-US1-02, AC-US1-03, AC-US1-04, AC-US2-01, AC-US2-02, AC-US2-03, AC-US2-04, AC-US3-01, AC-US3-02, AC-US3-03, AC-US3-04

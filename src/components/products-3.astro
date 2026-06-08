@@ -1,0 +1,63 @@
+---
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Price, PriceValue } from "@/components/ui/price"
+import { Section, SectionContainer } from "@/components/ui/section"
+
+type Props = {
+  class?: string
+  badge: string
+  title: string
+  products: {
+    title: string
+    description: string
+    price: {
+      value: number
+      currency: string
+    }
+  }[]
+}
+
+const { class: className, badge, title, products } = Astro.props
+---
+
+<Section class={cn("", className)}>
+  <SectionContainer class="gap-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <Badge variant="secondary">{badge}</Badge>
+      <h2
+        class="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
+      >
+        {title}
+      </h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        products.map((product) => (
+          <Card class="text-center">
+            <CardHeader>
+              <Price class="justify-center">
+                <PriceValue
+                  class="text-3xl font-semibold"
+                  price={product.price.value}
+                  currency={product.price.currency}
+                />
+              </Price>
+            </CardHeader>
+            <CardContent class="flex flex-col gap-2">
+              <CardTitle>{product.title}</CardTitle>
+              <CardDescription>{product.description}</CardDescription>
+            </CardContent>
+          </Card>
+        ))
+      }
+    </div>
+  </SectionContainer>
+</Section>

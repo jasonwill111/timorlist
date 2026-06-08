@@ -7,5 +7,15 @@
   "created": "2026-06-07",
   "updated": "2026-06-07",
   "owner": "team",
-  "tags": ["ui", "cleanup", "dead-code", "shadcn-style", "separation-of-concerns"]
+  "tags": [
+    "ui",
+    "cleanup",
+    "dead-code",
+    "shadcn-style",
+    "separation-of-concerns"
+  ],
+  "externalLinks": {},
+  "lastActivity": "2026-06-07",
+  "testMode": "test-after",
+  "coverageTarget": 80
 }

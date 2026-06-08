@@ -1,0 +1,18 @@
+{
+  "id": "0145-fulldev-install-legacy-cleanup",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-07T16:32:04.367Z",
+  "lastActivity": "2026-06-08T02:13:46.108Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "approvedAt": "2026-06-08T02:13:46.111Z"
+}

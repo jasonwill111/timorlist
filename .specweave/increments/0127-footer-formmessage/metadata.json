@@ -7,5 +7,15 @@
   "created": "2026-06-07",
   "updated": "2026-06-07",
   "owner": "team",
-  "tags": ["ui", "alert", "footer", "form-message", "low-risk"]
+  "tags": [
+    "ui",
+    "alert",
+    "footer",
+    "form-message",
+    "low-risk"
+  ],
+  "externalLinks": {},
+  "lastActivity": "2026-06-07",
+  "testMode": "test-after",
+  "coverageTarget": 80
 }

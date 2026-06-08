@@ -1,43 +1,11 @@
-/**
- * Utility functions for UI components
- */
-
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { nanoid } from 'nanoid'
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+import { nanoid } from "nanoid"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-/**
- * Format a number as USD currency
- */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-}
-
-/**
- * Format a date string for display
- */
-export function formatDate(dateStr: string | Date): string {
-  const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
-  if (isNaN(date.getTime())) {
-    return 'Invalid Date';
-  }
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date);
-}
-
-/**
- * Convert a string to a URL-safe slug
- */
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -49,20 +17,32 @@ export function slugify(text: string): string {
     .replace(/-+/g, '-');             // Collapse multiple hyphens
 }
 
-/**
- * Generate a unique slug by appending nanoid suffix
- * Use for creating slugs that won't collide with existing ones
- */
 export function generateUniqueSlug(title: string): string {
   const base = slugify(title).replace(/-+/g, '-').replace(/^-|-$/g, '');
   return `${base}-${nanoid(6)}`;
 }
 
-/**
- * Extract error message from unknown error
- * Used across all server actions to normalize error messages
- */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   return String(error);
+}
+
+export function buildWhatsAppLink(
+  contactNumber: string | null,
+  countryCode = '+670',
+  text = ''
+): string {
+  if (!contactNumber) return '';
+  const number = contactNumber.replace(/\D/g, '');
+  const cc = countryCode.replace('+', '');
+  return `https://wa.me/${cc}${number}?text=${encodeURIComponent(text)}`;
+}
+
+export function formatUnixTimestamp(unixSeconds: number | null | undefined): string {
+  if (!unixSeconds) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date(unixSeconds * 1000));
 }

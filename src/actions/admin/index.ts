@@ -11,4 +11,6 @@ export { adminReviews as reviews } from './reviews';
 export { settings } from './settings';
 export { adminUsers as users } from './users';
 export { adminBusinesses as businesses } from './businesses';
+export { adminNonProfits as nonProfits } from './non-profits';
+export { adminPublicSectors as publicSectors } from './public-sectors';
 export { login } from './auth/login';
