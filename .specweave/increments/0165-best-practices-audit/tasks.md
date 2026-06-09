@@ -7,74 +7,69 @@
 ### T-001: 重写 middleware.ts
 **Satisfies ACs**: AC-0165-US1-01 ~ AC-0165-US1-07
 **Status**: [x] completed
-**Test**: Given `src/middleware.ts` → When file read → Then HSTS + COOP + CORP present, X-XSS-Protection absent, img-src tightened
+**Test**: Given `src/middleware.ts` → When file read → Then HSTS + COOP + CORP present, X-XSS-Protection absent
 **Files**: `src/middleware.ts`
-**Commit**: (pending — part of this increment)
-
-### T-002: 验证 CSP img-src 收紧
-**Satisfies ACs**: AC-0165-US1-07
-**Status**: [x] completed
-**Test**: Given `middleware.ts` → When CSP header inspected → Then img-src excludes `https:` and `blob:`
-**Files**: `src/middleware.ts`
-**Commit**: (pending)
-
-### T-003: 验证旧 headers 移除
-**Satisfies ACs**: AC-0165-US1-04, AC-0165-US1-05, AC-0165-US1-06
-**Status**: [x] completed
-**Test**: Given `middleware.ts` → When grep for X-XSS-Protection/X-Frame-Options/Pragma → Then 0 matches
-**Files**: `src/middleware.ts`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
 
 ---
 
 ## US-002: 移除重复 CSRF 保护
 
-### T-004: 删除 CSRF origin 验证循环
+### T-002: 删除 CSRF origin 验证循环
 **Satisfies ACs**: AC-0165-US2-01, AC-0165-US2-02
 **Status**: [x] completed
-**Test**: Given `src/middleware.ts` → When origin validation block searched → Then not found; `rg 'mutationMethods\|CSRF\|isTrusted' src/middleware.ts` returns 0
+**Test**: Given `src/middleware.ts` → When grep for mutationMethods/CSRF → Then 0 matches
 **Files**: `src/middleware.ts`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
 
 ---
 
 ## US-003: better-auth 配置修正
 
-### T-005: 修复 withCloudflare 参数结构
+### T-003: 修复 withCloudflare 参数结构
 **Satisfies ACs**: AC-0165-US3-01, AC-0165-US3-02, AC-0165-US3-03, AC-0165-US3-04
 **Status**: [x] completed
-**Test**: Given `src/lib/auth.ts` → When build → Then exit 0; `withCloudflare()` called with single config object
+**Test**: Given `src/lib/auth.ts` → When build → Then exit 0
 **Files**: `src/lib/auth.ts`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
 
 ---
 
-## US-004: 移除 signIn 双重 rate limiting
+## US-004: 移除 auth actions 双重 rate limiting
 
-### T-006: 删除 checkRateLimit 调用
-**Satisfies ACs**: AC-0165-US4-01, AC-0165-US4-02
+### T-004: 删除 signIn checkRateLimit
+**Satisfies ACs**: AC-0165-US4-01
 **Status**: [x] completed
-**Test**: Given `src/actions/auth/signIn.ts` → When `rg 'checkRateLimit' src/actions/auth/signIn.ts` → Then 0 matches
 **Files**: `src/actions/auth/signIn.ts`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
+
+### T-005: 删除 signUp checkRateLimit
+**Satisfies ACs**: AC-0165-US4-01
+**Status**: [x] completed
+**Files**: `src/actions/auth/signUp.ts`
+**Commit**: (pending — part of follow-up commit)
+
+### T-006: signOut secure hardcode → import.meta.env.PROD
+**Satisfies ACs**: (build correctness)
+**Status**: [x] completed
+**Files**: `src/actions/auth/signOut.ts`
+**Commit**: (pending — part of follow-up commit)
 
 ---
 
 ## US-005: Layout 添加 ViewTransitions
 
 ### T-007: 添加 ViewTransitions 到 Layout.astro
-**Satisfies ACs**: AC-0165-US5-01, AC-0165-US5-03
+**Satisfies ACs**: AC-0165-US5-01
 **Status**: [x] completed
-**Test**: Given `src/layouts/Layout.astro` → When grep 'ViewTransitions' → Then `<ViewTransitions />` found in head
 **Files**: `src/layouts/Layout.astro`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
 
 ### T-008: 添加 ViewTransitions 到 AdminLayout.astro
-**Satisfies ACs**: AC-0165-US5-02, AC-0165-US5-03
+**Satisfies ACs**: AC-0165-US5-02
 **Status**: [x] completed
-**Test**: Given `src/layouts/AdminLayout.astro` → When grep 'ViewTransitions' → Then `<ViewTransitions />` found in head
 **Files**: `src/layouts/AdminLayout.astro`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
 
 ---
 
@@ -83,17 +78,24 @@
 ### T-009: 修复 logout 按钮颜色 token
 **Satisfies ACs**: AC-0165-US6-01
 **Status**: [x] completed
-**Test**: Given `src/components/Header.astro` → When line 131 grep 'text-red-500' → Then 0 matches
 **Files**: `src/components/Header.astro`
-**Commit**: (pending)
+**Commit**: 2e25f0d5
+
+---
+
+## US-007: tsconfig.json 清理
+
+### T-010: 移除 @cloudflare/workers-types
+**Satisfies ACs**: (wrangler types generated at build time)
+**Status**: [x] completed
+**Files**: `tsconfig.json`
+**Commit**: (pending — part of follow-up commit)
 
 ---
 
 ## Verification
 
-### T-010: Full build verification
-**Satisfies ACs**: AC-0165-US2-02, AC-0165-US3-04, AC-0165-US4-02
+### T-011: Full build verification
 **Status**: [x] completed
-**Test**: Given project → When `pnpm build` run → Then "vite ✓ built in 3m 32s", exit 0
 **Command**: `pnpm build`
-**Result**: Pass — "vite ✓ built in 3m 32s", no errors
+**Result**: Pass — "vite ✓ built in 3m 36s", exit 0

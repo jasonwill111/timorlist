@@ -17,8 +17,13 @@
       "@pages/*": ["src/pages/*"],
       "@db/*": ["src/db/*"]
     },
-    "types": ["@cloudflare/workers-types", "astro/client"],
+    "types": ["astro/client"],
     "skipLibCheck": true,
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ],
   },
   "include": ["src/**/*", "astro.config.*", "drizzle.config.*", "wrangler.jsonc"],
   "exclude": ["src/db/seed.ts", "src/db/seeds/*.ts", "**/*.test.ts", "**/*.spec.ts"]
