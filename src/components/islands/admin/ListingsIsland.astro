@@ -1,0 +1,311 @@
+---
+/**
+ * ListingsIsland - Admin listings management island
+ * Server-fetched listings with client-side filter, toggle status, delete
+ */
+import { Button } from '@/components/fulldev/button';
+import { Input } from '@/components/fulldev/input';
+import { Select } from '@/components/fulldev/select';
+
+interface ListingData {
+  id: string;
+  title: string | null;
+  slug: string | null;
+  status: string | null;
+  price: string | null;
+  createdAt: number | null;
+  planExpiresAt: number | null;
+}
+
+interface ListingStats {
+  total: number;
+  published: number;
+  draft: number;
+  expired: number;
+}
+
+interface Props {
+  listings: ListingData[];
+  stats: ListingStats;
+}
+
+const { listings, stats } = Astro.props;
+
+function formatDate(ts: number | null): string {
+  return ts ? new Date(ts * 1000).toLocaleDateString() : 'N/A';
+}
+---
+
+<div class="listings-island" data-page="listings">
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold leading-tight">Listing Management</h1>
+      <p class="text-sm text-muted-foreground">Manage classified listings</p>
+    </div>
+    <a href="/admin/listings/new">
+      <Button>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 2424">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        New Listing
+      </Button>
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-card rounded-lg border p-4">
+      <div id="stat-total" class="text-2xl font-bold">{stats.total}</div>
+      <div class="text-xs text-muted-foreground">Total</div>
+    </div>
+    <div class="bg-card rounded-lg border p-4">
+      <div id="stat-published" class="text-2xl font-bold text-green-600">{stats.published}</div>
+      <div class="text-xs text-muted-foreground">Published</div>
+    </div>
+    <div class="bg-card rounded-lg border p-4">
+      <div id="stat-draft" class="text-2xl font-bold text-gray-600">{stats.draft}</div>
+      <div class="text-xs text-muted-foreground">Draft</div>
+    </div>
+    <div class="bg-card rounded-lg border p-4">
+      <div id="stat-expired" class="text-2xl font-bold text-red-600">{stats.expired}</div>
+      <div class="text-xs text-muted-foreground">Expired</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-4 mb-6">
+    <Select id="filter-status" options={[
+      { value: '', label: 'All Status' },
+      { value: 'draft', label: 'Draft' },
+      { value: 'published', label: 'Published' },
+    ]} />
+    <Input id="search" type="search" placeholder="Search listings..." class="w-64" />
+  </div>
+
+  <!-- Listings Table -->
+  <div class="bg-card rounded-lg border">
+    <div id="listings-table-wrapper">
+      <table class="w-full divide-y">
+        <thead>
+          <tr class="divide-x">
+            <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Title</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Price</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="listings-body" class="divide-y">
+          {listings.length === 0 ? (
+            <tr>
+              <td colspan="4" class="text-center py-8 text-muted-foreground">No listings found</td>
+            </tr>
+          ) : (
+            listings.map((listing) => {
+              const now = Date.now() / 1000;
+              const isExpired = listing.planExpiresAt && listing.planExpiresAt < now;
+              const effectiveStatus = isExpired ? 'expired' : (listing.status === 'active' ? 'published' : listing.status);
+              return (
+                <tr class="hover:bg-muted/30">
+                  <td class="px-4 py-3">
+                    <div class="font-medium">{listing.title || 'Untitled'}</div>
+                    <div class="text-xs text-muted-foreground">Created {formatDate(listing.createdAt)}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class={`px-2 py-0.5 text-xs rounded-full ${effectiveStatus === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : effectiveStatus === 'expired' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}>
+                      {effectiveStatus || 'draft'}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3">{listing.price || '-'}</td>
+                  <td class="px-4 py-3 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                      <a href={`/admin/listings/${listing.id}/edit`} data-action="edit-listing" data-id={listing.id} class="text-sm text-primary hover:underline">Edit</a>
+                      <button
+                        type="button"
+                        data-action="toggle-status"
+                        data-id={listing.id}
+                        data-status={effectiveStatus}
+                        class="text-sm text-primary hover:underline"
+                      >
+                        {effectiveStatus === 'published' ? 'Unpublish' : 'Publish'}
+                      </button>
+                      <button
+                        type="button"
+                        data-action="delete-listing"
+                        data-id={listing.id}
+                        class="text-sm text-red-500 hover:underline"
+                      >
+                        Delete
+                      </button>
+                      {listing.slug && (
+                        <a href={`/listing/${listing.slug}`} target="_blank" rel="noopener" class="text-sm text-muted-foreground hover:text-foreground">View</a>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+    <div id="no-results" class="hidden text-center py-12 text-muted-foreground">No listings found</div>
+  </div>
+</div>
+
+<script>
+  interface Listing {
+    id: string;
+    title: string | null;
+    slug: string | null;
+    status: string | null;
+    price: string | null;
+    createdAt: number | null;
+    planExpiresAt: number | null;
+  }
+  async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
+    return fetch(url, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+        ...options.headers,
+      },
+    });
+  }
+  const statusFilter = document.getElementById('filter-status') as HTMLSelectElement | null;
+  const searchInput = document.getElementById('search') as HTMLInputElement | null;
+  const tbody = document.getElementById('listings-body') as HTMLTableSectionElement | null;
+  const noResults = document.getElementById('no-results') as HTMLDivElement | null;
+  let listings: Listing[] = [];
+  function formatDate(ts: number | null): string {
+    return ts ? new Date(ts * 1000).toLocaleDateString() : 'N/A';
+  }
+  function escapeHtml(str: unknown): string {
+    if (str == null) return '';
+    const s = String(str);
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  async function loadListings() {
+    try {
+      const res = await authFetch('/api/admin/listing');
+      const data = await res.json();
+      if (data.success) {
+        listings = data.data || [];
+        updateStats();
+        renderListings();
+      } else {
+        console.error('API error:', data.error);
+      }
+    } catch (err) {
+      console.error('Failed to load listings:', err);
+    }
+  }
+  function updateStats() {
+    const now = Date.now() / 1000;
+    const total = listings.length;
+    const published = listings.filter(l => l.status === 'published' || l.status === 'active').length;
+    const draft = listings.filter(l => l.status === 'draft').length;
+    const expired = listings.filter(l => l.planExpiresAt && l.planExpiresAt < now).length;
+    const el = (id: string) => document.getElementById(id);
+    (el('stat-total') as HTMLElement).textContent = String(total);
+    (el('stat-published') as HTMLElement).textContent = String(published);
+    (el('stat-draft') as HTMLElement).textContent = String(draft);
+    (el('stat-expired') as HTMLElement).textContent = String(expired);
+  }
+  function renderListings() {
+    if (!tbody) return;
+    const search = searchInput?.value.toLowerCase() || '';
+    const status = statusFilter?.value || '';
+    const filtered = listings.filter(l => {
+      if (search && !(l.title?.toLowerCase().includes(search) ?? false)) return false;
+      if (status) {
+        if (status === 'published') {
+          if (l.status !== 'published' && l.status !== 'active') return false;
+        } else if (l.status !== status) {
+          return false;
+        }
+      }
+      return true;
+    });
+    if (filtered.length === 0) {
+      tbody.textContent = '';
+      noResults?.classList.remove('hidden');
+      return;
+    }
+    noResults?.classList.add('hidden');
+    const now = Date.now() / 1000;
+    tbody.textContent = '';
+    for (const listing of filtered) {
+      const isExpired = listing.planExpiresAt && listing.planExpiresAt < now;
+      const effectiveStatus = isExpired ? 'expired' : (listing.status === 'active' ? 'published' : listing.status);
+      const statusColors: Record<string, string> = {
+        published: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+        expired: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+        draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+      };
+      const colorClass = statusColors[effectiveStatus || 'draft'] || statusColors.draft;
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-muted/30';
+      const td1 = document.createElement('td');
+      td1.className = 'px-4 py-3';
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'font-medium';
+      titleDiv.textContent = listing.title || 'Untitled';
+      const dateDiv = document.createElement('div');
+      dateDiv.className = 'text-xs text-muted-foreground';
+      dateDiv.textContent = 'Created ' + formatDate(listing.createdAt);
+      td1.appendChild(titleDiv);
+      td1.appendChild(dateDiv);
+      const td2 = document.createElement('td');
+      td2.className = 'px-4 py-3';
+      const badge = document.createElement('span');
+      badge.className = 'px-2 py-0.5 text-xs rounded-full ' + colorClass;
+      badge.textContent = effectiveStatus || 'draft';
+      td2.appendChild(badge);
+      const td3 = document.createElement('td');
+      td3.className = 'px-4 py-3';
+      td3.textContent = listing.price || '-';
+      const td4 = document.createElement('td');
+      td4.className = 'px-4 py-3 text-right';
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'flex items-center justify-end gap-2';
+      const editLink = document.createElement('a');
+      editLink.href = '/admin/listings/' + listing.id + '/edit';
+      editLink.setAttribute('data-action', 'edit-listing');
+      editLink.setAttribute('data-id', listing.id);
+      editLink.className = 'text-sm text-primary hover:underline';
+      editLink.textContent = 'Edit';
+      actionsDiv.appendChild(editLink);
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.setAttribute('data-action', 'toggle-status');
+      toggleBtn.setAttribute('data-id', listing.id);
+      toggleBtn.setAttribute('data-status', effectiveStatus || 'draft');
+      toggleBtn.className = 'text-sm text-primary hover:underline';
+      toggleBtn.textContent = effectiveStatus === 'published' ? 'Unpublish' : 'Publish';
+      actionsDiv.appendChild(toggleBtn);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.setAttribute('data-action', 'delete-listing');
+      deleteBtn.setAttribute('data-id', listing.id);
+      deleteBtn.className = 'text-sm text-red-500 hover:underline';
+      deleteBtn.textContent = 'Delete';
+      actionsDiv.appendChild(deleteBtn);
+      if (listing.slug) {
+        const viewLink = document.createElement('a');
+        viewLink.href = '/listing/' + escapeHtml(listing.slug);
+        viewLink.target = '_blank';
+        viewLink.rel = 'noopener';
+        viewLink.className = 'text-sm text-muted-foreground hover:text-foreground';
+        viewLink.textContent = 'View';
+        actionsDiv.appendChild(viewLink);
+      }
+      td4.appendChild(actionsDiv);
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      tr.appendChild(td4);
+      tbody.appendChild(tr);
+    }
+  }
