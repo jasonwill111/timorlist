@@ -1,0 +1,17 @@
+{
+  "id": "0164-platform-cleanup",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-09T16:00:00.000Z",
+  "lastActivity": "2026-06-09T16:00:00.000Z",
+  "testMode": "test-after",
+  "coverageTarget": 100,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp"
+}
