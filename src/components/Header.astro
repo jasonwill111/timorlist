@@ -8,19 +8,19 @@
  *
  * All imports must be inside the single frontmatter block (SSR safety, see 0125).
  */
-import ThemeToggle from './ui/ThemeToggle.astro';
-import { Button } from './ui/button';
-import { Avatar } from './ui/avatar';
-import { AvatarFallback } from './ui/avatar';
-import { DropdownMenu } from './ui/dropdown-menu';
-import { DropdownMenuTrigger } from './ui/dropdown-menu';
-import { DropdownMenuContent } from './ui/dropdown-menu';
-import { Sheet } from './ui/sheet';
-import { SheetTrigger } from './ui/sheet';
-import { SheetContent } from './ui/sheet';
-import { SheetHeader } from './ui/sheet';
-import { SheetTitle } from './ui/sheet';
-import { SheetDescription } from './ui/sheet';
+import ThemeToggle from './fulldev/ThemeToggle.astro';
+import { Button } from './fulldev/button';
+import { Avatar } from './fulldev/avatar';
+import { AvatarFallback } from './fulldev/avatar';
+import { DropdownMenu } from './fulldev/dropdown-menu';
+import { DropdownMenuTrigger } from './fulldev/dropdown-menu';
+import { DropdownMenuContent } from './fulldev/dropdown-menu';
+import { Sheet } from './fulldev/sheet';
+import { SheetTrigger } from './fulldev/sheet';
+import { SheetContent } from './fulldev/sheet';
+import { SheetHeader } from './fulldev/sheet';
+import { SheetTitle } from './fulldev/sheet';
+import { SheetDescription } from './fulldev/sheet';
 
 interface Props {
   currentPath?: string;
@@ -128,7 +128,7 @@ const urlParams = new URL(Astro.request.url).searchParams;
                   My Account
                 </a>
                 <div data-slot="dropdown-menu-separator" class="bg-muted -mx-1 my-1 h-px"></div>
-                <button id="logout-btn" data-slot="dropdown-menu-item" data-variant="destructive" class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none text-red-500 hover:bg-destructive/10">
+                <button id="logout-btn" data-slot="dropdown-menu-item" data-variant="destructive" class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none text-destructive hover:bg-destructive/10">
                   Log Out
                 </button>
               </DropdownMenuContent>

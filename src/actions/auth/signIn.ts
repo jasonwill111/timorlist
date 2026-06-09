@@ -1,9 +1,9 @@
 // Auth Server Action - Sign In
+// Rate limiting: better-auth 1.6+ built-in (configured in src/lib/auth.ts) — no duplicate needed
 import { defineAction } from 'astro:actions';
 import * as z from 'zod';
 import { getAuth } from '@/lib/auth';
 import { emailSchema, requiredString } from '@/lib/schemas/common';
-import { checkRateLimit } from '@/lib/rate-limit';
 import { createErrorResponse, getErrorMessage } from '@/lib/errors';
 import { ErrorCode } from '@/lib/errors';
 
@@ -15,16 +15,6 @@ export const signIn = defineAction({
     rememberMe: z.boolean().optional().default(false),
   }),
   handler: async (input) => {
-    // Simple in-memory rate limiting (no KV overhead)
-    const rateLimit = checkRateLimit('auth-sign-in');
-    if (!rateLimit.allowed) {
-      return createErrorResponse(
-        ErrorCode.AUTH_RATE_LIMITED,
-        'Too many sign-in attempts. Please try again later.',
-        { resetIn: rateLimit.resetIn }
-      );
-    }
-
     try {
       // Use singleton getAuth - instance cached across requests
       const auth = await getAuth();

@@ -1,7 +1,7 @@
 ---
 import '../styles/globals.css';
-import { Button } from '../components/ui/button';
-import ToastContainer from '../components/ui/toast/ToastContainer.astro';
+import { Button } from '../components/fulldev/button';
+import ToastContainer from '../components/fulldev/toast/ToastContainer.astro';
 import { actions } from 'astro:actions';
 
 interface Props {
@@ -18,6 +18,7 @@ const fullTitle = title.includes('Admin') ? title : `${title} - Admin`;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
+    <ViewTransitions />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- Robots - admin pages should not be indexed -->
     <meta name="robots" content="noindex, nofollow" />
@@ -42,366 +43,219 @@ const fullTitle = title.includes('Admin') ? title : `${title} - Admin`;
         <div class="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center flex-shrink-0">
           <span class="text-white font-bold text-sm">T</span>
         </div>
-        <span class="font-bold text-sm truncate">TimorUp</span>
+        <span class="font-semibold text-sm truncate">TimorUp</span>
+        <span class="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Admin</span>
       </div>
-      <!-- Right: Theme Toggle Only -->
-      <div class="flex items-center gap-1 flex-shrink-0">
-        <Button id="admin-theme-toggle-mobile" variant="ghost" size="icon">
-          <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-          </svg>
-          <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-        </Button>
-      </div>
+      <!-- Right: Theme toggle -->
+      <Button id="theme-toggle-mobile" variant="ghost" size="icon" class="p-2 -mr-2">
+        <svg class="w-5 h-5 sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg class="w-5 h-5 moon-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </Button>
     </header>
 
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="md:hidden fixed inset-0 z-40 hidden">
-      <div id="mobile-menu-backdrop" class="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-200"></div>
-      <div id="mobile-menu-panel" class="absolute left-0 top-0 h-full w-56 bg-card border-r pt-14 -translate-x-full transition-transform duration-200 ease-out">
-        <nav class="p-4 space-y-1">
-          <a href="/admin" class="nav-item" data-section="dashboard">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-            </svg>
-            <span>Dashboard</span>
-          </a>
-          <a href="/" target="_blank" class="nav-item" data-section="site">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-            </svg>
-            <span>View Site</span>
-          </a>
-          <div class="pt-2 mt-2 border-t">
-            <p class="px-2 py-1 text-xs text-muted-foreground">Manage</p>
+    <div class="flex">
+      <!-- Sidebar - Desktop -->
+      <aside class="hidden md:flex flex-col w-64 min-h-screen border-r bg-card fixed left-0 top-0 bottom-0 z-40">
+        <div class="flex items-center gap-2 p-4 border-b">
+          <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold">T</span>
           </div>
-          <a href="/admin/orders" class="nav-item" data-section="orders">
+          <div>
+            <div class="font-semibold text-sm">TimorUp</div>
+            <div class="text-xs text-muted-foreground">Admin Panel</div>
+          </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+          <a href="/admin" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname === '/admin' ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
-            <span>Orders</span>
+            Dashboard
           </a>
-          <a href="/admin/listings" class="nav-item" data-section="listing">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-            </svg>
-            <span>Listings</span>
-          </a>
-          <a href="/admin/businesses" class="nav-item" data-section="businesses">
+          <a href="/admin/listings" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/listings') ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
-            <span>Businesses</span>
+            Listings
           </a>
-          <a href="/admin/non-profits" class="nav-item" data-section="non-profits">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.682l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-            </svg>
-            <span>Non-Profits</span>
-          </a>
-          <a href="/admin/public-sectors" class="nav-item" data-section="public-sectors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1"/>
-            </svg>
-            <span>Gov & NGOs</span>
-          </a>
-          <a href="/admin/ai-tools" class="nav-item" data-section="ai-tools">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
-            <span>AI Tools</span>
-          </a>
-          <a href="/admin/users" class="nav-item" data-section="users">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-            <span>Users</span>
-          </a>
-          <a href="/admin/products" class="nav-item" data-section="products">
+          <a href="/admin/products" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/products') ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
-            <span>Products</span>
+            Products
           </a>
-          <a href="/admin/banners" class="nav-item" data-section="banners">
+          <a href="/admin/service-packages" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/service-packages') ? 'bg-accent' : ''}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+            Service Packages
+          </a>
+          <a href="/admin/businesses" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/businesses') ? 'bg-accent' : ''}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+            Businesses
+          </a>
+          <a href="/admin/users" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/users') ? 'bg-accent' : ''}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+            </svg>
+            Users
+          </a>
+          <a href="/admin/media" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/media') ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
-            <span>Banners</span>
+            Media
           </a>
-          <a href="/admin/blogs" class="nav-item" data-section="blogs">
+          <a href="/admin/non-profits" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/non-profits') ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
-            <span>Blog Posts</span>
+            Non-Profits
           </a>
-          <a href="/admin/media" class="nav-item" data-section="media">
+          <a href="/admin/public-sectors" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/public-sectors') ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
-            <span>Media</span>
+            Public Sectors
           </a>
-          <a href="/admin/service-packages" class="nav-item" data-section="service-packages">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-            </svg>
-            <span>Service Packages</span>
-          </a>
-          <a href="/admin/settings" class="nav-item" data-section="settings">
+          <a href="/admin/settings" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname.startsWith('/admin/settings') ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
-            <span>Settings</span>
+            Settings
           </a>
-          
-          <div class="pt-2 mt-2 border-t">
-            <Button id="admin-logout-btn-mobile" variant="ghost" class="nav-item w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-              </svg>
-              <span>Log Out</span>
-            </Button>
-          </div>
         </nav>
-      </div>
-    </div>
 
-    <!-- Desktop Sidebar -->
-    <aside class="hidden md:flex fixed left-0 top-0 h-full w-48 bg-card border-r flex-col z-40">
-      <!-- Logo + User Info -->
-      <div class="p-4 border-b flex items-center justify-between">
-        <a href="/admin" class="flex items-center gap-2 min-w-0">
-          <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span class="text-white font-bold text-lg">T</span>
-          </div>
-          <span class="font-bold text-sm truncate">TimorUp</span>
-        </a>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-        <a href="/admin" class="nav-item" data-section="dashboard">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-          </svg>
-          <span>Dashboard</span>
-        </a>
-
-        <div class="pt-2 mt-2 border-t">
-          <p class="px-2 py-1 text-xs text-muted-foreground">Manage</p>
-        </div>
-        
-        <a href="/admin/orders" class="nav-item" data-section="orders">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          <span>Orders</span>
-        </a>
-        
-        <a href="/admin/listings" class="nav-item" data-section="listing">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-          </svg>
-          <span>Listings</span>
-        </a>
-        <a href="/admin/businesses" class="nav-item" data-section="businesses">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-          </svg>
-          <span>Businesses</span>
-        </a>
-        <a href="/admin/non-profits" class="nav-item" data-section="non-profits">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.682l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
-          <span>Non-Profits</span>
-        </a>
-        <a href="/admin/public-sectors" class="nav-item" data-section="public-sectors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
-          </svg>
-          <span>Gov & NGOs</span>
-        </a>
-        <a href="/admin/ai-tools" class="nav-item" data-section="ai-tools">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          <span>AI Tools</span>
-        </a>
-
-        <a href="/admin/users" class="nav-item" data-section="users">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <span>Users</span>
-        </a>
-        
-        <a href="/admin/products" class="nav-item" data-section="products">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-          </svg>
-          <span>Products</span>
-        </a>
-        
-        <a href="/admin/ad-banners" class="nav-item" data-section="ad-banners">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <span>Ad Banners</span>
-        </a>
-        
-        <a href="/admin/blogs" class="nav-item" data-section="blogs">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-          </svg>
-          <span>Blog Posts</span>
-        </a>
-
-        <a href="/admin/media" class="nav-item" data-section="media">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <span>Media</span>
-        </a>
-
-        <a href="/admin/service-packages" class="nav-item" data-section="service-packages">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-          </svg>
-          <span>Service Packages</span>
-        </a>
-
-        <a href="/admin/settings" class="nav-item" data-section="settings">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-          <span>Settings</span>
-        </a>
-      </nav>
-
-      <!-- Bottom Actions: View Site + Theme + Logout -->
-      <div class="p-4 border-t">
-        <!-- Role name with badge style -->
-        <p class="text-sm text-center font-medium text-primary mb-3">Super Admin</p>
-        <!-- Icons row - vertically aligned -->
-        <div class="flex items-center justify-center gap-4">
-          <a href="/" target="_blank" class="p-2 hover:bg-muted rounded-lg" title="View Site">
+        <!-- Bottom section: AI Tools + Logout -->
+        <div class="border-t p-3 space-y-1">
+          <a href="/admin/ai-tools" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors {Astro.url.pathname === '/admin/ai-tools' ? 'bg-accent' : ''}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
             </svg>
+            AI Tools
           </a>
-          <Button id="admin-theme-toggle-desktop" variant="ghost" size="icon" title="Toggle Theme">
-            <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-            </svg>
-            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-          </Button>
-          <Button id="admin-logout-btn-desktop" variant="ghost" size="icon" title="Log Out" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+          <button id="logout-btn-desktop" class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-destructive/10 text-destructive transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
-          </Button>
+            Log Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 md:ml-64 pt-14 md:pt-0 min-h-screen">
+        <div class="p-4 md:p-6 lg:p-8">
+          <slot />
+        </div>
+      </main>
+    </div>
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/50" id="mobile-menu-overlay"></div>
+      <div class="absolute left-0 top-0 bottom-0 w-72 bg-card shadow-xl transform -translate-x-full transition-transform duration-200" id="mobile-menu-panel">
+        <div class="flex items-center gap-2 p-4 border-b">
+          <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold">T</span>
+          </div>
+          <div>
+            <div class="font-semibold text-sm">TimorUp</div>
+            <div class="text-xs text-muted-foreground">Admin Panel</div>
+          </div>
+          <button id="close-mobile-menu" class="ml-auto p-2 hover:bg-accent rounded-md">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+          <a href="/admin" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Dashboard</a>
+          <a href="/admin/listings" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Listings</a>
+          <a href="/admin/products" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Products</a>
+          <a href="/admin/service-packages" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Service Packages</a>
+          <a href="/admin/businesses" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Businesses</a>
+          <a href="/admin/users" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Users</a>
+          <a href="/admin/media" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Media</a>
+          <a href="/admin/non-profits" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Non-Profits</a>
+          <a href="/admin/public-sectors" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Public Sectors</a>
+          <a href="/admin/settings" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">Settings</a>
+          <a href="/admin/ai-tools" class="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors">AI Tools</a>
+        </nav>
+        <div class="border-t p-3">
+          <button id="logout-btn-mobile" class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-destructive/10 text-destructive transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Log Out
+          </button>
         </div>
       </div>
+    </div>
 
-    </aside>
+    <script>
+      // Theme toggle
+      function applyTheme(dark: boolean) {
+        document.documentElement.classList.toggle('dark', dark);
+        const sun = document.querySelectorAll('.sun-icon');
+        const moon = document.querySelectorAll('.moon-icon');
+        sun.forEach(el => (el as HTMLElement).style.display = dark ? 'none' : 'block');
+        moon.forEach(el => (el as HTMLElement).style.display = dark ? 'block' : 'none');
+      }
 
-    <!-- Main Content -->
-    <main class="pt-14 md:pt-0 md:pl-56">
-      <slot />
-    </main>
+      document.addEventListener('astro:page-load', () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        applyTheme(isDark);
+
+        document.querySelectorAll('#theme-toggle-mobile, #theme-toggle-desktop').forEach(btn => {
+          btn?.addEventListener('click', () => {
+            const nowDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+            applyTheme(nowDark);
+          });
+        });
+
+        // Mobile menu
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMobileMenu = document.getElementById('close-mobile-menu');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+        function openMenu() {
+          mobileMenu?.classList.remove('hidden');
+          setTimeout(() => mobileMenuPanel?.classList.remove('-translate-x-full'), 0);
+        }
+        function closeMenu() {
+          mobileMenuPanel?.classList.add('-translate-x-full');
+          setTimeout(() => mobileMenu?.classList.add('hidden'), 200);
+        }
+
+        mobileMenuBtn?.addEventListener('click', openMenu);
+        closeMobileMenu?.addEventListener('click', closeMenu);
+        mobileMenuOverlay?.addEventListener('click', closeMenu);
+
+        // Logout handlers
+        async function handleLogout() {
+          try {
+            await actions.auth.signOut();
+          } catch (e) {
+            console.error('Logout error:', e);
+          }
+          window.location.href = '/admin/login';
+        }
+
+        document.getElementById('logout-btn-desktop')?.addEventListener('click', handleLogout);
+        document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
+      });
+    </script>
   </body>
 </html>
-
-<style>
-  @reference "../styles/globals.css";
-  .nav-item {
-    @apply flex items-center gap-2 px-2 py-2 min-h-9 rounded-lg text-sm text-muted-foreground transition-colors;
-  }
-  .nav-item:hover {
-    @apply bg-muted text-foreground;
-  }
-  .nav-item.active {
-    @apply bg-primary text-primary-foreground;
-  }
-  .nav-item.active:hover {
-    @apply opacity-90;
-  }
-</style>
-
-<script is:inline>
-  (function() {
-    // Initialize theme before page renders to prevent flash
-    const theme = localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-
-    // Theme toggle functions
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-
-    // Attach to all theme toggles
-    document.getElementById('admin-theme-toggle-desktop')?.addEventListener('click', toggleTheme);
-    document.getElementById('admin-theme-toggle-mobile')?.addEventListener('click', toggleTheme);
-
-    // Logout - use Better Auth signOut
-    async function handleLogout() {
-      if (confirm('Are you sure you want to log out?')) {
-        try {
-          await actions.auth.signOut();
-        } catch (e) {
-          console.error('Logout error:', e);
-        }
-        window.location.href = '/admin/login';
-      }
-    }
-    document.getElementById('admin-logout-btn-desktop')?.addEventListener('click', handleLogout);
-    document.getElementById('admin-logout-btn-mobile')?.addEventListener('click', handleLogout);
-
-    // Mobile menu
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuPanel = document.getElementById('mobile-menu-panel');
-    const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
-
-    function openMobileMenu() {
-      if (!mobileMenu || !mobileMenuPanel || !mobileMenuBackdrop) return;
-      mobileMenu.classList.remove('hidden');
-      mobileMenuPanel.offsetHeight;
-      mobileMenuPanel.classList.remove('-translate-x-full');
-      mobileMenuBackdrop.classList.remove('opacity-0');
-    }
-
-    function closeMobileMenu() {
-      if (!mobileMenu || !mobileMenuPanel || !mobileMenuBackdrop) return;
-      mobileMenuPanel.classList.add('-translate-x-full');
-      mobileMenuBackdrop.classList.add('opacity-0');
-      setTimeout(() => mobileMenu.classList.add('hidden'), 200);
-    }
-
-    mobileMenuBtn?.addEventListener('click', openMobileMenu);
-    mobileMenuBackdrop?.addEventListener('click', closeMobileMenu);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !mobileMenu?.classList.contains('hidden')) closeMobileMenu();
-    });
-
-    // Highlight active nav item based on current path
-    const path = window.location.pathname;
-    document.querySelectorAll('.nav-item[data-section]').forEach(item => {
-      const section = item.dataset.section;
-      let isActive = false;
-      if (section === 'dashboard' && path === '/admin') isActive = true;
-      if (section !== 'dashboard' && section !== 'site' && path.includes(`/admin/${section}`)) isActive = true;
-      if (section === 'site' && path === '/') isActive = true;
-      item.classList.toggle('active', isActive);
-    });
-  })();
-</script>
