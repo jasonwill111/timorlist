@@ -6,7 +6,7 @@ export default defineConfig({
   output: 'server',
   adapter: cloudflare({
     kvNamespaces: [],
-    imageService: 'passthrough',
+    imageService: 'cloudflare-binding',
   }),
   site: 'https://timorup.com',
 
