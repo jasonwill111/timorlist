@@ -1,0 +1,29 @@
+---
+import ChevronLeft from "lucide-static/icons/chevron-left.svg";
+import type { HTMLAttributes } from "astro/types";
+import type { VariantProps } from "tailwind-variants";
+
+import { buttonVariants } from "@/components/fulldev/button";
+
+import PaginationLink from "./PaginationLink.astro";
+import { paginationPrevious } from "./variants";
+
+type Props = HTMLAttributes<"a"> & {
+  size?: VariantProps<typeof buttonVariants>["size"];
+};
+
+const { class: className, size = "md", ...rest } = Astro.props;
+---
+
+<PaginationLink
+  aria-label="Go to previous page"
+  size={size}
+  class={paginationPrevious({ class: className })}
+  {...rest}
+  data-slot="pagination-previous"
+>
+  <slot name="icon">
+    <ChevronLeft class="size-4 transition-transform group-hover:-translate-x-1" />
+  </slot>
+  <slot />
+</PaginationLink>
