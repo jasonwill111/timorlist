@@ -26,14 +26,16 @@
     {
       "binding": "SESSION",
       "id": "3e9ae14a105b4aa48316eaa029f5bc5f",
-      "preview_id": "3e9ae14a105b4aa48316eaa029f5bc5f"
+      "preview_id": "3e9ae14a105b4aa48316eaa029f5bc5f",
+      "remote": true
     }
   ],
   "r2_buckets": [
     {
       "binding": "MEDIA_BUCKET",
       "bucket_name": "timorup-media",
-      "preview_bucket_name": "timorup-media"
+      "preview_bucket_name": "timorup-media",
+      "remote": true
     }
   ],
   // --- Secret / Environment Variables ---

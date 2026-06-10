@@ -5,7 +5,7 @@ import { Input } from '@/components/fulldev/input';
 // All filtering, sorting, and pagination happens on the server
 // Data layer extracted to lib/db/queries/products-list.ts
 import { getProductList } from '@/lib/db/queries/products-list';
-import { Select } from '@/components/fulldev/select';
+import { Input } from '@/components/fulldev/input';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('search') || '';
@@ -67,16 +67,24 @@ const buildUrl = (pageNum: number) => {
     />
   </div>
 
-  <Select id="business-filter" name="business">
+  <select
+    id="business-filter"
+    name="business"
+    class="h-10 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors"
+  >
     <option value="">All Businesses</option>
     {allBusinesses.map(b => (
       <option value={b.id} selected={businessId === b.id}>{b.title}</option>
     ))}
-  </Select>
-  <Select id="sort-filter" name="sort">
+  </select>
+  <select
+    id="sort-filter"
+    name="sort"
+    class="h-10 px-4 rounded-xl border border-border bg-background text-sm cursor-pointer hover:border-primary/50 transition-colors"
+  >
     <option value="recent" selected={sort === 'recent'}>Recent</option>
     <option value="name" selected={sort === 'name'}>Name A-Z</option>
-  </Select>
+  </select>
   <Button type="submit">
     Filter
   </Button>
