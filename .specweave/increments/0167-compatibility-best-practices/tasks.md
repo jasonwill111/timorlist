@@ -15,8 +15,7 @@ created: 2026-06-10
 - [x] **T-0167-03**: 添加 `experimental.queuedRendering` + `security.*` 选项到 `astro.config.mjs`
 - [x] **T-0167-04**: 修复 `src/lib/auth.ts` `withCloudflare()` 双参数 API
 - [x] **T-0167-05**: 添加 `advanced.ipAddress.ipAddressHeaders` + `backgroundTasks.handler`
-- [x] **T-0167-06**: 验证 Astro build 通过（`✓ built in 2m 44s`）
-
+- [x] **T-0167-06**: 验证 Astro build 通过（`✓ Complete in 3m 30s`，astro@6.4.5 + @astrojs/cloudflare@13.7.0 + @tailwindcss/vite@4.3.0）
 ### Phase: Documentation
 
 - [x] **T-0167-07**: 创建 `.specweave/increments/0167-compatibility-best-practices/spec.md`

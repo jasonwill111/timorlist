@@ -12,9 +12,7 @@ coverage_target: 100
 
 # Feature: Platform Best Practices — compatibility_date + Astro 6 features + auth API fix
 
-## Overview
-
-在官方文档核对后，对 `wrangler.jsonc`、`astro.config.mjs`、`src/lib/auth.ts` 进行 5 项修复，全部 build 验证通过（`✓ built in 2m 44s`）。
+在官方文档核对后，对 `wrangler.jsonc`、`astro.config.mjs`、`src/lib/auth.ts` 进行 5 项修复，全部 build 验证通过（`✓ Complete in 3m 30s`，astro@6.4.5 + @astrojs/cloudflare@13.7.0）。
 
 ## User Stories
 
@@ -69,11 +67,10 @@ coverage_target: 100
 **I want** `withCloudflare()` 使用正确的两参数 API
 **So that** build 不报语法错误
 
-**Acceptance Criteria**:
 - [x] **AC-0167-US5-01**: `withCloudflare(cloudflareOptions, betterAuthOptions)` 双参数调用
 - [x] **AC-0167-US5-02**: Cloudflare 选项（`d1Native`, `kv`, `geolocationTracking`, `autoDetectIpAddress`）在第一个参数
 - [x] **AC-0167-US5-03**: Better Auth 选项（`baseURL`, `emailAndPassword`, `session`, `trustedOrigins` 等）在第二个参数
-- [x] **AC-0167-US5-04**: Astro Vite build 通过（`✓ built in 2m 44s`）
+- [x] **AC-0167-US5-04**: Astro Vite build 通过（`✓ Complete in 3m 30s`，astro@6.4.5 + @astrojs/cloudflare@13.7.0 + @tailwindcss/vite@4.3.0）
 
 ### US-006: 配置 better-auth IP 提取和后台任务
 **Project**: TimorUp
