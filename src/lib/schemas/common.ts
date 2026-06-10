@@ -34,10 +34,7 @@ export const phoneSchema = z.string().regex(
  */
 export const countryCodeSchema = z.string().default('+670');
 
-/**
- * URL schema with optional http/https
- */
-export const urlSchema = z.string().url().or(z.literal('')).optional();
+export const urlSchema = z.url().or(z.literal('')).optional();
 
 /**
  * Slug schema (lowercase alphanumeric with hyphens)

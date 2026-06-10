@@ -1,14 +1,7 @@
 // Lightweight Auth Action - Bypasses better-auth for Free Plan compatibility
 // Uses direct D1 queries to stay under 10ms CPU limit
 import { defineAction } from 'astro:actions';
-import * as z from 'zod';
-import { createErrorResponse } from '@/lib/errors';
-import { ErrorCode } from '@/lib/errors';
-import { checkRateLimit } from '@/lib/rate-limit';
-import { hash as bcryptHash, compare as bcryptCompare } from 'bcryptjs';
-import { getRawDb } from '@/lib/db';
-
-const emailSchema = z.string().email({ error: 'Valid email required' });
+import { emailSchema } from '@/lib/schemas/common';
 
 function generateSessionToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));

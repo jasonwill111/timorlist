@@ -22,7 +22,7 @@ export const create = defineAction({
     openingHours: z.string().optional(),
     locationLat: z.number().optional(),
     locationLng: z.number().optional(),
-    registrationUrl: z.string().url().optional().or(z.string().optional()),
+    registrationUrl: z.url().optional().or(z.string().optional()),
 
     yearOfEstablishment: z.number().optional(),
     socialLinks: z.string().optional(),
