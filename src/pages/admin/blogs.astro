@@ -8,7 +8,5 @@ const posts = await getAdminBlogPosts();
 ---
 
 <AdminLayout title="Blog Posts">
-  <div class="container py-4 px-2 md:py-6">
-    <BlogsIsland posts={posts} />
-  </div>
+    <BlogsIsland client:load posts={posts} />
 </AdminLayout>

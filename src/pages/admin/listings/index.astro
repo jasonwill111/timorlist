@@ -8,8 +8,5 @@ const listings = await getAdminListings();
 const stats = await getAdminListingStats();
 ---
 
-<AdminLayout title="Listing Management">
-  <div class="container py-8">
-    <ListingsIsland listings={listings} stats={stats} />
-  </div>
+    <ListingsIsland client:load listings={listings} stats={stats} />
 </AdminLayout>

@@ -3,13 +3,9 @@ export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import { ProductsIsland } from '@/components/islands/admin';
 import { getAdminProducts, getAdminBusinessOptions } from '@/lib/db/queries';
-
-const products = await getAdminProducts();
-const businessOptions = await getAdminBusinessOptions();
----
+const products = await getAdminProducts().catch(e => { console.error('getAdminProducts error:', e); return []; });
+const businessOptions = await getAdminBusinessOptions().catch(e => { console.error('getAdminBusinessOptions error:', e); return []; });
 
 <AdminLayout title="Products">
   <div class="container py-4 px-2 md:py-6">
-    <ProductsIsland products={products} businessOptions={businessOptions} />
-  </div>
-</AdminLayout>
+    <ProductsIsland client:load products={products} businessOptions={businessOptions} />

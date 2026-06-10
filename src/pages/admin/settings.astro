@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import AdminLayout from '@layouts/AdminLayout.astro';
 import SettingsIsland from '@/components/islands/admin/SettingsIsland.astro';
 ---
@@ -8,9 +9,6 @@ import SettingsIsland from '@/components/islands/admin/SettingsIsland.astro';
     <div class="mb-4 md:mb-6">
       <h1 class="text-xl md:text-2xl font-bold">Site Settings</h1>
     </div>
-    <div class="bg-card border rounded-lg p-3 md:p-4">
-      <h3 class="font-semibold mb-3 text-sm md:text-base">General Settings</h3>
-      <SettingsIsland />
-    </div>
+    <SettingsIsland client:load />
   </div>
 </AdminLayout>

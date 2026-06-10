@@ -8,7 +8,5 @@ const businesses = await getAdminBusinesses();
 ---
 
 <AdminLayout title="Businesses">
-  <div class="container py-4 px-2 md:py-6">
-    <BusinessesIsland businesses={businesses} />
-  </div>
+    <BusinessesIsland client:load businesses={businesses} />
 </AdminLayout>

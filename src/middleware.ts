@@ -1,34 +1,38 @@
 /**
- * Astro Middleware - Security Headers + Smart Cache
- * Updated 2026-06-09 (increment 0165):
- * - Remove custom CSRF: better-auth handles it via trustedOrigins + built-in CSRF
- * - Add HSTS, COOP, CORP headers (Cloudflare Workers best practice)
- * - Tighten CSP img-src (was 'https: blob:')
- * - Remove redundant X-Frame-Options (CSP frame-ancestors handles it)
- * - Remove deprecated X-XSS-Protection header
- * - Remove redundant Pragma/Expires (Cache-Control sufficient)
+ * Astro Middleware - Auth Guard + Security Headers + Smart Cache
+ * Updated 2026-06-10:
+ * - Add auth guard for /listings/create (requires login)
+ * - Wrap auth check in try-catch to prevent SSR 500s on D1 errors
  */
-
 import { defineMiddleware } from 'astro:middleware';
-
-const SITE_URL = 'https://timorup.com';
-const PRODUCTION_TRUSTED_HOSTS = new Set<string>([
-  new URL(SITE_URL).host,
-  'timorup.jasonwill.workers.dev',
-  'timorup.pages.dev',
-]);
+import { getAdminUser } from '@/lib/admin-auth';
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // CSRF is handled by better-auth's trustedOrigins + built-in CSRF protection.
-  // Custom CSRF here would duplicate better-auth and cause false positives.
-  void context;
+  const url = context.url;
+  const pathname = url.pathname;
+
+  // === Auth Guard: /listings/create requires login ===
+  if (pathname === '/listings/create') {
+    try {
+      const user = await getAdminUser(context.request);
+      if (!user) {
+        const redirectTo = new URL('/login', url);
+        redirectTo.searchParams.set('redirect', pathname);
+        return context.redirect(redirectTo.toString(), 302);
+      }
+    } catch (e) {
+      // If auth check fails (D1 unavailable), deny access rather than 500
+      console.error('Auth guard error for /listings/create:', e);
+      return new Response('Service Unavailable', { status: 503 });
+    }
+  }
 
   const response = await next();
 
-  const url = context.url;
+  // === Static asset detection ===
   const isStaticAsset =
-    url.pathname.startsWith('/_astro/') ||
-    /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/.test(url.pathname);
+    pathname.startsWith('/_astro/') ||
+    /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/.test(pathname);
 
   let hasExistingCacheControl = false;
   response.headers.forEach((_, key) => {
@@ -40,14 +44,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     newHeaders.set(key, value);
   });
 
-  // === Static cache for immutable assets ===
+  // === Cache control ===
   if (isStaticAsset) {
     newHeaders.set('Cache-Control', 'public, max-age=31536000, immutable');
   } else if (!hasExistingCacheControl) {
     newHeaders.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   }
 
-  // === P1-A: CSP ===
+  // === CSP (P1-A) ===
   // unsafe-inline required for: Astro framework runtime + Tailwind v4 CSS-in-JS
   // img-src: self + data: (inline SVG) + R2 public bucket + site domain (OG images)
   const csp = [
@@ -65,7 +69,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   newHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   newHeaders.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
   newHeaders.set('Content-Security-Policy', csp);
-  // Cloudflare Workers HSTS + Spectre mitigations
   newHeaders.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   newHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
   newHeaders.set('Cross-Origin-Resource-Policy', 'same-origin');
