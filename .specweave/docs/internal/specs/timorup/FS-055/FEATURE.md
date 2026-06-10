@@ -4,8 +4,8 @@ title: "Feature: Price Fields Format Unification"
 type: feature
 status: completed
 priority: P1
-created: 2026-05-27
-lastUpdated: 2026-05-27
+created: 2026-06-09
+lastUpdated: 2026-06-09
 tldr: "Unify price display format across entire application: schema �?database �?frontend."
 complexity: medium
 stakeholder_relevant: true
@@ -29,7 +29,7 @@ Unify price display format across entire application: schema �?database �?fr
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0055-price-fields-format-unification](../../../../../increments/0055-price-fields-format-unification/spec.md) | ✅ completed | 2026-05-27 |
+| [0055-price-fields-format-unification](../../../../../increments/0055-price-fields-format-unification/spec.md) | ✅ completed | 2026-06-09 |
 
 ## User Stories
 

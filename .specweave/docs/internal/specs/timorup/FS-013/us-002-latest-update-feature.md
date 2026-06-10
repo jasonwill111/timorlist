@@ -4,7 +4,7 @@ feature: FS-013
 title: "Latest Update Feature"
 status: not_started
 priority: P1
-created: 2026-05-27
+created: 2026-06-09
 tldr: "As a business owner, I want to post weekly updates about promotions, events, or news so customers stay engaged and return to my page."
 project: TimorUp
 ---

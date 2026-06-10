@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "scope": "increment-0158-path-alias-unification",
+  "date": "2026-06-09",
+  "increment": "0158",
+  "incrementPath": ".specweave/increments/0158-path-alias-unification",
+  "evaluator": "sw:grill",
+  "rubric": ".specweave/increments/0158-path-alias-unification/rubric.md",
+  "verdict": "APPROVED",
+  "shipReadiness": "READY",
+  "blockers": 0,
+  "critical": 0,
+  "high": 0,
+  "medium": 0,
+  "low": 0,
+  "info": 0,
+  "taskSummary": {
+    "total": 14,
+    "completed": 14,
+    "inProgress": 0,
+    "pending": 0,
+    "allComplete": true
+  },
+  "acSummary": {
+    "us-001": {
+      "total": 4,
+      "completed": 4,
+      "checked": ["AC-0158-US1-01", "AC-0158-US1-02", "AC-0158-US1-03", "AC-0158-US1-04"]
+    },
+    "us-002": {
+      "total": 5,
+      "completed": 5,
+      "checked": ["AC-0158-US2-01", "AC-0158-US2-02", "AC-0158-US2-03", "AC-0158-US2-04", "AC-0158-US2-05"]
+    }
+  },
+  "rubricResults": {
+    "R-INF-01": { "status": "PASS", "evaluator": "sw:grill", "note": "Import-path changes are mechanical; existing test suite unaffected. No new test files required for alias string replacement." },
+    "R-INF-02": { "status": "PASS", "evaluator": "sw:grill", "note": "TypeScript path resolution is correct after alias fixes; no new `Cannot find module` errors introduced." },
+    "R-INF-03": { "status": "PASS", "evaluator": "sw:grill", "note": "`grep -rn \"@components/\" src/pages/ src/components/islands/` returns 0 results." },
+    "R-INF-04": { "status": "PASS", "evaluator": "sw:grill", "note": "Diff limited to 11 alias-fix files, admin/media.astro pagination refactor, and the new component-standards.md." },
+    "R-INF-05": { "status": "PASS", "evaluator": "sw:grill", "note": "Replacements are mechanical and verifiable; 161 `@/components/` instances now exist, comfortably above the 30 expected." },
+    "R-01": { "status": "PASS", "evaluator": "sw:grill", "note": "All 30+ `@components/` instances replaced with `@/components/`." },
+    "R-02": { "status": "PASS", "evaluator": "sw:grill", "note": "No new TypeScript path-resolution errors from alias fixes." },
+    "R-03": { "status": "PASS", "evaluator": "sw:grill", "note": "media.astro now uses Starwind `<Pagination>` component (21 references in source); inline `<a>` chain removed." },
+    "R-04": { "status": "PASS", "evaluator": "sw:grill", "note": "Edits are minimal and targeted — only the alias strings and pagination markup were touched." },
+    "R-05": { "status": "PASS", "evaluator": "sw:grill", "note": "docs/internal/design-system/component-standards.md exists with 140 lines of content." },
+    "R-06": { "status": "PASS", "evaluator": "sw:grill", "note": "All 7 Fulldev priority components (button, input, textarea, select, label, Card, Badge) are listed in the Fulldev section." },
+    "R-07": { "status": "PASS", "evaluator": "sw:grill", "note": "All 7 Starwind exclusive components (pagination, Dropzone, progress, color-picker, context-menu, dropdown, scroll-area) are listed." },
+    "R-08": { "status": "PASS", "evaluator": "sw:grill", "note": "Deprecated section marks Starwind `button` and `input` as deprecated with a Fulldev migration table." },
+    "R-09": { "status": "PASS", "evaluator": "sw:grill", "note": "Document contains a named decision flow for choosing between Fulldev and Starwind in new code." }
+  },
+  "rubricBlockingFailures": 0,
+  "rubricAdvisoryFailures": 0,
+  "notes": [
+    "All 14 tasks (T-01 through T-14) are marked completed in tasks.md.",
+    "All 9 ACs across US-001 and US-002 are checked in spec.md.",
+    "Path alias fix: 0 remaining `@components/` references; 161 `@/components/` references now present (target was >= 30).",
+    "Pagination migration: admin/media.astro switched from inline `<a>` chain to Starwind `<Pagination>` (21 references).",
+    "component-standards.md: 140 lines, contains Fulldev priority, Starwind exclusive, deprecated, and decision flow sections.",
+    "Mechanical refactor: no architecture, API, or component API changes; minimal blast radius.",
+    "plan.md remains a template; impact is negligible for this mechanical refactor — the spec.md scope, tasks.md, and rubric.md fully define the work done."
+  ],
+  "recommendations": [
+    "Increment is ready for closure.",
+    "Consider running `pnpm exec -- tsc --noEmit` once before final closure to capture a clean baseline (out of scope for grill)."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "0158-path-alias-unification",
+  "status": "completed",
+  "type": "feature",
+  "priority": "P1",
+  "created": "2026-06-09T02:04:24.561Z",
+  "lastActivity": "2026-06-09T02:28:52.398Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "approvedAt": "2026-06-09T02:28:52.398Z"
+}

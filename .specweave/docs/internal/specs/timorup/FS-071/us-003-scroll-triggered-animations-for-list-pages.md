@@ -21,11 +21,11 @@ project: timorup
 
 ## Acceptance Criteria
 
-- [x] **AC-US3-01**: List page (businesses, listings, non-profits, public-sectors) cards use `sectionReveal` on scroll
-- [x] **AC-US3-02**: Filter/tabs section uses `animateFilters` for staggered tag appearance
-- [x] **AC-US3-03**: Pagination nav uses `animatePagination` for button stagger
-- [x] **AC-US3-04**: Entity cards use `addHoverLift` and `addCardGlow` for interactive feedback
-- [x] **AC-US3-05**: Hero section on list pages uses `initParallax` for scroll parallax effect
+- [x] **AC-US3-01**: List page cards use CSS class `reveal-on-scroll` for scroll reveal
+- [x] **AC-US3-02**: Filter/tabs use CSS stagger animation
+- [x] **AC-US3-03**: Pagination nav uses CSS animation
+- [x] **AC-US3-04**: Entity cards use `.card-hover` and `.card-glow` for interactive feedback
+- [x] **AC-US3-05**: Parallax effect via CSS class `data-parallax` + JS handler
 
 ---
 

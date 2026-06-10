@@ -6,26 +6,26 @@
 
 ## Phase 1: Installation
 
-- [ ] T-018a: `npx shadcn@latest add @fulldev/badge @fulldev/skeleton @fulldev/textarea @fulldev/label @fulldev/native-select @fulldev/avatar -y`
+- [x] T-018a: `npx shadcn@latest add @fulldev/badge @fulldev/skeleton @fulldev/textarea @fulldev/label @fulldev/native-select @fulldev/avatar -y`
 
 ## Phase 2: Component Migration
 
-- [ ] T-019a: Migrate `src/components/ui/Badge.astro` → @fulldev/badge (3 files use this)
-- [ ] T-020a: Migrate `src/components/ui/Textarea.astro` → @fulldev/textarea (3 files use this)
-- [ ] T-021a: Migrate `src/components/ui/Label.astro` → @fulldev/label (3 files use this)
-- [ ] T-022a: Migrate `src/components/ui/Select.astro` → @fulldev/native-select (create wrapper for options prop)
-- [ ] T-024a: Migrate `src/components/ui/Avatar.astro` → @fulldev/avatar (1 file uses this)
+- [x] T-019a: Migrate `src/components/ui/Badge.astro` → @fulldev/badge (3 files use this)
+- [x] T-020a: Migrate `src/components/ui/Textarea.astro` → @fulldev/textarea (3 files use this)
+- [x] T-021a: Migrate `src/components/ui/Label.astro` → @fulldev/label (3 files use this)
+- [x] T-022a: Migrate `src/components/ui/Select.astro` → @fulldev/native-select (create wrapper for options prop)
+- [x] T-024a: Migrate `src/components/ui/Avatar.astro` → @fulldev/avatar (1 file uses this)
 
 ## Phase 3: Domain Logic Foundation
 
-- [ ] T-025: Create `src/lib/ui/card-colors.ts` — ORG_TYPE_COLORS, LISTING_TYPE_COLORS, PRODUCT_TYPE_COLORS, ENTITY_TYPE_COLORS
-- [ ] T-026: Create `src/lib/ui/card-helpers.ts` — buildEntityHref, buildListingHref, buildProductHref
+- [x] T-025: Create `src/lib/ui/card-colors.ts` — ORG_TYPE_COLORS, LISTING_TYPE_COLORS, PRODUCT_TYPE_COLORS, ENTITY_TYPE_COLORS
+- [x] T-026: Create `src/lib/ui/card-helpers.ts` — buildEntityHref, buildListingHref, buildProductHref
 
 ## Verification
 
-- [ ] T-027: `pnpm build` exits 0
-- [ ] T-028: Visual regression test (diff < 5%)
-- [ ] T-029: E2E tests pass (14/14 pages)
+- [x] T-027: `pnpm build` exits 0
+- [x] T-028: Visual regression test (diff < 5%)
+- [x] T-029: E2E tests pass (14/14 pages)
 
 ## Summary
 

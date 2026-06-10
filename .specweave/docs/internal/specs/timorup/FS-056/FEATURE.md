@@ -4,8 +4,8 @@ title: "Feature: Homepage Redesign - Tabs + 12 Cards"
 type: feature
 status: completed
 priority: P1
-created: 2026-05-27
-lastUpdated: 2026-05-27
+created: 2026-06-09
+lastUpdated: 2026-06-09
 tldr: "Redesigned homepage to show 3 content types with tab navigation."
 complexity: medium
 stakeholder_relevant: true
@@ -29,7 +29,7 @@ Redesigned homepage to show 3 content types with tab navigation. Each tab displa
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0056-homepage-redesign-tabs](../../../../../increments/0056-homepage-redesign-tabs/spec.md) | ✅ completed | 2026-05-27 |
+| [0056-homepage-redesign-tabs](../../../../../increments/0056-homepage-redesign-tabs/spec.md) | ✅ completed | 2026-06-09 |
 
 ## User Stories
 

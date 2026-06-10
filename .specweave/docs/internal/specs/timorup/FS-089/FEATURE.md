@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "Fix TypeScript type safety issues: replace `any` types in in-memory-adapter, add type guards for unsafe `as` assertions, convert enums to const objects."
 complexity: medium
 stakeholder_relevant: true

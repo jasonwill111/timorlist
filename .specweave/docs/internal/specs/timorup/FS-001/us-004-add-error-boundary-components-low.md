@@ -4,7 +4,7 @@ feature: FS-001
 title: "Add Error Boundary Components (LOW)"
 status: completed
 priority: P1
-created: 2026-05-27
+created: 2026-06-09
 tldr: "**As a** frontend engineer."
 project: timorlink
 ---

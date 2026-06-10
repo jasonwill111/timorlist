@@ -1,0 +1,17 @@
+{
+  "id": "0161-build-fix-actions-ts",
+  "status": "planned",
+  "type": "feature",
+  "priority": "P1",
+  "created": "2026-06-09T06:51:53.512Z",
+  "lastActivity": "2026-06-09T06:51:53.514Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp"
+}

@@ -1,0 +1,39 @@
+{
+  "increment": "0142",
+  "title": "Slug Pages Query Extraction",
+  "reviewType": "post-fix-verification",
+  "date": "2026-06-07",
+  "verdict": "PASS",
+  "blocks": [],
+  "suggestions": [],
+  "nits": [
+    {
+      "severity": "nit",
+      "file": "src/pages/listings/[slug].astro",
+      "line":13,
+      "issue": "Unused variable: `listingType` is destructured from `getListingBySlug` but never referenced. The page reads `listing.listingType` directly from the returned `listing` object instead.",
+      "fix": "Change line 13 from:\n  const { listing, category, images } = await getListingBySlug(slug);\nto:\n  const { listing, category } = await getListingBySlug(slug);\n\nAlternatively, if you want to use the standalone `listingType` field for future use, use it somewhere (e.g. pass it to a sub-component).",
+      "note": "Not a blocker — this is dead code from an earlier approach. No runtime impact."
+    }
+  ],
+  "fixVerification": {
+    "F-001": {
+      "description": "blog/[slug].astro line 63: postTags changed to post.tags",
+      "status": "FIXED",
+      "detail": "getBlogPostBySlug always spreads post.tags onto the returned object (line 21 of getBlogPostBySlug.ts: tags: post.tags ? JSON.parse(...) : []). The blog slug page correctly accesses post.tags on line 63 and line 28 (structured data keywords)."
+    },
+    "F-002": {
+      "description": "getListingBySlug returns listingType; listings/[slug].astro uses listing.listingType",
+      "status": "FIXED",
+      "detail": "getListingBySlug now (1) includes listingType in its return type, (2) queries listing_categories.parentId to derive listingType, and (3) returns listingType in ListingResult. The listings/[slug].astro page correctly reads listing.listingType directly on line 35 for schema.org @type mapping and line 88 for the display badge."
+    }
+  },
+  "preExistingErrorsOutOfScope": [
+    "actions/admin/listings.ts",
+    "pages/api/listings/index.ts",
+    "components/islands/admin/index.ts",
+    "lib/db/queries/admin-listings.ts",
+    "pages/api/non-profits/index.ts"
+  ],
+  "summary": "Both F-001 and F-002 are correctly fixed. No new issues introduced. One nit (unused listingType destructuring) noted for cleanup but does not block PASS."
+}

@@ -1,35 +1,53 @@
 {
   "id": "0111-business-public-migration",
   "title": "Business + Public Pages UI Component Migration",
-  "status": "pending",
+  "status": "completed",
   "type": "refactor",
   "priority": "P1",
   "created": "2026-06-04T16:00:00.000Z",
-  "lastActivity": "2026-06-04T16:00:00.000Z",
+  "lastActivity": "2026-06-09T00:05:39.919Z",
   "completed": null,
   "testMode": "manual-e2e",
   "coverageTarget": 0,
   "feature_id": null,
   "epic_id": "0103-fulldev-migration-refactor",
-  "planning": { "parallel": false },
+  "planning": {
+    "parallel": false
+  },
   "project": "TimorUp",
   "scope": {
     "businessPages": [
-      "business/[slug]", "business/[slug]/edit", "business/[slug]/product/*"
+      "business/[slug]",
+      "business/[slug]/edit",
+      "business/[slug]/product/*"
     ],
     "publicPages": [
-      "listings", "non-profit/[slug]", "public-sector/[slug]", "search", "index"
+      "listings",
+      "non-profit/[slug]",
+      "public-sector/[slug]",
+      "search",
+      "index"
     ],
     "sharedComponents": [
-      "Header.astro", "Footer.astro", "PhotoGallery.astro",
-      "UpdatesSection.astro", "CarouselBanner.astro", "Modal.astro"
+      "Header.astro",
+      "Footer.astro",
+      "PhotoGallery.astro",
+      "UpdatesSection.astro",
+      "CarouselBanner.astro",
+      "Modal.astro"
     ]
   },
-  "expectedOutcomes": { "nativeButtonsReplaced": 20, "nativeInputsReplaced": 10 },
+  "expectedOutcomes": {
+    "nativeButtonsReplaced": 20,
+    "nativeInputsReplaced": 10
+  },
   "riskLevel": "HIGH",
   "blockingRisks": [
     "Public pages are primary user experience",
     "Header.astro changes affect every page",
     "CarouselBanner used on homepage"
-  ]
+  ],
+  "externalLinks": {},
+  "readyForReviewAt": "2026-06-09T00:05:39.771Z",
+  "approvedAt": "2026-06-09T00:05:39.919Z"
 }

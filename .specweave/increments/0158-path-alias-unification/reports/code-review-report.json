@@ -1,0 +1,81 @@
+{
+  "version": "1.1",
+  "scope": "increment-0158-path-alias-unification",
+  "date": "2026-06-09",
+  "increment": "0158",
+  "incrementPath": ".specweave/increments/0158-path-alias-unification",
+  "reviewers": ["logic", "security", "performance"],
+  "gateCheck": {
+    "passed": true,
+    "reason": null
+  },
+  "summary": {
+    "total": 0,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0
+  },
+  "validation": {
+    "performed": true,
+    "preValidation": { "critical": 0, "high": 0 },
+    "postValidation": { "critical": 0, "high": 0 },
+    "rejected": 0
+  },
+  "findings": [],
+  "scopeOfChanges": {
+    "description": "Mechanical path-alias unification across 11 source files plus admin/media.astro pagination migration and a new component-standards.md design-system document.",
+    "filesTouched": 13,
+    "aliasReplacements": {
+      "from": "@components/",
+      "to": "@/components/",
+      "filesAffected": 11,
+      "instancesReplaced": 30,
+      "postFixTotalReferences": 161
+    },
+    "additionalChanges": [
+      {
+        "file": "src/pages/admin/media.astro",
+        "change": "Inline `<a>` pagination chain replaced with Starwind `<Pagination>` component."
+      },
+      {
+        "file": "docs/internal/design-system/component-standards.md",
+        "change": "New 140-line document covering Fulldev priority components, Starwind exclusive components, deprecated Starwind components, and a decision flow for new code."
+      }
+    ]
+  },
+  "perFileSummary": [
+    { "file": "src/pages/admin/ai-tools.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/admin/login.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/admin/media.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/admin/settings.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/business/[slug]/product/[id]/edit/index.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/business/[slug]/product/[id]/index.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/business/[slug]/product/new/index.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/contact.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/pages/faq.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/components/islands/admin/LoginIsland.astro", "issues": 0, "topSeverity": null },
+    { "file": "src/components/islands/admin/SettingsIsland.astro", "issues": 0, "topSeverity": null },
+    { "file": "docs/internal/design-system/component-standards.md", "issues": 0, "topSeverity": null }
+  ],
+  "reviewerNotes": {
+    "logic": "All 30 alias replacements are mechanical (`@components/` -> `@/components/`) with no logic change. Pagination refactor swaps inline `<a>` chain for the existing Starwind `<Pagination>` component while preserving query-string and total-page behavior. No control flow, error handling, or state changes were introduced.",
+    "security": "Path-alias string replacement has no security surface. The Pagination component is rendered with HTML-attribute interpolation matching the previous inline markup; no new user input is consumed and no untrusted data crosses a new trust boundary.",
+    "performance": "No new hot-path code introduced. Replacing inline `<a>` chain with a parameterized component removes duplication. No N+1, blocking, or memory issues present."
+  },
+  "rubricUpdates": {
+    "file": "rubric.md",
+    "blockingCriteriaUpdated": []
+  },
+  "recommendations": [
+    "Mechanical refactor + doc creation — no code-quality issues identified.",
+    "Increment is clean and ready for closure."
+  ],
+  "notes": [
+    "All 14 tasks marked completed in tasks.md.",
+    "All 9 acceptance criteria checked in spec.md.",
+    "Post-fix verification: `grep -rn \"@components/\" src/pages/ src/components/islands/` returns 0 results; `grep -rn \"@/components/\" ... | wc -l` returns 161.",
+    "component-standards.md is 140 lines and contains all required sections (Fulldev priority, Starwind exclusive, deprecated, decision flow)."
+  ]
+}

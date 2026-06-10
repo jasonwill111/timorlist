@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-27
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "统一错误处理，创建 ErrorHandler 模块和错误码系统，消除重复的 `getErrorMessage` 函数和不一致的错误码。."
 complexity: high
 stakeholder_relevant: true

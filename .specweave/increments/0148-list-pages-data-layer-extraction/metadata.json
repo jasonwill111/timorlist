@@ -1,0 +1,19 @@
+{
+  "id": "0148-list-pages-data-layer-extraction",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-07T16:32:26.835Z",
+  "lastActivity": "2026-06-08T04:49:08.237Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-08T04:49:08.190Z",
+  "approvedAt": "2026-06-08T04:49:08.237Z"
+}

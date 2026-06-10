@@ -4,8 +4,8 @@ title: "Security & Best Practices Hardening - SPEC"
 type: feature
 status: completed
 priority: P1
-created: 2026-05-27
-lastUpdated: 2026-05-27
+created: 2026-06-09
+lastUpdated: 2026-06-09
 tldr: "Security & Best Practices Hardening - SPEC"
 complexity: low
 stakeholder_relevant: true
@@ -25,4 +25,4 @@ stakeholder_relevant: true
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0075-security-hardening](../../../../../increments/0075-security-hardening/spec.md) | ✅ completed | 2026-05-27 |
+| [0075-security-hardening](../../../../../increments/0075-security-hardening/spec.md) | ✅ completed | 2026-06-09 |

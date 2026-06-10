@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P2
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "Refactor code architecture: unify error handling patterns, merge shallow modules, consolidate duplicated code."
 complexity: medium
 stakeholder_relevant: true

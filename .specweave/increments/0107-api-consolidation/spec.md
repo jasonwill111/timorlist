@@ -1,14 +1,14 @@
 ---
 increment: 0107-api-consolidation
-title: "API Layer Consolidation"
+title: API Layer Consolidation
 type: refactor
 priority: P1
-status: in_progress
-created: 2026-06-04
+status: completed
+created: 2026-06-04T00:00:00.000Z
 structure: user-stories
 test_mode: manual-e2e
 project: TimorUp
-production: https://timorup.jasonwill.workers.dev
+production: 'https://timorup.jasonwill.workers.dev'
 ---
 
 # Refactor: API Layer Consolidation

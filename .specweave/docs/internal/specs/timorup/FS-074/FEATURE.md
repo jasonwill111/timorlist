@@ -2,10 +2,10 @@
 id: FS-074
 title: "AI Tools Mastra Fix"
 type: feature
-status: planned
+status: completed
 priority: P1
 created: 2026-05-20
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Fix AI tools to use Mastra agents with correct JSON output for all 4 generators."
 complexity: high
 stakeholder_relevant: true
@@ -16,7 +16,7 @@ stakeholder_relevant: true
 ## TL;DR
 
 **What**: Fix AI tools to use Mastra agents with correct JSON output for all 4 generators.
-**Status**: planned | **Priority**: P1
+**Status**: completed | **Priority**: P1
 **User Stories**: 4
 
 ![AI Tools Mastra Fix illustration](assets\feature-fs-074.jpg)
@@ -29,7 +29,7 @@ Fix AI tools to use Mastra agents with correct JSON output for all 4 generators.
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0074-ai-tools-mastra-fix](../../../../../increments/0074-ai-tools-mastra-fix/spec.md) | ⏳ planned | 2026-05-20 |
+| [0074-ai-tools-mastra-fix](../../../../../increments/0074-ai-tools-mastra-fix/spec.md) | ✅ completed | 2026-05-20 |
 
 ## User Stories
 

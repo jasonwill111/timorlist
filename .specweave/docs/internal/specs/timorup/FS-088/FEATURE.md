@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "Fix XSS vulnerabilities in user-generated content by adding DOMPurify saniti."
 complexity: medium
 stakeholder_relevant: true

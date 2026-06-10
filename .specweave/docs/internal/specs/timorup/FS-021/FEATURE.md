@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P2
 created: 2026-04-30T00:00:00.000Z
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Admin SKUs description字段使用TipTap富文本编辑器替换plain textarea，支持加粗、斜体、列表等格式�?."
 complexity: low
 stakeholder_relevant: true

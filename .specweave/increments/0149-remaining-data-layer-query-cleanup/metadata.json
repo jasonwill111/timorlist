@@ -1,0 +1,19 @@
+{
+  "id": "0149-remaining-data-layer-query-cleanup",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P2",
+  "created": "2026-06-07T16:32:28.908Z",
+  "lastActivity": "2026-06-08T04:36:21.748Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-08T04:36:21.630Z",
+  "approvedAt": "2026-06-08T04:36:21.748Z"
+}

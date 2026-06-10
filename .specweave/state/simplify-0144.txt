@@ -1,0 +1,453 @@
+diff --git a/src/layouts/Layout.astro b/src/layouts/Layout.astro
+index 3e63cbc6..4192ff4a 100644
+--- a/src/layouts/Layout.astro
++++ b/src/layouts/Layout.astro
+@@ -2,6 +2,7 @@
+ import '../styles/globals.css';
+ import Header from '../components/Header.astro';
+ import Footer from '../components/Footer.astro';
++import { Toaster } from '../components/starwind/toast';
+ 
+ interface Props {
+   title: string;
+@@ -184,6 +185,7 @@ const websiteSchema = {
+         <slot />
+       </main>
+       <Footer />
++      <Toaster position="bottom-right" />
+   </body>
+ </html>
+ 
+
+
+diff --git a/src/pages/login.astro b/src/pages/login.astro
+index e995da4f..4b45df89 100644
+--- a/src/pages/login.astro
++++ b/src/pages/login.astro
+@@ -112,6 +112,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+ 
+ <script>
+   import { actions } from 'astro:actions';
++  import { toast } from '../components/starwind/toast';
+ 
+   const form = document.getElementById('login-form') as HTMLFormElement | null;
+   const emailInput = document.getElementById('email') as HTMLInputElement | null;
+@@ -242,6 +243,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+ 
+       if (result.error) {
+         showError(result.error);
++        toast.error(result.error);
+         return;
+       }
+ 
+@@ -249,11 +251,13 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+         // If the response includes Set-Cookie, the browser already set it via the header
+         const setCookie = response.headers.get('set-cookie');
+         if (setCookie) {
++          toast.success('Login successful!');
+           window.location.assign('/account');
+         } else {
+           // Fallback: manually set cookie if header wasn't present
+           const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
+           document.cookie = `better-auth.session_token=${result.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
++          toast.success('Login successful!');
+           window.location.assign('/account');
+         }
+         return;
+@@ -275,6 +279,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+       if (error || !data?.success) {
+         const msg = error?.message || data?.error?.message || 'Invalid email or password';
+         showError(msg);
++        toast.error(msg);
+         return;
+       }
+ 
+@@ -282,11 +287,13 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+       if (data?.token) {
+         const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
+         document.cookie = `better-auth.session_token=${data.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
++        toast.success('Login successful!');
+         window.location.assign('/account');
+       }
+     } catch (actionError) {
+       setLoading(false);
+       showError('Authentication failed. Please try again.');
++      toast.error('Authentication failed. Please try again.');
+     }
+   });
+ </script>
+
+
+diff --git a/src/pages/register.astro b/src/pages/register.astro
+index 3fc621bf..d3b41203 100644
+--- a/src/pages/register.astro
++++ b/src/pages/register.astro
+@@ -69,6 +69,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+ 
+ <script>
+   import { actions } from 'astro:actions';
++  import { toast } from '../components/starwind/toast';
+ 
+   const form = document.getElementById('register-form') as HTMLFormElement | null;
+   const emailInput = document.getElementById('email') as HTMLInputElement | null;
+@@ -218,6 +219,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+       }
+ 
+       if (result.success) {
++        toast.success('Account created! Redirecting to login...');
+         window.location.assign('/login?registered=true');
+         return;
+       }
+@@ -238,13 +240,16 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
+       if (error || !data?.success) {
+         const msg = error?.message || data?.error?.message || 'Registration failed';
+         showError(msg);
++        toast.error(msg);
+         return;
+       }
+ 
++      toast.success('Account created! Redirecting to login...');
+       window.location.assign('/login?registered=true');
+     } catch (actionError) {
+       setLoading(false);
+       showError('Registration failed. Please try again.');
++      toast.error('Registration failed. Please try again.');
+     }
+   });
+ </script>
+
+
+diff --git a/src/pages/blog/index.astro b/src/pages/blog/index.astro
+index a67cd712..7c32d09c 100644
+--- a/src/pages/blog/index.astro
++++ b/src/pages/blog/index.astro
+@@ -3,6 +3,12 @@ import Layout from '@/layouts/Layout.astro';
+ import { getDb } from '@/lib/db';
+ import { blogPosts, blogCategories } from '@/db/schema';
+ import { eq, desc, and, like, sql } from 'drizzle-orm';
++import Pagination from '@/components/starwind/pagination/Pagination.astro';
++import PaginationContent from '@/components/starwind/pagination/PaginationContent.astro';
++import PaginationItem from '@/components/starwind/pagination/PaginationItem.astro';
++import PaginationLink from '@/components/starwind/pagination/PaginationLink.astro';
++import PaginationPrevious from '@/components/starwind/pagination/PaginationPrevious.astro';
++import PaginationNext from '@/components/starwind/pagination/PaginationNext.astro';
+ 
+ export const prerender = false;
+ 
+@@ -236,33 +242,31 @@ const blogSchema = {
+ 
+         {/* Pagination */}
+         {totalPages > 1 && (
+-          <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
+-            {page > 1 && (
+-              <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+-                ← Previous
+-              </a>
+-            )}
+-            
+-            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+-              const pageNum = i + 1;
+-              const isActive = pageNum === page;
+-              return (
+-                <a 
+-                  href={buildUrl(pageNum)} 
+-                  class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+-                  aria-current={isActive ? 'page' : undefined}
+-                >
+-                  {pageNum}
+-                </a>
+-              );
+-            })}
+-            
+-            {page < totalPages && (
+-              <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+-                Next →
+-              </a>
+-            )}
+-          </nav>
++          <Pagination class="mt-8">
++            <PaginationContent>
++              {page > 1 && (
++                <PaginationItem>
++                  <PaginationPrevious href={buildUrl(page - 1)} />
++                </PaginationItem>
++              )}
++              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
++                const pageNum = i + 1;
++                const isActive = pageNum === page;
++                return (
++                  <PaginationItem>
++                    <PaginationLink href={buildUrl(pageNum)} isActive={isActive}>
++                      {pageNum}
++                    </PaginationLink>
++                  </PaginationItem>
++                );
++              })}
++              {page < totalPages && (
++                <PaginationItem>
++                  <PaginationNext href={buildUrl(page + 1)} />
++                </PaginationItem>
++              )}
++            </PaginationContent>
++          </Pagination>
+         )}
+       </>
+     ) : (
+
+
+diff --git a/src/pages/listings/index.astro b/src/pages/listings/index.astro
+index 7c137a52..002383a4 100644
+--- a/src/pages/listings/index.astro
++++ b/src/pages/listings/index.astro
+@@ -5,6 +5,12 @@ import ListingCard from '../../components/business/ListingCard.astro';
+ import { Input } from '../../components/ui/input';
+ import { Select } from '../../components/ui/select';
+ import { getRawDb } from '@/lib/db';
++import Pagination from '@/components/starwind/pagination/Pagination.astro';
++import PaginationContent from '@/components/starwind/pagination/PaginationContent.astro';
++import PaginationItem from '@/components/starwind/pagination/PaginationItem.astro';
++import PaginationLink from '@/components/starwind/pagination/PaginationLink.astro';
++import PaginationPrevious from '@/components/starwind/pagination/PaginationPrevious.astro';
++import PaginationNext from '@/components/starwind/pagination/PaginationNext.astro';
+ 
+ const searchParams = Astro.url.searchParams;
+ const search = searchParams.get('q') || '';
+@@ -162,33 +168,31 @@ const buildUrl = (pageNum: number) => {
+ 
+         {/* Pagination */}
+         {totalPages > 1 && (
+-          <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
+-            {page > 1 && (
+-              <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+-                ← Previous
+-              </a>
+-            )}
+-            
+-            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+-              const pageNum = i + 1;
+-              const isActive = pageNum === page;
+-              return (
+-                <a 
+-                  href={buildUrl(pageNum)} 
+-                  class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+-                  aria-current={isActive ? 'page' : undefined}
+-                >
+-                  {pageNum}
+-                </a>
+-              );
+-            })}
+-            
+-            {page < totalPages && (
+-              <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+-                Next →
+-              </a>
+-            )}
+-          </nav>
++          <Pagination class="mt-8">
++            <PaginationContent>
++              {page > 1 && (
++                <PaginationItem>
++                  <PaginationPrevious href={buildUrl(page - 1)} />
++                </PaginationItem>
++              )}
++              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
++                const pageNum = i + 1;
++                const isActive = pageNum === page;
++                return (
++                  <PaginationItem>
++                    <PaginationLink href={buildUrl(pageNum)} isActive={isActive}>
++                      {pageNum}
++                    </PaginationLink>
++                  </PaginationItem>
++                );
++              })}
++              {page < totalPages && (
++                <PaginationItem>
++                  <PaginationNext href={buildUrl(page + 1)} />
++                </PaginationItem>
++              )}
++            </PaginationContent>
++          </Pagination>
+         )}
+       </>
+     ) : (
+
+
+diff --git a/src/pages/admin/ai-tools.astro b/src/pages/admin/ai-tools.astro
+index 027481a7..8433ce29 100644
+--- a/src/pages/admin/ai-tools.astro
++++ b/src/pages/admin/ai-tools.astro
+@@ -8,6 +8,7 @@ import { Input } from '@components/ui/input';
+ import { Select } from '@components/ui/select';
+ import { Button } from '@components/ui/button';
+ import { Badge } from '@/components/ui/badge';
++import Progress from '@/components/starwind/progress/Progress.astro';
+ 
+ <AdminLayout title="AI Tools">
+   <div class="container py-6 px-4">
+@@ -108,9 +109,9 @@ import { Badge } from '@/components/ui/badge';
+             <h2 class="text-lg font-semibold leading-snug">Generated Preview</h2>
+             <span id="listing-status" class="px-2 py-1 text-xs rounded-full bg-muted">Ready</span>
+           </div>
+-          <div id="listing-loading" class="hidden py-12 text-center">
+-            <div class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+-            <p class="text-muted-foreground">Generating listing...</p>
++          <div id="listing-loading" class="hidden py-12 space-y-4">
++            <Progress variant="primary" />
++            <p class="text-center text-muted-foreground">Generating listing...</p>
+           </div>
+           <div id="listing-preview" class="hidden space-y-4">
+             <div class="p-4 bg-muted rounded-lg">
+@@ -206,9 +207,9 @@ import { Badge } from '@/components/ui/badge';
+             <h2 class="text-lg font-semibold leading-snug">Generated Preview</h2>
+             <span id="sku-status" class="px-2 py-1 text-xs rounded-full bg-muted">Ready</span>
+           </div>
+-          <div id="sku-loading" class="hidden py-12 text-center">
+-            <div class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+-            <p class="text-muted-foreground">Generating SKU...</p>
++          <div id="sku-loading" class="hidden py-12 space-y-4">
++            <Progress variant="primary" />
++            <p class="text-center text-muted-foreground">Generating SKU...</p>
+           </div>
+           <div id="sku-preview" class="hidden space-y-4">
+             <div class="p-4 bg-muted rounded-lg">
+@@ -291,9 +292,9 @@ import { Badge } from '@/components/ui/badge';
+             <h2 class="text-lg font-semibold leading-snug">Generated Article</h2>
+             <span id="blog-status" class="px-2 py-1 text-xs rounded-full bg-muted">Ready</span>
+           </div>
+-          <div id="blog-loading" class="hidden py-12 text-center">
+-            <div class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+-            <p class="text-muted-foreground">Generating article...</p>
++          <div id="blog-loading" class="hidden py-12 space-y-4">
++            <Progress variant="primary" />
++            <p class="text-center text-muted-foreground">Generating article...</p>
+           </div>
+           <div id="blog-preview" class="hidden space-y-4">
+             <div class="p-4 bg-muted rounded-lg">
+@@ -367,9 +368,9 @@ import { Badge } from '@/components/ui/badge';
+             <h2 class="text-lg font-semibold leading-snug">Generated Page</h2>
+             <span id="landing-status" class="px-2 py-1 text-xs rounded-full bg-muted">Ready</span>
+           </div>
+-          <div id="landing-loading" class="hidden py-12 text-center">
+-            <div class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+-            <p class="text-muted-foreground">Generating landing page...</p>
++          <div id="landing-loading" class="hidden py-12 space-y-4">
++            <Progress variant="primary" />
++            <p class="text-center text-muted-foreground">Generating landing page...</p>
+           </div>
+           <div id="landing-preview" class="hidden space-y-4">
+             <div class="p-4 bg-muted rounded-lg">
+
+
+diff --git a/src/pages/admin/media.astro b/src/pages/admin/media.astro
+index 5e28452a..fbc8478d 100644
+--- a/src/pages/admin/media.astro
++++ b/src/pages/admin/media.astro
+@@ -9,6 +9,13 @@ import { getAdminUser } from '@/lib/admin-auth';
+ import { Select } from '@/components/ui/select';
+ import { Input } from '@/components/ui/input';
+ import { Button } from '@/components/ui/button';
++import { Dropzone } from '@/components/starwind/dropzone';
++import Pagination from '@/components/starwind/pagination/Pagination.astro';
++import PaginationContent from '@/components/starwind/pagination/PaginationContent.astro';
++import PaginationItem from '@/components/starwind/pagination/PaginationItem.astro';
++import PaginationLink from '@/components/starwind/pagination/PaginationLink.astro';
++import PaginationPrevious from '@/components/starwind/pagination/PaginationPrevious.astro';
++import PaginationNext from '@/components/starwind/pagination/PaginationNext.astro';
+ 
+ 
+ // Check admin auth using KV session
+@@ -88,6 +95,16 @@ function getThumbnailUrl(item: MediaData): string {
+ }
+ 
+ const totalPages = Math.ceil(total / limit);
++
++// Build pagination URL helper for admin/media
++const buildMediaUrl = (pageNum: number) => {
++  const p = new URLSearchParams();
++  if (entityTypeFilter) p.set('entityType', entityTypeFilter);
++  if (categoryFilter) p.set('category', categoryFilter);
++  if (entityIdFilter) p.set('entityId', entityIdFilter);
++  if (pageNum > 1) p.set('page', pageNum.toString());
++  return `/admin/media?${p.toString()}`;
++};
+ ---
+ 
+ <AdminLayout title="Media Library">
+@@ -101,12 +118,18 @@ const totalPages = Math.ceil(total / limit);
+         </p>
+       </div>
+       <div class="flex gap-2 flex-shrink-0">
+-        <Button form="upload-form" type="submit" class="text-xs px-2 py-1 h-7 border rounded-lg hover:bg-muted flex items-center gap-1 md:text-sm md:px-4 md:h-9">
++        <Dropzone
++          id="media-dropzone"
++          name="files"
++          accept="image/*,video/*,application/pdf,.doc,.docx,.xls,.xlsx"
++          multiple
++          class="text-xs px-3 py-1 h-7 border rounded-lg hover:bg-muted flex items-center gap-1 md:text-sm md:px-4 md:h-9 cursor-pointer"
++        >
+           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+           </svg>
+-          Upload
+-        </Button>
++          <span>Upload</span>
++        </Dropzone>
+       </div>
+     </div>
+ 
+@@ -237,27 +260,31 @@ const totalPages = Math.ceil(total / limit);
+ 
+     <!-- Pagination -->
+     {totalPages > 1 && (
+-      <div class="flex justify-center gap-2 mt-6">
+-        {page > 1 && (
+-          <a
+-            href={`/admin/media?page=${page - 1}${entityTypeFilter ? `&entityType=${entityTypeFilter}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
+-            class="px-4 py-2 border rounded-lg hover:bg-muted"
+-          >
+-            Previous
+-          </a>
+-        )}
+-        <span class="px-4 py-2">
+-          Page {page} of {totalPages}
+-        </span>
+-        {page < totalPages && (
+-          <a
+-            href={`/admin/media?page=${page + 1}${entityTypeFilter ? `&entityType=${entityTypeFilter}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
+-            class="px-4 py-2 border rounded-lg hover:bg-muted"
+-          >
+-            Next
+-          </a>
+-        )}
+-      </div>
++      <Pagination class="mt-6">
++        <PaginationContent>
++          {page > 1 && (
++            <PaginationItem>
++              <PaginationPrevious href={buildMediaUrl(page - 1)} />
++            </PaginationItem>
++          )}
++          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
++            const pageNum = i + 1;
++            const isActive = pageNum === page;
++            return (
++              <PaginationItem>
++                <PaginationLink href={buildMediaUrl(pageNum)} isActive={isActive}>
++                  {pageNum}
++                </PaginationLink>
++              </PaginationItem>
++            );
++          })}
++          {page < totalPages && (
++            <PaginationItem>
++              <PaginationNext href={buildMediaUrl(page + 1)} />
++            </PaginationItem>
++          )}
++        </PaginationContent>
++      </Pagination>
+     )}
+   </div>
+ </AdminLayout>
+
+

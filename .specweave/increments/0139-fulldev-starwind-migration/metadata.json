@@ -1,0 +1,18 @@
+{
+  "id": "0139-fulldev-starwind-migration",
+  "status": "completed",
+  "type": "feature",
+  "priority": "P1",
+  "created": "2026-06-07T10:29:18.099Z",
+  "lastActivity": "2026-06-08T10:41:42.801Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "approvedAt": "2026-06-08T10:41:42.803Z"
+}

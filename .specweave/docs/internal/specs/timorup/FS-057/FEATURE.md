@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-15
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "修复首页 Server Islands 未启用、Middleware 重复问题，优�?TTFB �?CDN 缓存."
 complexity: high
 stakeholder_relevant: true

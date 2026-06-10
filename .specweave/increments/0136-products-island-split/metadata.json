@@ -1,0 +1,12 @@
+{
+  "id": "0136-products-island-split",
+  "status": "abandoned",
+  "type": "feature",
+  "created": "2026-06-07T06:21:58.066Z",
+  "lastActivity": "2026-06-07T06:21:58.066Z",
+  "externalLinks": {},
+  "priority": "medium",
+  "testMode": "test-after",
+  "coverageTarget": 80,
+  "abandonedReason": "Work already covered in 0152 (data layer) and 0138 (island migration). ProductsIsland.astro exists. No spec.md/tasks.md was ever created."
+}

@@ -1,13 +1,14 @@
 ---
 increment: 0106-ui-migration-batch-2
-title: "UI Component Migration - Batch 2 (High Impact Components)"
+title: UI Component Migration - Batch 2 (High Impact Components)
 type: refactor
 priority: P1
-status: pending
-created: 2026-06-04
+status: completed
+created: 2026-06-04T00:00:00.000Z
 project: TimorUp
 parent: 0103-fulldev-migration-refactor
-dependsOn: ["0105-ui-migration-batch-1"]
+dependsOn:
+  - 0105-ui-migration-batch-1
 ---
 
 # Increment 0106: UI Component Migration - Batch 2
@@ -22,8 +23,8 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ## Prerequisites
 
-- [ ] Batch 1 completed (0105)
-- [ ] @fulldev/button, @fulldev/card installed
+- [x] Batch 1 completed (0105)
+- [x] @fulldev/button, @fulldev/card installed
 
 ## Components to Migrate
 
@@ -41,7 +42,7 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ### Button Migration
 
-- [ ] T-018b: Migrate `src/components/ui/Button.astro` → @fulldev/button
+- [x] T-018b: Migrate `src/components/ui/Button.astro` → @fulldev/button
   - **Keep as wrapper** to preserve loading prop enhancement
   - Add backward-compat loading={bool} prop
   ```astro
@@ -66,14 +67,14 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ### Card Family Migration
 
-- [ ] T-023: Migrate Card family → @fulldev/card
+- [x] T-023: Migrate Card family → @fulldev/card
   - Card.astro, CardHeader.astro, CardTitle.astro, CardContent.astro, CardDescription.astro, CardFooter.astro
   - Direct swap, API should match
   - Test in **11 files**
 
 ### Image Utils Extraction
 
-- [ ] T-027: Create `src/lib/ui/image-utils.ts`
+- [x] T-027: Create `src/lib/ui/image-utils.ts`
   ```typescript
   import { getMediaUrl } from '@/lib/media';
   
@@ -99,7 +100,7 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ### Business Card Refactoring
 
-- [ ] T-028: Refactor `src/components/business/BusinessCard.astro`
+- [x] T-028: Refactor `src/components/business/BusinessCard.astro`
   - Use `buildEntityHref()` from card-helpers.ts
   - Use `resolveEntityImage()` from image-utils.ts
   - Use `ORG_TYPE_COLORS` from card-colors.ts
@@ -108,7 +109,7 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ### Listing Card Refactoring
 
-- [ ] T-029: Refactor `src/components/business/ListingCard.astro`
+- [x] T-029: Refactor `src/components/business/ListingCard.astro`
   - Use `buildListingHref()` from card-helpers.ts
   - Use `resolveListingImage()` from image-utils.ts
   - Use `LISTING_TYPE_COLORS` from card-colors.ts
@@ -117,7 +118,7 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ### Product Card Refactoring
 
-- [ ] T-030: Refactor `src/components/business/ProductCard.astro`
+- [x] T-030: Refactor `src/components/business/ProductCard.astro`
   - Use `buildProductHref()` from card-helpers.ts
   - Use `resolveEntityImage()` from image-utils.ts
   - Use `PRODUCT_TYPE_COLORS` from card-colors.ts
@@ -126,7 +127,7 @@ Replace high-impact UI components (Button, Card) with @fulldev equivalents. Thes
 
 ### Business Header Card Refactoring
 
-- [ ] T-031: Refactor `src/components/business/BusinessHeaderCard.astro`
+- [x] T-031: Refactor `src/components/business/BusinessHeaderCard.astro`
   - Use `ENTITY_TYPE_COLORS` from card-colors.ts
   - Contact info helpers (if needed)
   - Component becomes **presentation only**
@@ -197,15 +198,15 @@ npx wrangler deploy --env production
 
 ## Acceptance Criteria
 
-- [ ] `pnpm build` exits 0
-- [ ] Visual diff < 5% (critical for high-impact components)
-- [ ] Button works in all 17 files (including loading state)
-- [ ] Card family works in all 11 files
-- [ ] BusinessCard renders correctly with extracted helpers
-- [ ] ListingCard renders correctly with extracted helpers
-- [ ] ProductCard renders correctly with extracted helpers
-- [ ] BusinessHeaderCard renders correctly
-- [ ] E2E tests pass (14/14 pages)
+- [x] `pnpm build` exits 0
+- [x] Visual diff < 5% (critical for high-impact components)
+- [x] Button works in all 17 files (including loading state)
+- [x] Card family works in all 11 files
+- [x] BusinessCard renders correctly with extracted helpers
+- [x] ListingCard renders correctly with extracted helpers
+- [x] ProductCard renders correctly with extracted helpers
+- [x] BusinessHeaderCard renders correctly
+- [x] E2E tests pass (14/14 pages)
 
 ## Estimated Reduction
 

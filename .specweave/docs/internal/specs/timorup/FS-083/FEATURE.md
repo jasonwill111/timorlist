@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P2
 created: 2026-05-27
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "分析追踪集中化，创建统一的 `Analytics` 模块来收集和报告用户行为事件。."
 complexity: medium
 stakeholder_relevant: true

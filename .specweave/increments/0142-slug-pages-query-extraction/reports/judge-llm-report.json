@@ -1,0 +1,7 @@
+{
+  "incrementId": "0142-slug-pages-query-extraction",
+  "timestamp": "2026-06-07T20:35:00.000Z",
+  "verdict": "WAIVED",
+  "reason": "No ANTHROPIC_API_KEY or external model API key present in environment. externalModels.consent not configured in .specweave/config.json.",
+  "scope": "Judge LLM gate skipped — no external model access"
+}

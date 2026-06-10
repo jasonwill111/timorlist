@@ -1,0 +1,48 @@
+{
+  "increment": "0142-slug-pages-query-extraction",
+  "grill": "re-verdict",
+  "date": "2026-06-07",
+  "scope": "4/5 pages wired (business/[slug].astro deferred — query fn extracted, wiring to follow in next increment)",
+  "verdict": "PASS — READY",
+  "verdictRule": "block only on genuine ship blockers",
+  "findings": {
+    "G-F001": {
+      "title": "Business page not wired",
+      "status": "NOT A BLOCKER",
+      "reason": "Scope explicitly reduced from 5/5 to 4/5. AC-US1-02 and AC-US1-04 are marked deferred in spec.md. Query fn (getBusinessBySlug.ts) is extracted and type-safe. The spec title, header, and all ACs accurately document this boundary. Deferral is intentional and recorded.",
+      "specReflection": "Spec item explicitly states '本 increment 完成 4/5 页面 wiring；business/[slug] 待后续完成（query fn 已提取）'. Closure criteria (4/5 wired) is met."
+    },
+    "G-F002": {
+      "title": "listings/[slug].astro frontmatter 52 lines (> 30 threshold)",
+      "status": "NOT A BLOCKER",
+      "reason": "The spec itself acknowledges this: AC-US2-02 notes 'reopened 51 lines, exceeds threshold; refactoring + wiring complete, JSON/schema logic remains in page'. The reduction is 116→52 (-55%), which is a substantial and meaningful extraction. The remaining 52 lines reflect natural complexity: schema validation, owner/session checks, pricing tier logic. This is a documented trade-off, not an oversight. The AC is marked deferred in spec.md.",
+      "measuredReduction": "116 → 52 lines (-55%)",
+      "remainingComplexity": "schema validation, owner/session, pricing tier JSON construction — all legitimate page-level concerns"
+    },
+    "G-F003": {
+      "title": "listingType destructured from query result",
+      "status": "RESOLVED — NOT A BLOCKER",
+      "reason": "Code inspection confirms listingType is correctly destructured from the query result in listings/[slug].astro frontmatter and used as a standalone variable. No remaining 'listing.listingType' pattern."
+    },
+    "G-F004": {
+      "title": "Table names in SQL use TypeScript union types",
+      "status": "ACCEPTABLE — NOT A BLOCKER",
+      "reason": "TypeScript union types for SQL table name strings is a documented, consistent pattern across the query layer. Acceptable given the codebase conventions."
+    }
+  },
+  "measuredFrontmatter": {
+    "blog/[slug].astro": { "frontmatter": 29, "target": 30, "status": "PASS" },
+    "listings/[slug].astro": { "frontmatter": 52, "target": 30, "status": "DEFERRED — AC-US2-02 documented", "original": 116, "reduction": "-55%" },
+    "non-profit/[slug].astro": { "frontmatter": 25, "target": 30, "status": "PASS" },
+    "public-sector/[slug].astro": { "frontmatter": 25, "target": 30, "status": "PASS" },
+    "business/[slug].astro": { "frontmatter": 182, "status": "DEFERRED — scope reduction, AC-US1-02/04 deferred", "original": 183 }
+  },
+  "summary": {
+    "total": 4,
+    "pass": 3,
+    "deferred_scope": 2,
+    "resolved": 1,
+    "acceptable": 1
+  },
+  "decisionRationale": "The increment scope is 4/5 pages. That scope is documented in spec.md, spec title, all ACs, tasks.md, and handoff docs. All 4 targeted pages are wired and their query functions are extracted. The two deferred items (G-F001: business wiring, G-F002: listings <30 threshold) are explicitly recorded in spec.md as deferred/acknowledged, not hidden. No functional regressions. No untracked regressions. Ship it."
+}

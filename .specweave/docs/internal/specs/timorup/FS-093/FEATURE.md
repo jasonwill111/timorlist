@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P2
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "Additional security hardening items identified during review."
 complexity: medium
 stakeholder_relevant: true

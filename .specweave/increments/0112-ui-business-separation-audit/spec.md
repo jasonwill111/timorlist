@@ -1,14 +1,14 @@
 ---
 increment: 0112-ui-business-separation-audit
-title: "UI/Business Separation Audit + Final Cleanup"
+title: UI/Business Separation Audit + Final Cleanup
 type: refactor
 priority: P1
-status: pending
-created: 2026-06-04
+status: completed
+created: 2026-06-04T00:00:00.000Z
 structure: user-stories
 test_mode: manual-e2e
 project: TimorUp
-production: https://timorup.jasonwill.workers.dev
+production: 'https://timorup.jasonwill.workers.dev'
 ---
 
 # Refactor: UI/Business Separation Audit + Final Cleanup

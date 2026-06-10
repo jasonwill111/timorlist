@@ -1,0 +1,69 @@
+{
+  "version": "1.1",
+  "incrementId": "0156-data-layer-extraction",
+  "timestamp": "2026-06-09T00:20:00Z",
+  "verdict": "FAIL",
+  "shipReadiness": "NOT READY",
+  "summary": { "totalFindings": 3, "critical": 2, "high": 1, "medium": 0 },
+  "acCompliance": {
+    "totalACs": 19,
+    "passed": 15,
+    "failed": 4,
+    "scopeCreep": [],
+    "results": [
+      { "acId": "AC-US1-01", "status": "pass", "evidence": "admin/media.astro has zero imports from '@/db/schema' or 'drizzle-orm' (grep 0 matches)" },
+      { "acId": "AC-US1-02", "status": "pass", "evidence": "admin/media.astro imports getMediaList from '@/lib/db/queries/media-listing'" },
+      { "acId": "AC-US1-03", "status": "pass", "evidence": "admin/media.astro imports MediaIsland exactly once (line 12)" },
+      { "acId": "AC-US1-04", "status": "pass", "evidence": "getMediaList returns correct shape at media-listing.ts:32" },
+      { "acId": "AC-US2-01", "status": "pass", "evidence": "admin/listings/new.astro has zero schema/drizzle imports, no db.prepare()" },
+      { "acId": "AC-US2-02", "status": "pass", "evidence": "admin/listings/new.astro imports getAllListingCategories from listings.ts:11" },
+      { "acId": "AC-US2-03", "status": "fail", "evidence": "admin/listings/[id]/edit.astro imports getListingById from listings.ts but that function was removed from listings.ts (only getAllListingCategories exists). Astro/Vite shims it to undefined due to shimMissingExports: true default, causing silent runtime crash." },
+      { "acId": "AC-US2-04", "status": "fail", "evidence": "edit.astro imports getListingById from listings.ts -- function does not exist there. The canonical implementation exists in admin-listings.ts:181 but the import path does not resolve to it." },
+      { "acId": "AC-US3-01", "status": "pass", "evidence": "business/[slug]/product/new.astro has zero schema/drizzle imports, no db.prepare()" },
+      { "acId": "AC-US3-02", "status": "pass", "evidence": "Imports getProductCategories from products.ts:183" },
+      { "acId": "AC-US3-03", "status": "pass", "evidence": "business/[slug]/product/[id]/edit.astro has zero schema/drizzle imports, no db.prepare()" },
+      { "acId": "AC-US3-04", "status": "pass", "evidence": "edit page imports getProductCategories from products.ts" },
+      { "acId": "AC-US4-01", "status": "pass", "evidence": "product/[id]/index.astro imports getProductWithDetails from products.ts:11. Template uses images as string[] correctly." },
+      { "acId": "AC-US4-02", "status": "pass", "evidence": "grep 'db.prepare' on product/[id]/index.astro = 0" },
+      { "acId": "AC-US4-03", "status": "pass", "evidence": "Frontmatter reduced to ~35 lines (even smaller than spec target of 68)" },
+      { "acId": "AC-US5-01", "status": "fail", "evidence": "Server build succeeds (11.91s). Client build fails with EPERM on Windows (known Astro race condition, not code issue). However, the edit page will crash at runtime due to missing getListingById export." },
+      { "acId": "AC-US5-02", "status": "pass", "evidence": "grep '@/db/schema' in *.astro = 0; grep 'db.prepare' in *.astro = 0" },
+      { "acId": "AC-US5-03", "status": "pass", "evidence": "Existing query files (products.ts, auth.ts, businesses.ts) remain intact" }
+    ]
+  },
+  "findings": [
+    {
+      "title": "getListingById import resolves to undefined at runtime",
+      "severity": "critical",
+      "confidence": 95,
+      "category": "correctness",
+      "file": "src/pages/admin/listings/[id]/edit/index.astro:11",
+      "issue": "edit.astro line 11 imports { getListingById, getAllListingCategories } from '@/lib/db/queries/listings'. The listings.ts module only exports getAllListingCategories. getListingById was removed from listings.ts to fix the prior TS2308 barrel duplicate. Astro/Vite defaults to shimMissingExports: true, which silently resolves missing named imports to undefined. The page renders, but when a user visits /admin/listings/[id]/edit, await getListingById(id) calls undefined with an argument, causing TypeError: 'undefined is not a function'.",
+      "evidence": "listings.ts exports: getAllListingCategories only (26 lines, grep getListingById = 0). edit.astro:11 imports getListingById from listings. edit.astro:16: const listing = await getListingById(id ?? ''); -- will throw TypeError.",
+      "suggestion": "Fix import path in edit.astro:11 to import from '@/lib/db/queries' (the barrel re-exports getListingById from admin-listings.ts), OR restore getListingById in listings.ts as: export { getListingById } from './admin-listings'.",
+      "impact": "The entire admin listing edit page crashes on load for every user. Cannot edit any listing."
+    },
+    {
+      "title": "T-002 spec not fulfilled -- listings.ts missing 3 of 4 required functions",
+      "severity": "critical",
+      "confidence": 92,
+      "category": "correctness",
+      "file": "src/lib/db/queries/listings.ts",
+      "issue": "T-002 requires listings.ts to export getAdminListings, getListingById, createListing, updateListing. The file (26 lines) only contains getAllListingCategories. These functions exist in admin-listings.ts but NOT in listings.ts as the plan explicitly instructed. This violates the architectural decision in plan.md line 45: 'extend existing query files rather than creating new ones.'",
+      "evidence": "tasks.md T-002: 'Export getAdminListings, getListingById, createListing, updateListing' in listings.ts. Actual: listings.ts has only getAllListingCategories.",
+      "suggestion": "Move getAdminListings, createListing, and updateListing into listings.ts per the spec, OR update plan.md and tasks.md to document the actual split.",
+      "impact": "Spec non-compliance. Future developers following T-002 will look for these functions in listings.ts and not find them."
+    },
+    {
+      "title": "admin/listings.ts server actions have 3 type errors",
+      "severity": "high",
+      "confidence": 85,
+      "category": "correctness",
+      "file": "src/actions/admin/listings.ts:45,61,93",
+      "issue": "tsc --noEmit confirms 3 TS2379 errors in actions/admin/listings.ts related to exactOptionalPropertyTypes. ListingFilters (line 45), CreateListingInput (line 61), and UpdateListingInput (line 93) all have optional properties being passed with explicit undefined values.",
+      "evidence": "tsc --noEmit: actions/admin/listings.ts:45 TS2379, line 61 TS2379, line 93 TS2379.",
+      "suggestion": "Add 'undefined' to the type definitions for these input interfaces.",
+      "impact": "Type errors in server actions. Will block CI builds."
+    }
+  ]
+}

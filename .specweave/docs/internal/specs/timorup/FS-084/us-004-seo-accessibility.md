@@ -4,7 +4,7 @@ feature: FS-084
 title: "SEO & Accessibility"
 status: completed
 priority: P1
-created: 2026-05-29
+created: 2026-06-09
 tldr: "**As a** marketing team."
 project: timorup
 ---

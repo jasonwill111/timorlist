@@ -1,0 +1,19 @@
+{
+  "id": "0154-starwind-deprecation-ui-separation-acceptance",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-08T08:21:45.736Z",
+  "lastActivity": "2026-06-08T09:03:38.012Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-08T09:03:37.915Z",
+  "approvedAt": "2026-06-08T09:03:38.012Z"
+}

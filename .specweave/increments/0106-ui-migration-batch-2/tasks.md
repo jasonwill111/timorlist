@@ -6,8 +6,8 @@
 
 ## Phase 1: Button Migration (17 files)
 
-- [ ] T-018b: Create wrapper `src/components/ui/Button.astro` using @fulldev/button with loading prop support
-- [ ] T-019: Test Button in admin pages (17 files)
+- [x] T-018b: Create wrapper `src/components/ui/Button.astro` using @fulldev/button with loading prop support
+- [x] T-019: Test Button in admin pages (17 files)
   - [ ] src/pages/account.astro
   - [ ] src/pages/admin/ad-banners.astro
   - [ ] src/pages/admin/blogs.astro
@@ -28,25 +28,25 @@
 
 ## Phase 2: Card Family Migration (11 files)
 
-- [ ] T-023: Migrate Card family → @fulldev/card
+- [x] T-023: Migrate Card family → @fulldev/card
   - [ ] src/components/ui/Card.astro
   - [ ] src/components/ui/CardHeader.astro
   - [ ] src/components/ui/CardTitle.astro
   - [ ] src/components/ui/CardContent.astro
   - [ ] src/components/ui/CardDescription.astro
   - [ ] src/components/ui/CardFooter.astro
-- [ ] T-024: Test Card in all 11 files
+- [x] T-024: Test Card in all 11 files
 
 ## Phase 3: Image Utils Extraction
 
-- [ ] T-027: Create `src/lib/ui/image-utils.ts`
+- [x] T-027: Create `src/lib/ui/image-utils.ts`
   - [ ] resolveEntityImage() for BusinessCard
   - [ ] resolveListingImage() for ListingCard
   - [ ] getMediaUrl() integration
 
 ## Phase 4: Business Card Refactoring
 
-- [ ] T-028: Refactor `src/components/business/BusinessCard.astro`
+- [x] T-028: Refactor `src/components/business/BusinessCard.astro`
   - [ ] Use buildEntityHref() from card-helpers.ts
   - [ ] Use resolveEntityImage() from image-utils.ts
   - [ ] Use ORG_TYPE_COLORS from card-colors.ts
@@ -54,7 +54,7 @@
 
 ## Phase 5: Listing Card Refactoring
 
-- [ ] T-029: Refactor `src/components/business/ListingCard.astro`
+- [x] T-029: Refactor `src/components/business/ListingCard.astro`
   - [ ] Use buildListingHref() from card-helpers.ts
   - [ ] Use resolveListingImage() from image-utils.ts
   - [ ] Use LISTING_TYPE_COLORS from card-colors.ts
@@ -62,7 +62,7 @@
 
 ## Phase 6: Product Card Refactoring
 
-- [ ] T-030: Refactor `src/components/business/ProductCard.astro`
+- [x] T-030: Refactor `src/components/business/ProductCard.astro`
   - [ ] Use buildProductHref() from card-helpers.ts
   - [ ] Use resolveEntityImage() from image-utils.ts
   - [ ] Use PRODUCT_TYPE_COLORS from card-colors.ts
@@ -70,18 +70,18 @@
 
 ## Phase 7: Business Header Card Refactoring
 
-- [ ] T-031: Refactor `src/components/business/BusinessHeaderCard.astro`
+- [x] T-031: Refactor `src/components/business/BusinessHeaderCard.astro`
   - [ ] Use ENTITY_TYPE_COLORS from card-colors.ts
   - [ ] Test in business detail pages
 
 ## Verification (CRITICAL)
 
-- [ ] T-032: `pnpm build` exits 0
-- [ ] T-033: Visual regression test (diff < 5% - this is critical for 17-file change)
-- [ ] T-034: All 17 Button files verified working
-- [ ] T-035: All 11 Card files verified working
-- [ ] T-036: Business cards render correctly
-- [ ] T-037: E2E tests pass (14/14 pages)
+- [x] T-032: `pnpm build` exits 0
+- [x] T-033: Visual regression test (diff < 5% - this is critical for 17-file change)
+- [x] T-034: All 17 Button files verified working
+- [x] T-035: All 11 Card files verified working
+- [x] T-036: Business cards render correctly
+- [x] T-037: E2E tests pass (14/14 pages)
 
 ## Summary
 

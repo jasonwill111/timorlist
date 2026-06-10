@@ -1,10 +1,10 @@
 {
   "id": "0137-admin-innerhtml-migration",
-  "status": "planned",
+  "status": "completed",
   "type": "refactor",
   "priority": "P1",
   "created": "2026-06-07T06:23:22.908Z",
-  "lastActivity": "2026-06-07T06:23:22.909Z",
+  "lastActivity": "2026-06-09T00:07:31.994Z",
   "testMode": "TDD",
   "coverageTarget": 80,
   "feature_id": null,
@@ -13,5 +13,7 @@
   "planning": {
     "parallel": false
   },
-  "project": "TimorUp"
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-09T00:07:31.924Z",
+  "approvedAt": "2026-06-09T00:07:31.994Z"
 }

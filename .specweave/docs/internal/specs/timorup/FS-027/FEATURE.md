@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-07
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Add 'Updates' section to business/non-profit detail pages for posting short announcements (promotions, new products, events, volunteer opportunities)."
 complexity: low
 stakeholder_relevant: true

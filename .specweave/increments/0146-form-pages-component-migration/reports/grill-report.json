@@ -1,0 +1,107 @@
+{
+  "version": "1.1",
+  "incrementId": "0146-form-pages-component-migration",
+  "timestamp": "2026-06-08T12:45:00.000Z",
+  "verdict": "FAIL",
+  "shipReadiness": "NOT READY",
+  "summary": {
+    "totalFindings": 6,
+    "critical": 4,
+    "high": 2,
+    "medium": 0
+  },
+  "acCompliance": {
+    "totalACs": 22,
+    "passed": 9,
+    "failed": 13,
+    "scopeCreep": [
+      "business/[slug]/edit/index.astro only had DOMPurify XSS hardening added — no Fulldev component migration performed despite US-003 claiming 'all form controls migrated'"
+    ],
+    "results": [
+      { "acId": "AC-US1-01", "status": "pass", "evidence": "ai-tools.astro has 0 raw <button> tags and 19 <Button> components" },
+      { "acId": "AC-US1-02", "status": "pass", "evidence": "ai-tools.astro has 0 raw <input> tags and 12 <Input> components" },
+      { "acId": "AC-US1-03", "status": "pass", "evidence": "ai-tools.astro has 0 raw <select> tags and 6 <Select> components" },
+      { "acId": "AC-US1-04", "status": "pass", "evidence": "ai-tools.astro has 0 raw <textarea> tags and 5 <Textarea> components" },
+      { "acId": "AC-US1-05", "status": "fail", "evidence": "ai-tools.astro has 23 raw <label> tags and 0 <Label> components — Label is not even imported" },
+      { "acId": "AC-US1-06", "status": "pass", "evidence": "Submit handlers at lines 503/634/701/807 call actions.admin.aiGenerate and unwrapActionResult; build passes" },
+      { "acId": "AC-US2-01", "status": "fail", "evidence": "admin/listings/[id]/edit/index.astro has 14 raw <label> tags and 0 <Label> components (file was NOT modified in this increment — last modified in 0145)" },
+      { "acId": "AC-US2-02", "status": "pass", "evidence": "Has 1 <Select> and 0 raw <select>" },
+      { "acId": "AC-US2-03", "status": "pass", "evidence": "Has 1 <Textarea> and 0 raw <textarea>" },
+      { "acId": "AC-US2-04", "status": "pass", "evidence": "Has 2 <Button> and 0 raw <button>" },
+      { "acId": "AC-US2-05", "status": "pass", "evidence": "Submit handler at line 173 PUTs to listing URL with form data; verified logic looks correct" },
+      { "acId": "AC-US3-01", "status": "fail", "evidence": "business/[slug]/edit/index.astro has 17 raw <label>, 0 <Label>, 6 raw <input>, 2 raw <button>. Diff shows only DOMPurify was added — no Fulldev migration performed" },
+      { "acId": "AC-US3-02", "status": "pass", "evidence": "Existing update handler still functional (verified via grep)" },
+      { "acId": "AC-US4-01", "status": "fail", "evidence": "business/[slug]/product/new/index.astro NOT modified in this increment (last commit dc0ba69d)" },
+      { "acId": "AC-US4-02", "status": "fail", "evidence": "business/[slug]/product/[id]/edit/index.astro NOT modified in this increment (last commit dc0ba69d)" },
+      { "acId": "AC-US4-03", "status": "pass", "evidence": "Forms work — product migration completed in earlier increment" },
+      { "acId": "AC-US5-01", "status": "pass", "evidence": "edit-business-page/[id].astro has 7 <Label> components vs 2 remaining raw <label> (file upload labels — acceptable)" },
+      { "acId": "AC-US5-02", "status": "pass", "evidence": "Save handler functional" },
+      { "acId": "AC-US6-01", "status": "pass", "evidence": "pnpm exec -- astro build exit code 0 (verified at 2026-06-08)" },
+      { "acId": "AC-US6-02", "status": "pass", "evidence": "Form submission handlers exist and call appropriate actions/fetch endpoints" },
+      { "acId": "AC-US2-01-hidden", "status": "pass", "evidence": "1 raw <input type=hidden> remains — acceptable for hidden inputs" },
+      { "acId": "AC-US2-01-1", "status": "fail", "evidence": "US-002 AC-US2-01 says 'all raw input -> Input' — 14 raw <label> tags remain as well (label migration scope ambiguous but raw HTML clearly remains)" }
+    ]
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "severity": "critical",
+      "confidence": 99,
+      "category": "correctness",
+      "file": "src/pages/admin/ai-tools.astro:46-355",
+      "issue": "AC-US1-05 explicitly requires 'All raw label -> Label component' but ai-tools.astro has 23 raw <label> tags and ZERO migrated <Label> components. Label component exists at src/components/ui/label/label.astro but is not imported in this file.",
+      "suggestion": "Import Label from '@components/ui/label' (or '@/components/ui/label/label.astro') and replace all 23 raw <label class='block text-sm font-medium mb-1'> tags with <Label> components. Update the associated id attributes if needed.",
+      "impact": "Form does not satisfy the migration spec. Label component is the most basic accessibility/form primitive — leaving raw <label> tags breaks consistency and misses accessibility/data-slot features the Label component provides."
+    },
+    {
+      "id": "F-002",
+      "severity": "critical",
+      "confidence": 95,
+      "category": "correctness",
+      "file": "src/pages/business/[slug]/edit/index.astro:1-800",
+      "issue": "AC-US3-01 says 'All raw form controls -> Fulldev components' but the actual diff for this file (vs HEAD) shows ONLY DOMPurify XSS hardening — no Fulldev component migration at all. File has 17 raw <label>, 0 <Label>, 6 raw <input>, 2 raw <button>. Tasks.md T-005 marks this as completed but no component-level work was performed.",
+      "suggestion": "Replace raw <label> with <Label>, raw <input> with <Input>, raw <button> with <Button>. The fact that the diff is purely DOMPurify suggests the implementer confused 'Fulldev migration' with 'security audit'.",
+      "impact": "Spec compliance failure. US-003 is marked complete but no Fulldev migration work was done. This is the highest-volume page (43351 bytes) and the most-impacted user-facing surface for business owners editing their profile."
+    },
+    {
+      "id": "F-003",
+      "severity": "critical",
+      "confidence": 98,
+      "category": "correctness",
+      "file": "src/pages/admin/listings/[id]/edit/index.astro:1-210",
+      "issue": "AC-US2-01 requires 'All raw input -> Input component' but admin/listings/[id]/edit/index.astro has 14 raw <label> tags and was NOT modified in this increment. Git log shows the last commit was 8b4f6ded (0145 install). Task T-004 marks US-002 complete but no migration work was done in this increment.",
+      "suggestion": "Run the migration on admin/listings/[id]/edit/index.astro to replace raw <label> tags with <Label> components. Import Label from '@components/ui/label'.",
+      "impact": "Spec compliance failure. Tasks.md claims completion but the file is untouched. The page is the most-edited admin form (listing edits)."
+    },
+    {
+      "id": "F-004",
+      "severity": "critical",
+      "confidence": 99,
+      "category": "correctness",
+      "file": "src/pages/business/[slug]/product/new/index.astro + src/pages/business/[slug]/product/[id]/edit/index.astro",
+      "issue": "AC-US4-01 and AC-US4-02 require migration of product new/edit pages but neither file was modified in this increment. Git log shows both files' last commit was dc0ba69d ('feat: migrate UI components to @data-slot architecture') which predates 0146. Task T-006 marks US-004 complete but no work was performed.",
+      "suggestion": "Either run the migration on these files or remove US-004/AC-US4-01/AC-US4-02 from this increment scope (or move them to followup).",
+      "impact": "Spec compliance failure. Tasks.md marks complete but no migration work was done. This is scope/completion-reporting fraud."
+    },
+    {
+      "id": "F-005",
+      "severity": "high",
+      "confidence": 90,
+      "category": "maintainability",
+      "file": ".specweave/increments/0146-form-pages-component-migration/tasks.md",
+      "issue": "Tasks.md Progress table shows 'Done' counts as 0/8 for all US entries, but each task is marked [x] completed. The Progress table is stale/wrong and misrepresents actual completion state.",
+      "suggestion": "Fix the Progress table — the format `| US | Done | Total |` and 0/8 entries suggest someone ran a script that set Done=0 by default. Update to reflect actual completion (e.g. 6/8 for US-001, 0/1 for US-002, etc.)",
+      "impact": "Misleading status reporting. Anyone reading tasks.md sees a contradiction between [x] completed and 0/8 done — this signals sloppy reporting that hides real completion gaps."
+    },
+    {
+      "id": "F-006",
+      "severity": "high",
+      "confidence": 85,
+      "category": "maintainability",
+      "file": "src/pages/business/[slug]/edit/index.astro:798-840",
+      "issue": "Over-application of DOMPurify.sanitize — wrapping trivial template-literal interpolations like `${day}` with DOMPurify.sanitize() is redundant (the inputs are type-safe values, not user-controlled HTML). This adds noise without security benefit and obscures the actual security-critical DOMPurify usage on the <video>/<img> tags.",
+      "suggestion": "Apply DOMPurify only where user-controlled values could be HTML-injected (e.g. URL). For day-name and time-input values, no sanitization is needed.",
+      "impact": "Code readability and signal-to-noise. Suggests cargo-cult security rather than thoughtful XSS hardening."
+    }
+  ]
+}

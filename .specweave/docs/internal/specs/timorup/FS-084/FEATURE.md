@@ -4,8 +4,8 @@ title: "Production Readiness Fixes"
 type: feature
 status: completed
 priority: P1
-created: 2026-05-29
-lastUpdated: 2026-05-29
+created: 2026-06-09
+lastUpdated: 2026-06-09
 tldr: "Fix 38 production gaps identified in deployment review."
 complexity: high
 stakeholder_relevant: true
@@ -29,7 +29,7 @@ Fix 38 production gaps identified in deployment review. Focus: monitoring, error
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0084-production-readiness](../../../../../increments/0084-production-readiness/spec.md) | ✅ completed | 2026-05-29 |
+| [0084-production-readiness](../../../../../increments/0084-production-readiness/spec.md) | ✅ completed | 2026-06-09 |
 
 ## User Stories
 

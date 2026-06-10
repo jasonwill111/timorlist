@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "incrementId": "0156",
+  "timestamp": "2026-06-09T00:20:00Z",
+  "verdict": "WAIVED",
+  "consentStatus": "denied",
+  "reason": "No ANTHROPIC_API_KEY configured; externalModels consent denied by config"
+}

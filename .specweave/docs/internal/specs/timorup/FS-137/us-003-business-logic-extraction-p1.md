@@ -2,9 +2,9 @@
 id: US-003
 feature: FS-137
 title: "Business Logic Extraction (P1)"
-status: not_started
+status: completed
 priority: P1
-created: 2026-06-07
+created: 2026-06-07T00:00:00.000Z
 tldr: "**As a** developer."
 project: timorup
 ---
@@ -21,10 +21,10 @@ project: timorup
 
 ## Acceptance Criteria
 
-- [ ] **AC-US3-01**: Admin pages import query functions from `src/lib/db/queries/` instead of inlining `db.select()` calls
-- [ ] **AC-US3-02**: Each query function has TypeScript return types matching the entity interface
-- [ ] **AC-US3-03**: Query functions are located in `src/lib/db/queries/admin/` subdirectory
-- [ ] **AC-US3-04**: Frontmatter in admin pages contains ONLY: imports, `prerender` flag, data fetching calls, and layout props — no business logic
+- [x] **AC-US3-01**: Admin pages import query functions from `src/lib/db/queries/` instead of inlining `db.select()` calls
+- [x] **AC-US3-02**: Each query function has TypeScript return types matching the entity interface
+- [x] **AC-US3-03**: Query functions are located in `src/lib/db/queries/admin/` subdirectory
+- [x] **AC-US3-04**: Frontmatter in admin pages contains ONLY: imports, `prerender` flag, data fetching calls, and layout props — no business logic
 
 ---
 
@@ -37,7 +37,7 @@ project: timorup
 
 ## Tasks
 
-- [ ] **T-003**: Migrate ad-banners.astro (haiku)
+- [x] **T-003**: Migrate ad-banners.astro (haiku)
 - [ ] **T-004**: Migrate ai-tools.astro (haiku)
 - [ ] **T-005**: Migrate service-packages.astro (haiku)
 - [ ] **T-006**: Migrate reviews.astro (haiku)

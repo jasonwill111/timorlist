@@ -1,0 +1,207 @@
+{
+  "version": "1.1",
+  "scope": "increment 0156-data-layer-extraction (re-review after fixes)",
+  "date": "2026-06-08",
+  "reviewers": ["logic", "security", "performance"],
+  "gateCheck": { "passed": true, "reason": "1215 changed lines across 15 files (well above 5-line minimum). Not a PR/draft, no rubric.md present." },
+  "summary": {
+    "total": 9,
+    "critical": 1,
+    "high": 3,
+    "medium": 3,
+    "low": 2,
+    "info": 0
+  },
+  "validation": {
+    "performed": true,
+    "preValidation": { "critical": 1, "high": 3, "medium": 3, "low": 2 },
+    "postValidation": { "critical": 1, "high": 3, "medium": 3, "low": 2 },
+    "rejected": 0
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "severity": "CRITICAL",
+      "file": "src/pages/business/[slug].astro",
+      "line": 37,
+      "category": "logic/runtime",
+      "title": "isBusinessOwner called with wrong argument types (Request vs sessionToken)",
+      "description": "Page frontmatter does `const isOwner = await checkBusinessOwner(Astro.request, business.id);` (line 37), but the imported function `isBusinessOwner` in `src/lib/db/queries/business-detail.ts:210` is declared as `isBusinessOwner(sessionToken: string, businessId: string): Promise<boolean>`. A `Request` object is being passed where a string is expected. Result: the session lookup `eq(sessions.token, requestObject)` will return nothing (no match), so `isOwner` will always be `false` for any request. Downstream impact: `if (business.status === 'draft' && isOwner)` cache-control is set wrong, AND non-owner draft visitors no longer get redirected to /businesses (the old inline code did this check, the refactored version does NOT — it just sets the cache header). Draft business pages are now publicly cacheable as if live. The page will likely throw a TypeScript compile error in `astro check` but the bare `astro build` may not catch it because the param is unannotated at the call site.",
+      "recommendation": "Either (a) fix the function to take a `Request` and extract the token itself: change signature to `isBusinessOwner(request: Request, businessId: string)` and have the function pull `better-auth.session_token` from the cookie header; or (b) fix the call site to extract the token first: `const cookieHeader = Astro.request.headers.get('cookie') || ''; const tokenMatch = cookieHeader.match(/better-auth\\.session_token=([^;]+)/); const isOwner = tokenMatch ? await checkBusinessOwner(tokenMatch[1], business.id) : false;`. (a) is cleaner. Also restore the non-owner redirect for `status === 'draft'` pages, which the refactor silently dropped.",
+      "validated": true,
+      "confidence": 5
+    },
+    {
+      "id": "F-002",
+      "severity": "HIGH",
+      "file": "src/pages/admin/listings/new/index.astro",
+      "line": 1,
+      "category": "security/auth",
+      "title": "Admin 'new listing' page has no auth gate — anonymous users can view the form",
+      "description": "The frontmatter goes straight to `getListingCategories()` and renders the form. Every other admin page in this increment's scope (`admin/media.astro`, `admin/listings/[id]/edit/index.astro` via `requireAuth adminOnly`) gates on `getAdminUser(Astro.request)`. The mutation itself is protected by the server action, but the page is in `/admin/listings/new` and is supposed to be admin-only. The auth gate is one line: `const adminUser = await getAdminUser(Astro.request); if (!adminUser) return Astro.redirect('/admin/login');`.",
+      "recommendation": "Add the auth gate at the top of frontmatter (matches the pattern in `admin/media.astro` lines 17-21).",
+      "validated": true,
+      "confidence": 5
+    },
+    {
+      "id": "F-003",
+      "severity": "HIGH",
+      "file": "src/pages/admin/media.astro",
+      "line": 12,
+      "category": "spec/cleanup",
+      "title": "Duplicate MediaIsland import and dead MediaData helper still present",
+      "description": "T-001 was supposed to (1) remove a duplicate `MediaIsland` import and (2) remove unused drizzle imports. (1) is undone — line 12 still has `import MediaIsland from '@components/islands/admin/MediaIsland.astro';` even though the same import is effectively the only one (no longer duplicated but the comment context suggests it was meant to be removed entirely and rely solely on the island). More importantly, line 52 declares `function getThumbnailUrl(item: MediaData)` referencing an undeclared `MediaData` type. The function is dead code (called only via the template at line 155 inside a `<img>` tag — but the inline template path is not exercised at compile time). tsc with strict mode would flag this; bare `astro build` does not. The dead helper will leak into the bundled SSR output. T-001's AC 'Duplicate MediaIsland import (line 16) is removed' is not satisfied (T-001 was marked [x] completed in tasks.md but the verification step is missing).",
+      "recommendation": "Either remove `getThumbnailUrl` and inline `/api/media/${item.id}` directly in the template, or add an explicit `type MediaData = { id: string; url: string | null }` declaration. Remove the duplicate `MediaIsland` import if the intention is to use it from the barrel (but the file currently imports it directly, so just confirm the import path is the canonical one).",
+      "validated": true,
+      "confidence": 4
+    },
+    {
+      "id": "F-004",
+      "severity": "HIGH",
+      "file": "src/pages/business/[slug]/product/[id]/index.astro",
+      "line": 45,
+      "category": "logic/dead-code",
+      "title": "Page does `JSON.parse` on already-parsed object fields from getProductWithDetails",
+      "description": "`getProductById` (in `src/lib/db/queries/products.ts:48-50`) already returns `priceFields: product.priceFields ? JSON.parse(...) : null` and `specifications: product.specifications ? JSON.parse(...) : null`. The page frontmatter then does `const specifications = product.specifications ? JSON.parse(product.specifications) : null;` and same for `priceFields` (lines 45-46). On a parsed object, `JSON.parse` first stringifies to `'{...}'` via `String()` conversion then re-parses. This actually succeeds (returns a new object) so the page doesn't throw — but it's a wasted round-trip and signals that the contract between query and page is muddled. Also the empty `images: string[] = []` placeholder (line 38) means the gallery, JSON-LD `image` array, and carousel all silently render empty, which is a regression — the old raw SQL fetched `imageIds` from the products row. The template uses `images[0]?.mediaId` (line 122) and `img.mediaId` (line 143) which on strings is undefined, so the carousel will show the title-letter fallback for the main image and zero thumbnails. The product page is functionally degraded — visitors see no product images.",
+      "recommendation": "Remove the redundant `JSON.parse` calls (use the parsed values directly). Decide on one of: (a) include `imageIds: string[]` in the `getProductWithDetails` return shape and load via the media table; (b) add a separate `getProductImages(productId)` query and call it; (c) document the empty-images state as intentional. AC-US4-03 says 'frontmatter reduced from ~109 lines to <30 lines' — current frontmatter is 69 lines, more than 2x the AC's hard limit. Trim to <30 lines.",
+      "validated": true,
+      "confidence": 5
+    },
+    {
+      "id": "F-005",
+      "severity": "MEDIUM",
+      "file": "src/pages/admin/listings/[id]/edit/index.astro",
+      "line": 184,
+      "category": "logic/bug",
+      "title": "Update submission PUTs to wrong URL (pre-existing, preserved through refactor)",
+      "description": "Line 184: `fetch(window.location.pathname.replace('/edit', ''), { method: 'PUT', ... })`. From `/admin/listings/<id>/edit` this strips `/edit` to get `/admin/listings/<id>` — which is NOT a route, only `/admin/listings/index.astro` exists. No PUT handler matches. The new listing page (line 159) uses `await actions.admin.listings.create(...)` — the Astro actions pattern — so the edit page is inconsistent with the codebase's mutation style. Save will always fail in production.",
+      "recommendation": "Switch the form to the actions pattern: import the `actions` object and call `await actions.admin.listings.update({ id, ...data })`. Drop the manual fetch entirely. Match the `admin/listings/new` pattern.",
+      "validated": true,
+      "confidence": 4
+    },
+    {
+      "id": "F-006",
+      "severity": "MEDIUM",
+      "file": "src/lib/db/queries/listings.ts",
+      "line": 91,
+      "category": "logic/edge-case",
+      "title": "JSON.parse on `tags` field throws on malformed values",
+      "description": "`getListingById` returns `parsedTags: row.tags ? JSON.parse(row.tags as string) : []`. A single bad row (malformed JSON) throws, which propagates up to the edit page at line 117 (`listing.parsedTags.join(', ')`) and 500s the page. The schema's `tags` field is `string | null`; the `as string` type assertion hides whether it's null vs empty string vs malformed. No try/catch, no fallthrough. The same risk applies to the inline `JSON.parse` calls in the product detail page (F-004) for `priceFields` / `specifications`.",
+      "recommendation": "Wrap the parse: `parsedTags: (() => { try { return row.tags ? JSON.parse(row.tags as string) : []; } catch { return []; } })()`. Apply the same pattern in `getProductById` for `priceFields` / `specifications` / `images`.",
+      "validated": true,
+      "confidence": 4
+    },
+    {
+      "id": "F-007",
+      "severity": "MEDIUM",
+      "file": "src/lib/db/queries/listings.ts",
+      "line": 1,
+      "category": "spec/scope",
+      "title": "Plan T-002 deliverable is incomplete (no createListing/updateListing in this file)",
+      "description": "Plan T-002 calls for `getAdminListings`, `getListingById`, `createListing`, `updateListing` to live in `src/lib/db/queries/listings.ts`. The file only ships `getListingCategories`, `getAllListingCategories`, `getListingById`. The CRUD functions live in `src/lib/db/queries/admin-listings.ts` instead. The two files have overlapping but inconsistent type names (`ListingData` vs `ListingRow` vs `ListingWithParsedTags`). AC-US2-02 / AC-US2-04 still pass because the page frontmatter only imports the read functions, but the plan vs reality drift makes the abstraction harder to navigate.",
+      "recommendation": "Either (a) consolidate: move `getAdminListings` / `createListing` / `updateListing` from `admin-listings.ts` into `listings.ts` and pick one `Listing*` type name, or (b) update the plan to reflect the actual two-file split. The duplication of `Listings` types between `listings.ts` and `admin/listings.ts` (which queries a different `listings` table — note plural vs singular confusion) is a footgun.",
+      "validated": true,
+      "confidence": 3
+    },
+    {
+      "id": "F-008",
+      "severity": "LOW",
+      "file": "src/lib/db/queries/products.ts",
+      "line": 7,
+      "category": "performance",
+      "title": "`sql<number>` count(*) used where drizzle's typed `count()` helper is idiomatic",
+      "description": "Line 110 calls `db.select({ count: sql<number>`count(*)` }).from(products)...` (the import on line 7 was added in the previous fix round). The `count(*)` template literal is safe (no user input) but a copy-paste of this pattern with a user-supplied column name would be a footgun. drizzle-orm exports a typed `count()` helper that is preferred.",
+      "recommendation": "Replace with `import { ..., count } from 'drizzle-orm'` and use `db.select({ count: count() }).from(products)...`. Pure code-quality improvement, no behavior change.",
+      "validated": true,
+      "confidence": 3
+    },
+    {
+      "id": "F-009",
+      "severity": "LOW",
+      "file": "src/lib/db/queries/auth.ts",
+      "line": 196,
+      "category": "logic/edge-case",
+      "title": "resolveUserFromCookie silently swallows all errors",
+      "description": "The new `resolveUserFromCookie` helper wraps a `try { ... } catch { return null; }` blanket handler. The caller cannot distinguish 'no session cookie' from 'DB error' from 'malformed session token' — all become `null`. A transient D1 outage would manifest as 401s on the dashboard rather than 500s. This pattern is repeated three times in the file and may be intentional, but it's worth surfacing the behavior.",
+      "recommendation": "Add a structured error return: `Promise<{ user: AuthUserRaw } | { error: 'NO_COOKIE' | 'EXPIRED' | 'DB_ERROR' }>`. Let the caller decide whether to log + redirect or surface a real error to the user. At minimum, log the caught error via `console.error` for observability.",
+      "validated": true,
+      "confidence": 3
+    }
+  ],
+  "previouslyReportedFindings": [
+    {
+      "id": "F-OLD-1",
+      "originalId": "F-001",
+      "originalTitle": "Product detail page references undefined variable `images`",
+      "resolution": "PARTIALLY_RESOLVED — page now has `const images: string[] = []` (line 38) so it does not throw `ReferenceError`. However, the placeholder is empty so all product images are silently missing. Superseded by F-004 in this report.",
+      "status": "partial"
+    },
+    {
+      "id": "F-OLD-2",
+      "originalId": "F-002",
+      "originalTitle": "Template uses unimported JSX components",
+      "resolution": "RESOLVED — `Card`, `CardContent`, `ArrowLeft`, `ChevronLeft`, `ChevronRight`, `ShareDialog` are now imported (lines 5-9).",
+      "status": "resolved"
+    },
+    {
+      "id": "F-OLD-3",
+      "originalId": "F-003",
+      "originalTitle": "`sql<number>` used without importing `sql` from drizzle-orm",
+      "resolution": "RESOLVED — `sql` is now imported on line 7. Downgraded to a LOW code-quality nit in F-008.",
+      "status": "resolved"
+    },
+    {
+      "id": "F-OLD-5",
+      "originalId": "F-005",
+      "originalTitle": "getListingById queries `businesses` table, not a `listings` table",
+      "resolution": "REJECTED — verified that the `businesses` table is the right source for this query (the admin edit form fields map to `businesses` columns: `contactName`, `countryCode`, `contactNumber`, `email`, `address`, `aboutUs`, `tags`, `yearOfEstablishment` all exist in `businesses`). The `listings` table is a separate, narrower table for the public classifieds feature. Both are legitimately queried by different functions in different files. F-007 captures the naming-clarity followup.",
+      "status": "rejected"
+    },
+    {
+      "id": "F-OLD-6",
+      "originalId": "F-006",
+      "originalTitle": "Missing required query functions: getAdminListings, createListing, updateListing",
+      "resolution": "RESOLVED — `getAdminListings` and `getAdminListingStats` live in `src/lib/db/queries/admin/listings.ts`; `createListing` and `updateListing` live in `src/lib/db/queries/admin-listings.ts`. All four are re-exported via the `@/lib/db/queries` barrel and the page imports them successfully. Plan scope drift captured as F-007.",
+      "status": "resolved"
+    },
+    {
+      "id": "F-OLD-7",
+      "originalId": "F-007",
+      "originalTitle": "Missing createProduct and updateProduct — T-005 not delivered",
+      "resolution": "REJECTED — verified that mutations live in `src/actions/products/` (server actions), not query functions. The page form handlers call `actions.products.createProduct` / `actions.products.updateProduct`. T-005's premise of mutation-as-query-function conflicts with the established Astro actions pattern. Plan should be amended; no code change needed.",
+      "status": "rejected"
+    },
+    {
+      "id": "F-OLD-8",
+      "originalId": "F-008",
+      "originalTitle": "Helper function getThumbnailUrl references undeclared type MediaData",
+      "resolution": "STILL_VALID — duplicate `MediaIsland` import is gone (only line 12 now), but `getThumbnailUrl(item: MediaData)` and the dead `MediaData` type are still present. Promoted to F-003 with high severity since T-001 was marked complete in tasks.md but its AC is not met.",
+      "status": "valid",
+      "promotedTo": "F-003"
+    },
+    {
+      "id": "F-OLD-9",
+      "originalId": "F-009",
+      "originalTitle": "Update submission PUTs to wrong URL",
+      "resolution": "STILL_VALID — re-confirmed at line 184. No PUT handler exists for the resolved path. Re-emitted as F-005.",
+      "status": "valid",
+      "promotedTo": "F-005"
+    },
+    {
+      "id": "F-OLD-10",
+      "originalId": "F-010",
+      "originalTitle": "getBusinessProductCount uses raw `count(*)` SQL",
+      "resolution": "RESOLVED — `sql` is now imported. Re-emitted as F-008 (low severity, code-quality nit).",
+      "status": "valid",
+      "promotedTo": "F-008"
+    },
+    {
+      "id": "F-OLD-11",
+      "originalId": "F-011",
+      "originalTitle": "JSON.parse on `tags` field throws if malformed",
+      "resolution": "STILL_VALID — re-confirmed at line 91. Re-emitted as F-006.",
+      "status": "valid",
+      "promotedTo": "F-006"
+    }
+  ]
+}

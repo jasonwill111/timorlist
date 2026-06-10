@@ -1,0 +1,40 @@
+{
+  "generated": "2026-06-09",
+  "totalPages": 58,
+  "totalIslands": 25,
+  "totalViolations": 278,
+  "rawButtonCount": 6,
+  "rawButtonFiles": [
+    "pages/business/[slug]/products.astro (1)",
+    "pages/business/[slug]/edit/index.astro (2)",
+    "pages/business/[slug]/product/[id]/edit/index.astro (2)",
+    "pages/business/[slug]/product/new/index.astro (1)"
+  ],
+  "rawButtonNote": "All are JS event handlers (data-delete/data-remove) in <script> blocks — intentional, cannot use Fulldev Button",
+  "rawLabelCount": 0,
+  "rawInputCount": 0,
+  "hardcodedPxCount": 263,
+  "hardcodedPxFiles": 49,
+  "darkModeCoverage": {
+    "withDarkMode": 14,
+    "withoutDarkMode": 44,
+    "percentage": "24%"
+  },
+  "cssVariableViolations": 0,
+  "adminIslandsOver300": [
+    { "file": "ProductsIsland.astro", "lines": 828, "priority": "P0" },
+    { "file": "ServicePackagesIsland.astro", "lines": 548, "priority": "P0" },
+    { "file": "DashboardIsland.astro", "lines": 351, "priority": "P1" },
+    { "file": "AIToolsIsland.astro", "lines": 341, "priority": "P1" },
+    { "file": "ListingsIsland.astro", "lines": 333, "priority": "P1" },
+    { "file": "ReviewsIsland.astro", "lines": 332, "priority": "P1" },
+    { "file": "AdBannersIsland.astro", "lines": 320, "priority": "P1" },
+    { "file": "OrdersIsland.astro", "lines": 310, "priority": "P1" }
+  ],
+  "verifiedClean": {
+    "cssTokens": "All 58 pages use Tailwind design tokens (text-primary, bg-card, text-muted-foreground)",
+    "dbPrepareInPages": 0,
+    "schemaImportsInPages": 0,
+    "starwindButtonUsage": "Only in legacy islands, Fulldev used for new pages"
+  }
+}

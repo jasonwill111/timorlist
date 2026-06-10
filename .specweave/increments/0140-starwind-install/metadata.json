@@ -1,0 +1,19 @@
+{
+  "id": "0140-starwind-install",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-07T10:55:30.748Z",
+  "lastActivity": "2026-06-07T11:50:21.217Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-07T11:47:42.496Z",
+  "approvedAt": "2026-06-07T11:50:21.218Z"
+}

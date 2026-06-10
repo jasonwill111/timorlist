@@ -4,7 +4,7 @@ feature: FS-056
 title: "Removed Sections"
 status: completed
 priority: P1
-created: 2026-05-27
+created: 2026-06-09
 tldr: "**As a** user."
 project: TimorLink
 ---

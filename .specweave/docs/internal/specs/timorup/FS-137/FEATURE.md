@@ -2,10 +2,10 @@
 id: FS-137
 title: "Admin innerHTML Migration to Astro Components"
 type: feature
-status: planned
+status: completed
 priority: P1
-created: 2026-06-07
-lastUpdated: 2026-06-07
+created: 2026-06-07T00:00:00.000Z
+lastUpdated: 2026-06-09
 tldr: "Replace innerHTML string-generation DOM patterns with proper Astro component architecture across 13 admin pages."
 complexity: high
 stakeholder_relevant: true
@@ -16,7 +16,7 @@ stakeholder_relevant: true
 ## TL;DR
 
 **What**: Replace innerHTML string-generation DOM patterns with proper Astro component architecture across 13 admin pages.
-**Status**: planned | **Priority**: P1
+**Status**: completed | **Priority**: P1
 **User Stories**: 4
 
 ## Overview
@@ -27,7 +27,7 @@ Replace innerHTML string-generation DOM patterns with proper Astro component arc
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0137-admin-innerhtml-migration](../../../../../increments/0137-admin-innerhtml-migration/spec.md) | ⏳ planned | 2026-06-07 |
+| [0137-admin-innerhtml-migration](../../../../../increments/0137-admin-innerhtml-migration/spec.md) | ✅ completed | 2026-06-07T00:00:00.000Z |
 
 ## User Stories
 

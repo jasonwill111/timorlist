@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-27
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "提取订阅过期逻辑到 `ExpiryEnforcer` 模块，消除 inline 逻辑，使过期判断可测试、可复用。核心价值： derrière 统一接口，多处调用统一行为。."
 complexity: high
 stakeholder_relevant: true

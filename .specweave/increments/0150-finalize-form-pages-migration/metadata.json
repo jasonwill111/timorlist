@@ -1,0 +1,19 @@
+{
+  "id": "0150-finalize-form-pages-migration",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P0",
+  "created": "2026-06-08T06:01:58.617Z",
+  "lastActivity": "2026-06-08T06:36:36.544Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-08T06:36:36.442Z",
+  "approvedAt": "2026-06-08T06:36:36.544Z"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "0153-extract-remaining-pages-data-layer",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-08T07:54:09.473Z",
+  "lastActivity": "2026-06-08T08:16:27.022Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-08T08:16:26.941Z",
+  "approvedAt": "2026-06-08T08:16:27.022Z"
+}

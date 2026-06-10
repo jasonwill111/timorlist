@@ -1,9 +1,16 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
-import { Accordion } from '@/components/ui/accordion';
+import { Button } from '@/components/fulldev/button';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/fulldev/accordion';
+import { Section, SectionContainer } from '@/components/fulldev/section';
 
-// FAQ structured data
+// FAQ structured data (JSON-LD for SEO)
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -44,75 +51,60 @@ const faqSchema = {
 };
 
 const faqs = [
-  {
-    question: "What's the difference between Business Directories and Classified Ads",
-    answer: "Business Directories are permanent listings for established businesses like restaurants, hotels, and shops complete with reviews, photos, and contact info. Classified Ads are temporary listings for buying, selling, or finding jobs, vehicles, property, and services. Think of it like the difference between a Yelp listing and a Craigslist post."
-  },
-  {
-    question: "How do I list my business on TimorUp",
-    answer: "Click 'Add Your Listing' on the homepage, choose your listing type (Business, Classified Ad, NGO, or Government), fill in details, and submit. Business listings require a subscription plan; classified ads are free for the first few days."
-  },
-  {
-    question: "Are classified ads really free",
-    answer: "Yes! Classified ads are free for the first 3 days. After that, you can renew for 7, 30, or 365 days at affordable rates. Business directory listings offer subscription plans with enhanced features."
-  },
-  {
-    question: "Can I list products or services directly",
-    answer: "Absolutely! Business directory members can add products and services with photos, descriptions, and pricing. Browse the Products & Services section to see what's available from local businesses."
-  },
-  {
-    question: "How do I find NGOs or non-profit organizations",
-    answer: "Visit the Non-Profits section to discover NGOs and charitable organizations in Timor-Leste. Filter by category to find volunteer opportunities, community initiatives, or social services near you."
-  },
-  {
-    question: "Where can I find government contact information",
-    answer: "The Public Sectors section lists all ministries, government agencies, and public institutions. Each entry includes contact details, locations, and descriptions of their services."
-  },
-  {
-    question: "What subscription plans are available for a business page",
-    answer: "We offer three business plans: Basic ($39/month or $390/year) with up to 10 products, Pro ($69/month or $690/year) with up to 30 products and enhanced visibility, and Max ($99/month or $990/year) with up to 60 products and priority placement. NGOs and public sector organizations are always free."
-  },
-  {
-    question: "How can I contact TimorUp support",
-    answer: "Email us at hello@TimorUp.com or use the contact form on our website. We typically respond within 24 hours on business days."
-  }
+  { id: "faq-0", question: "What's the difference between Business Directories and Classified Ads", answer: "Business Directories are permanent listings for established businesses like restaurants, hotels, and shops complete with reviews, photos, and contact info. Classified Ads are temporary listings for buying, selling, or finding jobs, vehicles, property, and services. Think of it like the difference between a Yelp listing and a Craigslist post." },
+  { id: "faq-1", question: "How do I list my business on TimorUp", answer: "Click 'Add Your Listing' on the homepage, choose your listing type (Business, Classified Ad, NGO, or Government), fill in details, and submit. Business listings require a subscription plan; classified ads are free for the first few days." },
+  { id: "faq-2", question: "Are classified ads really free", answer: "Yes! Classified ads are free for the first 3 days. After that, you can renew for 7, 30, or 365 days at affordable rates. Business directory listings offer subscription plans with enhanced features." },
+  { id: "faq-3", question: "Can I list products or services directly", answer: "Absolutely! Business directory members can add products and services with photos, descriptions, and pricing. Browse the Products & Services section to see what's available from local businesses." },
+  { id: "faq-4", question: "How do I find NGOs or non-profit organizations", answer: "Visit the Non-Profits section to discover NGOs and charitable organizations in Timor-Leste. Filter by category to find volunteer opportunities, community initiatives, or social services near you." },
+  { id: "faq-5", question: "Where can I find government contact information", answer: "The Public Sectors section lists all ministries, government agencies, and public institutions. Each entry includes contact details, locations, and descriptions of their services." },
+  { id: "faq-6", question: "What subscription plans are available for a business page", answer: "We offer three business plans: Basic ($39/month or $390/year) with up to 10 products, Pro ($69/month or $690/year) with up to 30 products and enhanced visibility, and Max ($99/month or $990/year) with up to 60 products and priority placement. NGOs and public sector organizations are always free." },
+  { id: "faq-7", question: "How can I contact TimorUp support", answer: "Email us at hello@TimorUp.com or use the contact form on our website. We typically respond within 24 hours on business days." },
 ];
+
+const title = "Frequently Asked Questions";
+const description = "Find answers about TimorUp business directories, classified ads, NGOs, government services, and more.";
+const buttons = [{ label: "Contact Us", href: "mailto:hello@TimorUp.com" }];
 ---
 
 <Layout
   title="FAQ - Frequently Asked Questions"
-  description="Find answers about TimorUp business directories, classified ads, NGOs, government services, and more."
+  description={description}
   structuredData={faqSchema}
 >
-  <div class="container py-12 max-w-4xl">
-    <!-- Header -->
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
-      <p class="text-lg text-muted-foreground">
-        Discover local businesses, products & services near you
-      </p>
-    </div>
-
-    <!-- FAQ Grid -->
-    <Accordion
-      items={faqs.map((faq, index) => ({
-        id: `faq-${index}`,
-        title: faq.question,
-        content: faq.answer,
-      }))}
-      class="divide-y divide-border rounded-lg border"
-    />
-
-    <!-- CTA -->
-    <div class="mt-12 text-center bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-8">
-      <h2 class="text-2xl font-bold mb-4">Still have questions</h2>
-      <p class="text-muted-foreground mb-6">
-        Can't find what you're looking for Contact us directly.
-      </p>
-      <a href="mailto:hello@TimorUp.com" class="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity">
-        Contact Us
-      </a>
-    </div>
-  </div>
+  <Section>
+    <SectionContainer class="items-center text-center">
+      <div class="flex max-w-2xl flex-col items-center gap-5">
+        <h2 class="text-foreground text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          {title}
+        </h2>
+        <p class="text-muted-foreground text-lg leading-relaxed text-balance">
+          {description}
+        </p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-3">
+        {buttons.map(({ href, label, ...button }, index) => (
+          <Button
+            as="a"
+            href={href}
+            size="lg"
+            variant={button.variant ?? (index === 0 ? "default" : "secondary")}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+    </SectionContainer>
+    <SectionContainer>
+      <div class="mx-auto w-full max-w-3xl">
+        <Accordion collapsible>
+          {faqs.map((item) => (
+            <AccordionItem value={item.id}>
+              <AccordionTrigger>{item.question}</AccordionTrigger>
+              <AccordionContent>{item.answer}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </SectionContainer>
+  </Section>
 </Layout>
-

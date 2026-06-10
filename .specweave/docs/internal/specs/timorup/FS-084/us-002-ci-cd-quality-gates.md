@@ -4,7 +4,7 @@ feature: FS-084
 title: "CI/CD Quality Gates"
 status: completed
 priority: P1
-created: 2026-05-29
+created: 2026-06-09
 tldr: "**As a** DevOps engineer."
 project: timorup
 ---

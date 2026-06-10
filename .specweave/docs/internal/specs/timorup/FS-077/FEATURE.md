@@ -2,10 +2,10 @@
 id: FS-077
 title: "Test Configuration Fixes"
 type: feature
-status: in-progress
+status: completed
 priority: P1
 created: 2026-05-25
-lastUpdated: 2026-05-28
+lastUpdated: 2026-06-09
 tldr: "修复项目测试配置和 API 错误，确保所有测试可运行，API 返回正确数据。."
 complexity: high
 stakeholder_relevant: true
@@ -16,7 +16,7 @@ stakeholder_relevant: true
 ## TL;DR
 
 **What**: 修复项目测试配置和 API 错误，确保所有测试可运行，API 返回正确数据。.
-**Status**: in-progress | **Priority**: P1
+**Status**: completed | **Priority**: P1
 **User Stories**: 4
 
 ![Test Configuration Fixes illustration](assets\feature-fs-077.jpg)
@@ -29,7 +29,7 @@ stakeholder_relevant: true
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0077-test-config-fixes](../../../../../increments/0077-test-config-fixes/spec.md) | ⏳ in-progress | 2026-05-25 |
+| [0077-test-config-fixes](../../../../../increments/0077-test-config-fixes/spec.md) | ✅ completed | 2026-05-25 |
 
 ## User Stories
 

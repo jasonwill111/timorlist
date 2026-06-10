@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: high
 created: 2026-05-04
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Refactor R2 storage access from AWS SDK (S3-compatible API requiring credentials) to Cloudflare Workers R2 binding (`env.MEDIA_BUCKET.put()`), aligning with timorbuy architecture for consistent local development experience."
 complexity: medium
 stakeholder_relevant: true

@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-25T00:00:00.000Z
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "统一优化 light/dark 模式 UI/UX，提升移动端体验和可读性。确保所有页面在两种模式下都简洁易读。."
 complexity: high
 stakeholder_relevant: true

@@ -1,13 +1,14 @@
 ---
 increment: 0104-lib-consolidation
-title: "Lib Consolidation - Foundation Layer"
+title: Lib Consolidation - Foundation Layer
 type: refactor
 priority: P1
-status: pending
-created: 2026-06-04
+status: completed
+created: 2026-06-04T00:00:00.000Z
 project: TimorUp
 parent: 0103-fulldev-migration-refactor
-dependsOn: ["0103-fulldev-migration-refactor"]
+dependsOn:
+  - 0103-fulldev-migration-refactor
 ---
 
 # Increment 0104: Lib Consolidation - Foundation Layer
@@ -24,42 +25,42 @@ Refactor backend utility layer to eliminate duplications and create canonical im
 
 ### Result Type Consolidation
 
-- [ ] T-007: Create `src/lib/result.ts` — Canonical Result type with success/failure helpers
+- [x] T-007: Create `src/lib/result.ts` — Canonical Result type with success/failure helpers
   ```typescript
   export type Result<T, E = Error> = { ok: true; data: T } | { ok: false; error: E };
   export const success = <T>(data: T): Result<T> => ({ ok: true, data });
   export const failure = <E>(error: E): Result<never, E> => ({ ok: false, error });
   ```
-- [ ] T-010a: Delete duplicate Result from `src/lib/type-utils.ts`
-- [ ] T-010b: Delete duplicate Result from `src/lib/queries/result.ts`
-- [ ] T-011a: Update imports in all files using Result type
+- [x] T-010a: Delete duplicate Result from `src/lib/type-utils.ts`
+- [x] T-010b: Delete duplicate Result from `src/lib/queries/result.ts`
+- [x] T-011a: Update imports in all files using Result type
 
 ### Sanitization Consolidation
 
-- [ ] T-008: Create `src/lib/sanitize.ts` — Canonical escaping functions
+- [x] T-008: Create `src/lib/sanitize.ts` — Canonical escaping functions
   ```typescript
   export function escapeHtml(str: string): string { ... }
   export function sanitizeForAttribute(str: string): string { ... }
   export function sanitizeForInnerHtml(str: string): string { ... }
   ```
-- [ ] T-046a: Delete duplicate escapeHtml from `src/lib/modal.ts`
-- [ ] T-046b: Delete duplicate escapeHtml from `src/lib/utils.ts` (keep sanitization there)
-- [ ] T-011b: Update imports in all files using escapeHtml
+- [x] T-046a: Delete duplicate escapeHtml from `src/lib/modal.ts`
+- [x] T-046b: Delete duplicate escapeHtml from `src/lib/utils.ts` (keep sanitization there)
+- [x] T-011b: Update imports in all files using escapeHtml
 
 ### Environment Access Consolidation
 
-- [ ] T-009: Create `src/lib/env.ts` — Canonical env access
+- [x] T-009: Create `src/lib/env.ts` — Canonical env access
   ```typescript
   export function getDb(): D1Database { ... }
   export function getAuth(): Auth } { ... }
   export function getKV(): KVNamespace { ... }
   export function getMinimaxApiKey(): string { ... }
   ```
-- [ ] T-011c: Update imports in all files using env access
+- [x] T-011c: Update imports in all files using env access
 
 ### API Helpers
 
-- [ ] T-042: Create `src/lib/api-helpers.ts`
+- [x] T-042: Create `src/lib/api-helpers.ts`
   ```typescript
   export function getErrorMessage(error: unknown): string { ... }
   export function jsonResponse(data: unknown, status = 200): Response { ... }
@@ -68,7 +69,7 @@ Refactor backend utility layer to eliminate duplications and create canonical im
 
 ### API Cache Helpers
 
-- [ ] T-043: Create `src/lib/api-cache.ts`
+- [x] T-043: Create `src/lib/api-cache.ts`
   ```typescript
   export function cacheResponse(response: Response, ttl: number): Response { ... }
   export async function getCachedResponse(key: string): Promise<Response | null> { ... }
@@ -76,7 +77,7 @@ Refactor backend utility layer to eliminate duplications and create canonical im
 
 ### API Middleware
 
-- [ ] T-044: Create `src/lib/api-middleware.ts`
+- [x] T-044: Create `src/lib/api-middleware.ts`
   ```typescript
   export function withAuth(handler: (request: Request, user: User) => Promise<Response>): Handler { ... }
   export function withRateLimit(handler: Handler, limit: number): Handler { ... }
@@ -84,12 +85,12 @@ Refactor backend utility layer to eliminate duplications and create canonical im
 
 ### Type Utils Cleanup
 
-- [ ] T-047: Merge `src/lib/type-guards.ts` into `src/lib/type-utils.ts` (65 lines merge)
-- [ ] T-048: Delete `src/lib/constants.ts` re-export shim
+- [x] T-047: Merge `src/lib/type-guards.ts` into `src/lib/type-utils.ts` (65 lines merge)
+- [x] T-048: Delete `src/lib/constants.ts` re-export shim
 
 ### Update API Endpoints
 
-- [ ] T-045: Update all API files to use new lib helpers
+- [x] T-045: Update all API files to use new lib helpers
 
 ## Files to Modify
 
@@ -140,13 +141,13 @@ npx wrangler deploy --env production
 
 ## Acceptance Criteria
 
-- [ ] `pnpm build` exits 0
-- [ ] All API endpoints respond correctly
-- [ ] No duplicate Result type definitions
-- [ ] No duplicate escapeHtml implementations
-- [ ] Env access consolidated to single module
-- [ ] All imports updated to canonical locations
-- [ ] E2E tests pass (14/14 pages)
+- [x] `pnpm build` exits 0
+- [x] All API endpoints respond correctly
+- [x] No duplicate Result type definitions
+- [x] No duplicate escapeHtml implementations
+- [x] Env access consolidated to single module
+- [x] All imports updated to canonical locations
+- [x] E2E tests pass (14/14 pages)
 
 ## Estimated Reduction
 

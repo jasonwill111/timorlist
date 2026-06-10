@@ -1,10 +1,10 @@
 ---
 increment: 0137-admin-innerhtml-migration
-title: "Admin innerHTML Migration to Astro Components"
+title: Admin innerHTML Migration to Astro Components
 type: refactor
 priority: P1
-status: planned
-created: 2026-06-07
+status: completed
+created: 2026-06-07T00:00:00.000Z
 structure: user-stories
 test_mode: TDD
 coverage_target: 80
@@ -26,10 +26,10 @@ Replace innerHTML string-generation DOM patterns with proper Astro component arc
 **So that** the codebase is type-safe, maintainable, and AI-editable at the component level
 
 **Acceptance Criteria**:
-- [ ] **AC-US1-01**: All 13 admin pages (`src/pages/admin/*.astro`) no longer use `.innerHTML = \`...\`` for list rendering
-- [ ] **AC-US1-02**: Each admin page has a corresponding island component (`src/components/islands/admin/*.astro`) that receives data via props and renders list items as Astro/HTML markup
-- [ ] **AC-US1-03**: Server-side initial data is passed as serialized JSON props to islands (not fetched client-side for initial render)
-- [ ] **AC-US1-04**: TypeScript interfaces are defined for each entity list (users, products, businesses, etc.)
+- [x] **AC-US1-01**: All 13 admin pages (`src/pages/admin/*.astro`) no longer use `.innerHTML = \`...\`` for list rendering
+- [x] **AC-US1-02**: Each admin page has a corresponding island component (`src/components/islands/admin/*.astro`) that receives data via props and renders list items as Astro/HTML markup
+- [x] **AC-US1-03**: Server-side initial data is passed as serialized JSON props to islands (not fetched client-side for initial render)
+- [x] **AC-US1-04**: TypeScript interfaces are defined for each entity list (users, products, businesses, etc.)
 
 ---
 
@@ -41,10 +41,10 @@ Replace innerHTML string-generation DOM patterns with proper Astro component arc
 **So that** forms are type-safe, accessible, and use the existing shadcn/ui component library
 
 **Acceptance Criteria**:
-- [ ] **AC-US2-01**: Each admin page's create/edit modal is a dedicated Astro island component
-- [ ] **AC-US2-02**: Modals use existing `Button`, `Input`, `Select`, `Textarea` components from `@/components/ui/`
-- [ ] **AC-US2-03**: Modal open/close state is managed client-side; form data submission uses `astro:actions`
-- [ ] **AC-US2-04**: No inline SVG or raw HTML strings in modal templates — all UI via shadcn components
+- [x] **AC-US2-01**: Each admin page's create/edit modal is a dedicated Astro island component
+- [x] **AC-US2-02**: Modals use existing `Button`, `Input`, `Select`, `Textarea` components from `@/components/ui/`
+- [x] **AC-US2-03**: Modal open/close state is managed client-side; form data submission uses `astro:actions`
+- [x] **AC-US2-04**: No inline SVG or raw HTML strings in modal templates — all UI via shadcn components
 
 ---
 
@@ -56,10 +56,10 @@ Replace innerHTML string-generation DOM patterns with proper Astro component arc
 **So that** data fetching is reusable, testable, and separated from page rendering
 
 **Acceptance Criteria**:
-- [ ] **AC-US3-01**: Admin pages import query functions from `src/lib/db/queries/` instead of inlining `db.select()` calls
-- [ ] **AC-US3-02**: Each query function has TypeScript return types matching the entity interface
-- [ ] **AC-US3-03**: Query functions are located in `src/lib/db/queries/admin/` subdirectory
-- [ ] **AC-US3-04**: Frontmatter in admin pages contains ONLY: imports, `prerender` flag, data fetching calls, and layout props — no business logic
+- [x] **AC-US3-01**: Admin pages import query functions from `src/lib/db/queries/` instead of inlining `db.select()` calls
+- [x] **AC-US3-02**: Each query function has TypeScript return types matching the entity interface
+- [x] **AC-US3-03**: Query functions are located in `src/lib/db/queries/admin/` subdirectory
+- [x] **AC-US3-04**: Frontmatter in admin pages contains ONLY: imports, `prerender` flag, data fetching calls, and layout props — no business logic
 
 ---
 
@@ -71,9 +71,9 @@ Replace innerHTML string-generation DOM patterns with proper Astro component arc
 **So that** the refactor is verified complete and shippable
 
 **Acceptance Criteria**:
-- [ ] **AC-US4-01**: `pnpm exec -- astro build` completes without errors
-- [ ] **AC-US4-02**: No `innerHTML` string assignment patterns remain in admin pages (grep verified)
-- [ ] **AC-US4-03**: E2E tests pass for admin pages (`npx playwright test e2e/admin.spec.ts`)
+- [x] **AC-US4-01**: `pnpm exec -- astro build` completes without errors
+- [x] **AC-US4-02**: No `innerHTML` string assignment patterns remain in admin pages (grep verified)
+- [x] **AC-US4-03**: E2E tests pass for admin pages (`npx playwright test e2e/admin.spec.ts`)
 
 ## Pages in Scope
 

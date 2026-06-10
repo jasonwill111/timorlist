@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "优化缓存策略，提升 Free Plan 承载能力至 25-30万 PV/月."
 complexity: high
 stakeholder_relevant: true

@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P2
 created: 2026-05-04
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Componenti."
 complexity: medium
 stakeholder_relevant: true

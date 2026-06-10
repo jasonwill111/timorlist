@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "Add transactions for multi-step ops, fix N+1 queries, add missing indexes, add pagination to list endpoints."
 complexity: high
 stakeholder_relevant: true

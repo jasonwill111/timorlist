@@ -1,0 +1,15 @@
+{
+  "id": "0156-data-layer-extraction",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P0",
+  "created": "2026-06-08T12:29:36.112Z",
+  "lastActivity": "2026-06-08T16:21:53.736Z",
+  "testMode": "test-after",
+  "project": "timorup",
+  "summary": "Extract all remaining inline DB logic from page frontmatter into src/lib/db/queries/ query functions",
+  "externalLinks": {},
+  "coverageTarget": 80,
+  "readyForReviewAt": "2026-06-08T16:21:53.643Z",
+  "approvedAt": "2026-06-08T16:21:53.736Z"
+}

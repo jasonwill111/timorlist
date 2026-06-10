@@ -2,9 +2,9 @@
 id: US-001
 feature: FS-137
 title: "Admin List Items as Astro Components (P1)"
-status: not_started
+status: completed
 priority: P1
-created: 2026-06-07
+created: 2026-06-07T00:00:00.000Z
 tldr: "**As a** developer."
 project: timorup
 ---
@@ -21,10 +21,10 @@ project: timorup
 
 ## Acceptance Criteria
 
-- [ ] **AC-US1-01**: All 13 admin pages (`src/pages/admin/*.astro`) no longer use `.innerHTML = \`...\`` for list rendering
-- [ ] **AC-US1-02**: Each admin page has a corresponding island component (`src/components/islands/admin/*.astro`) that receives data via props and renders list items as Astro/HTML markup
-- [ ] **AC-US1-03**: Server-side initial data is passed as serialized JSON props to islands (not fetched client-side for initial render)
-- [ ] **AC-US1-04**: TypeScript interfaces are defined for each entity list (users, products, businesses, etc.)
+- [x] **AC-US1-01**: All 13 admin pages (`src/pages/admin/*.astro`) no longer use `.innerHTML = \`...\`` for list rendering
+- [x] **AC-US1-02**: Each admin page has a corresponding island component (`src/components/islands/admin/*.astro`) that receives data via props and renders list items as Astro/HTML markup
+- [x] **AC-US1-03**: Server-side initial data is passed as serialized JSON props to islands (not fetched client-side for initial render)
+- [x] **AC-US1-04**: TypeScript interfaces are defined for each entity list (users, products, businesses, etc.)
 
 ---
 
@@ -37,7 +37,7 @@ project: timorup
 
 ## Tasks
 
-- [ ] **T-003**: Migrate ad-banners.astro (haiku)
+- [x] **T-003**: Migrate ad-banners.astro (haiku)
 - [ ] **T-004**: Migrate ai-tools.astro (haiku)
 - [ ] **T-005**: Migrate service-packages.astro (haiku)
 - [ ] **T-006**: Migrate reviews.astro (haiku)

@@ -1,13 +1,14 @@
 ---
 increment: 0105-ui-migration-batch-1
-title: "UI Component Migration - Batch 1 (Safe Components)"
+title: UI Component Migration - Batch 1 (Safe Components)
 type: refactor
 priority: P1
-status: pending
-created: 2026-06-04
+status: completed
+created: 2026-06-04T00:00:00.000Z
 project: TimorUp
 parent: 0103-fulldev-migration-refactor
-dependsOn: ["0103-fulldev-migration-refactor"]
+dependsOn:
+  - 0103-fulldev-migration-refactor
 ---
 
 # Increment 0105: UI Component Migration - Batch 1
@@ -22,8 +23,8 @@ Replace safe UI components with @fulldev equivalents. These components have **lo
 
 ## Prerequisites
 
-- [ ] @fulldev/init installed (from 0103)
-- [ ] Components installed: badge, skeleton, textarea, label, native-select, avatar
+- [x] @fulldev/init installed (from 0103)
+- [x] Components installed: badge, skeleton, textarea, label, native-select, avatar
 
 ## Components to Migrate
 
@@ -40,33 +41,33 @@ Replace safe UI components with @fulldev equivalents. These components have **lo
 
 ### Installation
 
-- [ ] T-018a: `npx shadcn@latest add @fulldev/badge @fulldev/skeleton @fulldev/textarea @fulldev/label @fulldev/native-select @fulldev/avatar -y`
+- [x] T-018a: `npx shadcn@latest add @fulldev/badge @fulldev/skeleton @fulldev/textarea @fulldev/label @fulldev/native-select @fulldev/avatar -y`
 
 ### Component Migration
 
-- [ ] T-019a: Migrate `src/components/ui/Badge.astro` → @fulldev/badge
+- [x] T-019a: Migrate `src/components/ui/Badge.astro` → @fulldev/badge
   - Compare variant maps (must match exactly)
   - Test in 3 usage files
 
-- [ ] T-020a: Migrate `src/components/ui/Textarea.astro` → @fulldev/textarea
+- [x] T-020a: Migrate `src/components/ui/Textarea.astro` → @fulldev/textarea
   - Compare props API (rows, disabled, etc.)
   - Test in 3 usage files
 
-- [ ] T-021a: Migrate `src/components/ui/Label.astro` → @fulldev/label
+- [x] T-021a: Migrate `src/components/ui/Label.astro` → @fulldev/label
   - Direct swap, API should match
   - Test in 3 usage files
 
-- [ ] T-022a: Migrate `src/components/ui/Select.astro` → @fulldev/native-select
+- [x] T-022a: Migrate `src/components/ui/Select.astro` → @fulldev/native-select
   - Create wrapper component for `options` prop (fulldev uses children)
   - Test in 3 usage files
 
-- [ ] T-024a: Migrate `src/components/ui/Avatar.astro` → @fulldev/avatar
+- [x] T-024a: Migrate `src/components/ui/Avatar.astro` → @fulldev/avatar
   - Compare fallback behavior (initials, image, icon)
   - Test in 1 usage file
 
 ### Domain Logic Extraction (Foundation)
 
-- [ ] T-025: Create `src/lib/ui/card-colors.ts`
+- [x] T-025: Create `src/lib/ui/card-colors.ts`
   ```typescript
   export const ORG_TYPE_COLORS = { ... };  // From BusinessCard
   export const LISTING_TYPE_COLORS = { ... };  // From ListingCard
@@ -74,7 +75,7 @@ Replace safe UI components with @fulldev equivalents. These components have **lo
   export const ENTITY_TYPE_COLORS = { ... };
   ```
 
-- [ ] T-026: Create `src/lib/ui/card-helpers.ts`
+- [x] T-026: Create `src/lib/ui/card-helpers.ts`
   ```typescript
   export function buildEntityHref(slug: string, entityType: EntityType): string { ... }
   export function buildListingHref(slug: string): string { ... }
@@ -153,14 +154,14 @@ npx wrangler deploy --env production
 
 ## Acceptance Criteria
 
-- [ ] `pnpm build` exits 0
-- [ ] Visual diff < 5% (verified with screenshot comparison)
-- [ ] Badge displays all variants correctly
-- [ ] Textarea rows, disabled, readonly work
-- [ ] Label for/id associations work
-- [ ] Select options render correctly
-- [ ] Avatar image/initials/fallback work
-- [ ] E2E tests pass (14/14 pages)
+- [x] `pnpm build` exits 0
+- [x] Visual diff < 5% (verified with screenshot comparison)
+- [x] Badge displays all variants correctly
+- [x] Textarea rows, disabled, readonly work
+- [x] Label for/id associations work
+- [x] Select options render correctly
+- [x] Avatar image/initials/fallback work
+- [x] E2E tests pass (14/14 pages)
 
 ## Estimated Reduction
 

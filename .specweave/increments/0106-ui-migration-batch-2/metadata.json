@@ -1,0 +1,13 @@
+{
+  "id": "0106-ui-migration-batch-2",
+  "status": "completed",
+  "type": "feature",
+  "created": "2026-06-07T06:21:58.017Z",
+  "lastActivity": "2026-06-08T10:05:43.024Z",
+  "externalLinks": {},
+  "priority": "medium",
+  "testMode": "test-after",
+  "coverageTarget": 80,
+  "readyForReviewAt": "2026-06-08T10:05:42.586Z",
+  "approvedAt": "2026-06-08T10:05:43.024Z"
+}

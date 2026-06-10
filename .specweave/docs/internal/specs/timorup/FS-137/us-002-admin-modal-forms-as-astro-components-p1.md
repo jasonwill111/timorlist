@@ -2,9 +2,9 @@
 id: US-002
 feature: FS-137
 title: "Admin Modal Forms as Astro Components (P1)"
-status: not_started
+status: completed
 priority: P1
-created: 2026-06-07
+created: 2026-06-07T00:00:00.000Z
 tldr: "**As a** developer."
 project: timorup
 ---
@@ -21,10 +21,10 @@ project: timorup
 
 ## Acceptance Criteria
 
-- [ ] **AC-US2-01**: Each admin page's create/edit modal is a dedicated Astro island component
-- [ ] **AC-US2-02**: Modals use existing `Button`, `Input`, `Select`, `Textarea` components from `@/components/ui/`
-- [ ] **AC-US2-03**: Modal open/close state is managed client-side; form data submission uses `astro:actions`
-- [ ] **AC-US2-04**: No inline SVG or raw HTML strings in modal templates — all UI via shadcn components
+- [x] **AC-US2-01**: Each admin page's create/edit modal is a dedicated Astro island component
+- [x] **AC-US2-02**: Modals use existing `Button`, `Input`, `Select`, `Textarea` components from `@/components/ui/`
+- [x] **AC-US2-03**: Modal open/close state is managed client-side; form data submission uses `astro:actions`
+- [x] **AC-US2-04**: No inline SVG or raw HTML strings in modal templates — all UI via shadcn components
 
 ---
 
@@ -37,7 +37,7 @@ project: timorup
 
 ## Tasks
 
-- [ ] **T-003**: Migrate ad-banners.astro (haiku)
+- [x] **T-003**: Migrate ad-banners.astro (haiku)
 - [ ] **T-004**: Migrate ai-tools.astro (haiku)
 - [ ] **T-005**: Migrate service-packages.astro (haiku)
 - [ ] **T-006**: Migrate reviews.astro (haiku)

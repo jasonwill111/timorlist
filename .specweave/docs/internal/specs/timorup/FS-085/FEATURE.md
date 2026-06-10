@@ -4,8 +4,8 @@ title: "Content Refresh: About, Pricing, FAQ, Contact"
 type: feature
 status: completed
 priority: P1
-created: 2026-05-27
-lastUpdated: 2026-05-27
+created: 2026-06-09
+lastUpdated: 2026-06-09
 tldr: "Refresh static page content to reflect TimorUp's unified positioning as Timor-Leste's 4-in-1 local info platform: Business Directory + Online Shop + Classified Ads + Public Services."
 complexity: high
 stakeholder_relevant: true
@@ -29,7 +29,7 @@ Refresh static page content to reflect TimorUp's unified positioning as Timor-Le
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0085-content-refresh-about-pricing](../../../../../increments/0085-content-refresh-about-pricing/spec.md) | ✅ completed | 2026-05-27 |
+| [0085-content-refresh-about-pricing](../../../../../increments/0085-content-refresh-about-pricing/spec.md) | ✅ completed | 2026-06-09 |
 
 ## User Stories
 

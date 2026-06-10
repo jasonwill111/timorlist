@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-27
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "媒体上传管道重构，统一错误处理，提取验证逻辑到可复用模块。."
 complexity: high
 stakeholder_relevant: true

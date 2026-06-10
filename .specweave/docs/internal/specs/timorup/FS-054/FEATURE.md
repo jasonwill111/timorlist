@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-14
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Add sitemap.xml generator and BreadcrumbList JSON-LD for all detail pages to improve search engine indexing."
 complexity: medium
 stakeholder_relevant: true

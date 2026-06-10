@@ -4,8 +4,8 @@ title: "SPEC.md �?0001-typescript-safety"
 type: feature
 status: completed
 priority: P1
-created: 2026-05-27
-lastUpdated: 2026-05-27
+created: 2026-06-09
+lastUpdated: 2026-06-09
 tldr: "SPEC.md �?0001-typescript-safety"
 complexity: high
 stakeholder_relevant: true
@@ -25,7 +25,7 @@ stakeholder_relevant: true
 
 | Increment | Status | Completion Date |
 |-----------|--------|----------------|
-| [0001-typescript-safety](../../../../../increments/0001-typescript-safety/spec.md) | ✅ completed | 2026-05-27 |
+| [0001-typescript-safety](../../../../../increments/0001-typescript-safety/spec.md) | ✅ completed | 2026-06-09 |
 
 ## User Stories
 

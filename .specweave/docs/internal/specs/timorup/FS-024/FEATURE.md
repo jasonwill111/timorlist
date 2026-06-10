@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P2
 created: 2026-05-03
-lastUpdated: 2026-05-27
+lastUpdated: 2026-06-09
 tldr: "Extract business list and category filter to Server Islands with server-side pagination, filtering, and URL params."
 complexity: high
 stakeholder_relevant: true

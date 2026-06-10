@@ -1,14 +1,14 @@
 ---
 increment: 0110-admin-pages-migration
-title: "Admin Pages UI Component Migration"
+title: Admin Pages UI Component Migration
 type: refactor
 priority: P1
-status: pending
-created: 2026-06-04
+status: completed
+created: 2026-06-04T00:00:00.000Z
 structure: user-stories
 test_mode: manual-e2e
 project: TimorUp
-production: https://timorup.jasonwill.workers.dev
+production: 'https://timorup.jasonwill.workers.dev'
 ---
 
 # Refactor: Admin Pages UI Component Migration
@@ -16,25 +16,25 @@ production: https://timorup.jasonwill.workers.dev
 ## User Stories
 
 ### US-1: Admin Users
-- [ ] admin/users.astro uses Input, Badge, Avatar, Button
+- [x] admin/users.astro uses Input, Badge, Avatar, Button
 - [ ] pnpm build exits 0
 
 ### US-2: Admin Businesses
-- [ ] admin/businesses.astro uses Input, Badge, Avatar, Tabs
+- [x] admin/businesses.astro uses Input, Badge, Avatar, Tabs
 - [ ] pnpm build exits 0
 
 ### US-3: Admin Categories
-- [ ] admin/categories.astro uses Input, Badge, Tabs
+- [x] admin/categories.astro uses Input, Badge, Tabs
 - [ ] pnpm build exits 0
 
 ### US-4: Admin Products
-- [ ] admin/products.astro uses Input, Badge, Tabs, Avatar
+- [x] admin/products.astro uses Input, Badge, Tabs, Avatar
 - [ ] pnpm build exits 0
 
 ### US-5: Admin Listings
-- [ ] admin/listings/index.astro uses Input, Badge, Avatar
-- [ ] admin/listings/new/index.astro uses Input, Tabs
-- [ ] admin/listings/[id]/edit/index.astro uses Input, Tabs
+- [x] admin/listings/index.astro uses Input, Badge, Avatar
+- [x] admin/listings/new/index.astro uses Input, Tabs
+- [x] admin/listings/[id]/edit/index.astro uses Input, Tabs
 - [ ] pnpm build exits 0
 
 ### US-6: Admin Blogs/AI/Orders/Reviews/ServicePackages/Media/Settings

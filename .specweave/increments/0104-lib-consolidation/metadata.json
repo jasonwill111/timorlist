@@ -1,0 +1,13 @@
+{
+  "id": "0104-lib-consolidation",
+  "status": "completed",
+  "type": "feature",
+  "created": "2026-06-07T06:21:58.002Z",
+  "lastActivity": "2026-06-08T09:58:21.351Z",
+  "externalLinks": {},
+  "priority": "medium",
+  "testMode": "test-after",
+  "coverageTarget": 80,
+  "readyForReviewAt": "2026-06-08T09:58:21.037Z",
+  "approvedAt": "2026-06-08T09:58:21.351Z"
+}

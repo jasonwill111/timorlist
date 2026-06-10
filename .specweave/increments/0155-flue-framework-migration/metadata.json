@@ -1,0 +1,19 @@
+{
+  "id": "0155-flue-framework-migration",
+  "status": "completed",
+  "type": "feature",
+  "priority": "P1",
+  "created": "2026-06-08T10:46:02.726Z",
+  "lastActivity": "2026-06-08T16:28:10.638Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-08T16:28:10.558Z",
+  "approvedAt": "2026-06-08T16:28:10.638Z"
+}

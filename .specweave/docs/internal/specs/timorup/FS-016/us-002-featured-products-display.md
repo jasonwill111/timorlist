@@ -4,7 +4,7 @@ feature: FS-016
 title: "Featured Products Display"
 status: not_started
 priority: P1
-created: 2026-05-27
+created: 2026-06-09
 tldr: "As a visitor, I want to see featured products/services so I can browse what's available."
 project: TimorUp
 ---

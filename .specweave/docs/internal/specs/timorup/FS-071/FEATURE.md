@@ -1,29 +1,29 @@
 ---
 id: FS-071
-title: "Lucide Icons & Motion Animation Integration"
+title: "Lucide Icons & CSS Animation Integration"
 type: feature
 status: completed
 priority: P1
 created: 2026-05-20T00:00:00.000Z
-lastUpdated: 2026-05-27
-tldr: "统一项目中所有图标为 Lucide，并增强 MotionAnimations 组件的集成使用。消除内联 SVG 混用，统一图标管理，同时提升 UI 动效体验。."
+lastUpdated: 2026-06-09
+tldr: "统一项目中所有图标为 Lucide，并增强 CSS 动画集成。消除内联 SVG 混用，统一图标管理，同时使用 Tailwind-first 的 CSS 动画方案。."
 complexity: medium
 stakeholder_relevant: true
 ---
 
-# Lucide Icons & Motion Animation Integration
+# Lucide Icons & CSS Animation Integration
 
 ## TL;DR
 
-**What**: 统一项目中所有图标为 Lucide，并增强 MotionAnimations 组件的集成使用。消除内联 SVG 混用，统一图标管理，同时提升 UI 动效体验。.
+**What**: 统一项目中所有图标为 Lucide，并增强 CSS 动画集成。消除内联 SVG 混用，统一图标管理，同时使用 Tailwind-first 的 CSS 动画方案。.
 **Status**: completed | **Priority**: P1
 **User Stories**: 3
 
-![Lucide Icons & Motion Animation Integration illustration](assets\feature-fs-071.jpg)
+![Lucide Icons & CSS Animation Integration illustration](assets\feature-fs-071.jpg)
 
 ## Overview
 
-统一项目中所有图标为 Lucide，并增强 MotionAnimations 组件的集成使用。消除内联 SVG 混用，统一图标管理，同时提升 UI 动效体验。
+统一项目中所有图标为 Lucide，并增强 CSS 动画集成。消除内联 SVG 混用，统一图标管理，同时使用 Tailwind-first 的 CSS 动画方案。
 
 ## Implementation History
 
@@ -34,5 +34,5 @@ stakeholder_relevant: true
 ## User Stories
 
 - [US-001: Unified LucideIcon Component](./us-001-unified-lucideicon-component.md)
-- [US-002: MotionAnimations Integration in Core Layouts](./us-002-motionanimations-integration-in-core-layouts.md)
+- [US-002: CSS Animation Integration in Core Layouts](./us-002-css-animation-integration-in-core-layouts.md)
 - [US-003: Scroll-Triggered Animations for List Pages](./us-003-scroll-triggered-animations-for-list-pages.md)

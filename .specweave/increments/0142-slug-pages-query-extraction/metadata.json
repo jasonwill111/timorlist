@@ -1,0 +1,19 @@
+{
+  "id": "0142-slug-pages-query-extraction",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-07T10:56:12.619Z",
+  "lastActivity": "2026-06-07T15:07:12.175Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "readyForReviewAt": "2026-06-07T14:58:21.216Z",
+  "approvedAt": "2026-06-07T15:07:12.176Z"
+}

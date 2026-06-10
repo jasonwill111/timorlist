@@ -1,0 +1,18 @@
+{
+  "id": "0144-starwind-integration-cleanup",
+  "status": "completed",
+  "type": "refactor",
+  "priority": "P1",
+  "created": "2026-06-07T10:57:06.043Z",
+  "lastActivity": "2026-06-08T03:36:38.589Z",
+  "testMode": "TDD",
+  "coverageTarget": 80,
+  "feature_id": null,
+  "epic_id": null,
+  "externalLinks": {},
+  "planning": {
+    "parallel": false
+  },
+  "project": "TimorUp",
+  "approvedAt": "2026-06-08T03:36:38.591Z"
+}

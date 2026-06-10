@@ -5,7 +5,7 @@ type: feature
 status: completed
 priority: P1
 created: 2026-05-29
-lastUpdated: 2026-05-29
+lastUpdated: 2026-06-09
 tldr: "Fix critical security gaps in auth flow: add rate limiting to signIn/signUp, configure secure cookie flags, add password complexity validation, and standardi."
 complexity: high
 stakeholder_relevant: true
