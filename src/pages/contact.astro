@@ -2,7 +2,6 @@
 import Layout from '../layouts/Layout.astro';
 import { Button } from '@/components/fulldev/button';
 import { Textarea } from '@/components/fulldev/textarea';
-import { Select } from '@/components/fulldev/select';
 import { Input } from '@/components/fulldev/input';
 import { Label } from '@/components/fulldev/label';
 
@@ -50,29 +49,31 @@ export const prerender = true;
             />
           </div>
           <div>
-            <Select
+            <Label for="subject">Subject *</Label>
+            <select
               id="subject"
               name="subject"
               required
-              options={[
-                { value: "", label: "Select a topic" },
-                { value: "listing", label: "Listing Inquiry" },
-                { value: "support", label: "Technical Support" },
-                { value: "partnership", label: "Partnership Opportunity" },
-                { value: "feedback", label: "Feedback" },
-                { value: "other", label: "Other" },
-              ]}
-            />
+              class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Select a topic</option>
+              <option value="listing">Listing Inquiry</option>
+              <option value="support">Technical Support</option>
+              <option value="partnership">Partnership Opportunity</option>
+              <option value="feedback">Feedback</option>
+              <option value="other">Other</option>
+            </select>
           </div>
           <div>
             <Label for="message">Message *</Label>
-          <Textarea
-            id="message"
-            name="message"
-            rows="5"
-            required
-            placeholder="How can we help you?"
-          />
+            <Textarea
+              id="message"
+              name="message"
+              rows="5"
+              required
+              class="w-full px-4 py-2 border rounded-lg bg-background"
+              placeholder="How can we help you?"
+            />
           </div>
           <Button variant="primary" class="w-full" type="submit">
             Send Message
@@ -87,21 +88,21 @@ export const prerender = true;
           <h3 class="font-bold mb-4">Email Us</h3>
           <div class="space-y-3">
             <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <div>
                 <p class="font-medium">General Inquiries</p>
-                <a href="mailto:hello@TimorUp.com" class="text-primary hover:underline">hello@TimorUp.com</a>
+                <a href="mailto:hello@timorup.com" class="text-primary hover:underline">hello@timorup.com</a>
               </div>
             </div>
             <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
               <div>
                 <p class="font-medium">Support</p>
-                <a href="mailto:support@TimorUp.com" class="text-primary hover:underline">support@TimorUp.com</a>
+                <a href="mailto:support@timorup.com" class="text-primary hover:underline">support@timorup.com</a>
               </div>
             </div>
           </div>
@@ -110,7 +111,7 @@ export const prerender = true;
         <div class="bg-card border rounded-xl p-6">
           <h3 class="font-bold mb-4">Location</h3>
           <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -174,4 +175,3 @@ export const prerender = true;
     }, 1500);
   });
 </script>
-
