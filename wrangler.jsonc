@@ -19,7 +19,7 @@
       "binding": "DB",
       "database_name": "timorup-db",
       "database_id": "45346e9c-d19c-4acb-85f1-ebf6cb581fc5",
-      "remote": true
+      "remote": false
     }
   ],
   "kv_namespaces": [
@@ -27,7 +27,7 @@
       "binding": "SESSION",
       "id": "3e9ae14a105b4aa48316eaa029f5bc5f",
       "preview_id": "3e9ae14a105b4aa48316eaa029f5bc5f",
-      "remote": true
+      "remote": false
     }
   ],
   "r2_buckets": [
@@ -35,7 +35,7 @@
       "binding": "MEDIA_BUCKET",
       "bucket_name": "timorup-media",
       "preview_bucket_name": "timorup-media",
-      "remote": true
+      "remote": false
     }
   ],
   // --- Secret / Environment Variables ---
