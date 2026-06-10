@@ -1,6 +1,6 @@
 # Component Standards
 
-> **Status**: Active | **Version**: 2.0 | **Updated**: 2026-06-09
+> **Status**: Active | **Version**: 2.1 | **Updated**: 2026-06-10
 
 This document defines the component library strategy for TimorUp, covering which library to use for each component type and the deprecation policy for overlapping components.
 
@@ -8,12 +8,8 @@ This document defines the component library strategy for TimorUp, covering which
 
 ## Library Overview
 
-| Library | Components | Type | Use For |
-|---------|-----------|------|---------|
-| **Fulldev** | 57 | Headless + Tailwind | Core form, button, card, dialog components |
-| **Starwind** | 15 (13 active) | Astro-native | Unique components (pagination, dropzone, etc.) |
-
-> **Note**: Starwind button and input have been **deleted** (2026-06-09). Use Fulldev equivalents exclusively.
+| **Fulldev** | 71+ | Headless + Tailwind | Core form, button, card, dialog components |
+| **Starwind** | 13 | Astro-native | Unique components (pagination, dropzone, etc.) |
 
 ---
 
@@ -146,9 +142,8 @@ import { getBlogListing } from '@/lib/db/queries/blog-listing';
 
 ## Why This Split?
 
-- **Fulldev**: 57 headless components with cva() variants, active maintenance, wide adoption. Used for all standard UI elements.
+- **Fulldev**: 71+ headless components with cva() variants, active maintenance, wide adoption. Used for all standard UI elements.
 - **Starwind**: 13 specialty Astro-native components without JS framework overhead. Used only for components Fulldev does not cover.
-- **Deleted**: Starwind Button and Input were duplicates of Fulldev — removed to eliminate maintenance burden and ensure single source of truth.
 
 ### Coexistence Strategy
 

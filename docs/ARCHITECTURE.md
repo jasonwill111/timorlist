@@ -46,10 +46,8 @@ All `.astro` files MUST have exactly ONE frontmatter block delimited by `---`. A
 
 ```astro
 ---
-// ✅ Correct - everything inside single frontmatter
-import Button from '@/components/ui/Button.astro';
-import Input from '@/components/ui/Input.astro';
-
+import Button from '@/components/fulldev/button';
+import Input from '@/components/fulldev/input';
 interface Props { name: string; }
 const { name } = Astro.props;
 export const prerender = true;
@@ -60,11 +58,7 @@ export const prerender = true;
 
 ```astro
 <!-- ❌ Wrong - imports outside frontmatter fence -->
-import Button from '@/components/ui/Button.astro';
----
----
-// This creates invalid dual-frontmatter pattern!
-import Input from '@/components/ui/Input.astro';
+import Button from '@/components/fulldev/button';
 ---
 
 <template>...</template>

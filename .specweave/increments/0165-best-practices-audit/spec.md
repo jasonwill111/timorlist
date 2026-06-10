@@ -53,10 +53,10 @@ coverage_target: 100
 **So that** 符合框架预期行为
 
 **Acceptance Criteria**:
-- [x] **AC-0165-US3-01**: `withCloudflare()` 使用单个 config 对象（不是两个参数）
-- [x] **AC-0165-US3-02**: 移除 `database: undefined`（better-auth 1.6 省略此 key）
-- [x] **AC-0165-US3-03**: 移除 `secure: import.meta.env.PROD`（better-auth 从 baseURL 协议自动推导）
-- [x] **AC-0165-US3-04**: Vite build 通过
+> ⚠️ 注意：正确的 `withCloudflare()` API 是双参数调用 `withCloudflare(cloudflareOptions, betterAuthOptions)`（已在 0167 中修正）
+- [x] **AC-0165-US3-01a**: 移除 `database: undefined`（better-auth 1.6 省略此 key）
+- [x] **AC-0165-US3-01b**: 移除 `secure: import.meta.env.PROD`（better-auth 从 baseURL 协议自动推导）
+- [x] **AC-0165-US3-02**: Vite build 通过
 
 ### US-004: 移除 signIn 双重 rate limiting
 **Project**: TimorUp
@@ -135,6 +135,6 @@ coverage_target: 100
 ## Notes
 
 - `ViewTransitions` 是 Astro 6 内置组件，在 `.astro` 文件中无需 import，直接使用 `<ViewTransitions />`
-- `better-auth 1.6+` 的 `withCloudflare()` 只接受一个 config 对象，内部合并平台默认值
+- ⚠️ 更正：`withCloudflare()` 接受两个参数 `withCloudflare(cloudflareOptions, betterAuthOptions)`（已在 0167 中修正）
 - Cloudflare Workers `HSTS` header 在边缘强制 HTTPS，降级攻击防护必需
 - CSP `img-src` 从 `'self' data: https: blob:'` 收紧到 `'self' data: https://pub-timorup... https://timorup.com`，防止 data: URL XSS 载荷
