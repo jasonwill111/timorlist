@@ -1,11 +1,11 @@
 ---
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/fulldev/button';
+import { Input } from '@/components/fulldev/input';
 // Server-rendered Products list with proper pagination
 // All filtering, sorting, and pagination happens on the server
 // Data layer extracted to lib/db/queries/products-list.ts
 import { getProductList } from '@/lib/db/queries/products-list';
-import { Select } from '@/components/ui/select';
+import { Select } from '@/components/fulldev/select';
 
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('search') || '';
