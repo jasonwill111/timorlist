@@ -1,7 +1,7 @@
 // Auth Server Action - Reset Password
 import { defineAction } from 'astro:actions';
 import { z } from 'zod';
-import { initAuth } from '@/lib/auth';
+import { getAuth } from '@/lib/auth';
 
 export const resetPassword = defineAction({
   accept: 'form',
@@ -11,11 +11,11 @@ export const resetPassword = defineAction({
   }),
   handler: async (input) => {
     try {
-      const auth = await initAuth();
-      const api = auth.api as { resetPassword?: (opts: { body: { token: string; password: string } }) => Promise<unknown> };
-      if (api?.resetPassword) {
-        await api.resetPassword({
-          body: { token: input.token, password: input.password }
+      const auth = await getAuth();
+      const authApi = auth.api as { resetPassword?: (opts: { body: { token?: string; newPassword: string } }) => Promise<unknown> };
+      if (authApi?.resetPassword) {
+        await authApi.resetPassword({
+          body: { token: input.token, newPassword: input.password }
         });
       }
       return { success: true, message: 'Password reset successfully' };

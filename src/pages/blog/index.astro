@@ -1,8 +1,14 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import { getDb } from '@/lib/db';
-import { blogPosts, blogCategories } from '@/db/schema';
-import { eq, desc, and, like, sql } from 'drizzle-orm';
+import { getBlogListing } from '@/lib/db/queries/blog-listing';
+import { Button } from '@/components/fulldev/button';
+import { Badge } from '@/components/fulldev/badge';
+import Pagination from '@/components/starwind/pagination/Pagination.astro';
+import PaginationContent from '@/components/starwind/pagination/PaginationContent.astro';
+import PaginationItem from '@/components/starwind/pagination/PaginationItem.astro';
+import PaginationLink from '@/components/starwind/pagination/PaginationLink.astro';
+import PaginationPrevious from '@/components/starwind/pagination/PaginationPrevious.astro';
+import PaginationNext from '@/components/starwind/pagination/PaginationNext.astro';
 
 export const prerender = false;
 
@@ -10,84 +16,11 @@ const searchParams = Astro.url.searchParams;
 const categorySlug = searchParams.get('category') || '';
 const page = parseInt(searchParams.get('page') || '1', 10);
 const LIMIT = 12;
-const offset = (page - 1) * LIMIT;
 
-// Cache: Blog changes less often - 5min browser, 30min CDN
 Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=1800, stale-while-revalidate=3600');
 
-const db = await getDb();
+const { posts, categories, total, totalPages } = await getBlogListing(categorySlug, page, LIMIT);
 
-let posts: Awaited<ReturnType<typeof db.select>> = [];
-let categories: Awaited<ReturnType<typeof db.select>> = [];
-let total = 0;
-
-try {
-  if (db) {
-    // Find category ID from slug
-    let categoryId: string | null = null;
-    if (categorySlug) {
-      const foundCategory = db
-        .select()
-        .from(blogCategories)
-        .where(eq(blogCategories.slug, categorySlug))
-        .get();
-      if (foundCategory) {
-        categoryId = (foundCategory as { id: string }).id;
-      }
-    }
-
-    // Fetch categories for filter pills
-    categories = await db
-      .select()
-      .from(blogCategories)
-      .where(eq(blogCategories.isActive, true))
-      .all();
-
-    // Build WHERE conditions
-    const conditions = [eq(blogPosts.status, 'published')];
-    
-    if (categoryId) {
-      conditions.push(eq(blogPosts.categoryId, categoryId));
-    }
-
-    // Count total matching posts
-    const countResult = db
-      .select({ count: sql<number>`count(*)` })
-      .from(blogPosts)
-      .where(and(...conditions))
-      .get();
-    total = countResult?.count || 0;
-
-    // Fetch paginated posts
-    posts = await db
-      .select({
-        id: blogPosts.id,
-        title: blogPosts.title,
-        slug: blogPosts.slug,
-        excerpt: blogPosts.excerpt,
-        coverImageId: blogPosts.coverImageId,
-        authorName: blogPosts.authorName,
-        status: blogPosts.status,
-        tags: blogPosts.tags,
-        publishedAt: blogPosts.publishedAt,
-        createdAt: blogPosts.createdAt,
-      })
-      .from(blogPosts)
-      .where(and(...conditions))
-      .orderBy(desc(blogPosts.publishedAt))
-      .limit(LIMIT)
-      .offset(offset)
-      .all();
-  }
-} catch (e) {
-  console.error('[blog] DB error:', e);
-  posts = [];
-  categories = [];
-}
-
-const totalPages = Math.ceil(total / LIMIT);
-
-// Build pagination URL helper
 const buildUrl = (pageNum: number) => {
   const p = new URLSearchParams();
   if (categorySlug) p.set('category', categorySlug);
@@ -95,7 +28,6 @@ const buildUrl = (pageNum: number) => {
   return `/blog?${p.toString()}`;
 };
 
-// Blog structured data for SEO
 const blogSchema = {
   "@context": "https://schema.org",
   "@type": "Blog",
@@ -128,19 +60,18 @@ const blogSchema = {
     <!-- Category Pills -->
     {categories.length > 0 && (
       <div class="flex flex-wrap gap-2 justify-center mb-8">
-        <a
-          href="/blog"
-          class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${!categorySlug ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-primary/10'}`}
-        >
+        <Button as="a" href="/blog" variant={!categorySlug ? 'default' : 'secondary'} size="sm">
           All
-        </a>
+        </Button>
         {categories.map((category) => (
-          <a
+          <Button
+            as="a"
             href={`/blog?category=${(category as { slug: string }).slug}`}
-            class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${categorySlug === (category as { slug: string }).slug ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-primary/10'}`}
+            variant={categorySlug === (category as { slug: string }).slug ? 'default' : 'secondary'}
+            size="sm"
           >
             {(category as { name: string }).name}
-          </a>
+          </Button>
         ))}
       </div>
     )}
@@ -204,9 +135,9 @@ const blogSchema = {
                   {postTags.length > 0 && (
                     <div class="flex flex-wrap gap-1 mb-3">
                       {postTags.slice(0, 2).map((tag: string) => (
-                        <span class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                        <Badge variant="outline" class="bg-primary/10 text-primary border-primary/20 text-xs font-normal">
                           {tag}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   )}
@@ -236,33 +167,31 @@ const blogSchema = {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
-            {page > 1 && (
-              <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
-                ← Previous
-              </a>
-            )}
-            
-            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-              const pageNum = i + 1;
-              const isActive = pageNum === page;
-              return (
-                <a 
-                  href={buildUrl(pageNum)} 
-                  class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {pageNum}
-                </a>
-              );
-            })}
-            
-            {page < totalPages && (
-              <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
-                Next →
-              </a>
-            )}
-          </nav>
+          <Pagination class="mt-8">
+            <PaginationContent>
+              {page > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious href={buildUrl(page - 1)} />
+                </PaginationItem>
+              )}
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                const pageNum = i + 1;
+                const isActive = pageNum === page;
+                return (
+                  <PaginationItem>
+                    <PaginationLink href={buildUrl(pageNum)} isActive={isActive}>
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+              {page < totalPages && (
+                <PaginationItem>
+                  <PaginationNext href={buildUrl(page + 1)} />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
         )}
       </>
     ) : (
@@ -284,9 +213,9 @@ const blogSchema = {
         <p class="text-muted-foreground">
           {categorySlug ? 'Try a different category or browse all posts.' : 'Check back soon for travel guides and local insights about Timor-Leste.'}
         </p>
-        <a href="/blog" class="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md">
+        <Button as="a" href="/blog" class="mt-4">
           View all posts
-        </a>
+        </Button>
       </div>
     )}
   </main>

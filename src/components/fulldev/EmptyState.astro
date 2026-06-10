@@ -1,0 +1,21 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+import { cn } from "@/lib/utils"
+import { Card } from "@/components/fulldev/card/Card.astro"
+
+type Props = HTMLAttributes<"div"> & {
+  icon?: string
+  title: string
+  description?: string
+}
+
+const { class: className, icon, title, description, ...props } = Astro.props
+---
+
+<div data-slot="empty-state" class={cn("flex flex-col items-center justify-center text-center py-12 px-4", className)} {...props}>
+  {icon && <div class="text-4xl mb-4">{icon}</div>}
+  <h3 class="text-lg font-semibold text-foreground mb-1">{title}</h3>
+  {description && <p class="text-sm text-muted-foreground mb-4 max-w-sm">{description}</p>}
+  <slot name="action" />
+</div>

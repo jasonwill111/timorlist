@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
+import { Input } from '../components/fulldev/input';
+import { Button } from '../components/fulldev/button'
+import { Label } from '@/components/fulldev/label';
 import AuthCard from '../components/forms/AuthCard.astro';
 import FormMessage from '../components/forms/FormMessage.astro';
 import PasswordInput from '../components/forms/PasswordInput.astro';
@@ -18,12 +19,12 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       <FormMessage id="form-message" type="error" />
 
       <div>
-        <label for="name" class="block text-sm font-medium mb-1">Full Name</label>
+        <Label for="name">Full Name</Label>
         <Input id="name" name="name" type="text" placeholder="John Doe" required />
       </div>
 
       <div>
-        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+        <Label for="email">Email</Label>
         <div class="relative">
           <Input id="email" name="email" type="email" placeholder="your@email.com" required />
           <span id="email-valid" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
@@ -36,7 +37,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium mb-1">Password</label>
+        <Label for="password">Password</Label>
         <div class="relative">
           <PasswordInput id="password" name="password" label="" placeholder="••••••••" />
           <span id="password-valid" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
@@ -49,7 +50,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       </div>
 
       <div>
-        <label for="confirmPassword" class="block text-sm font-medium mb-1">Confirm Password</label>
+        <Label for="confirmPassword">Confirm Password</Label>
         <PasswordInput id="confirmPassword" name="confirmPassword" label="" placeholder="••••••••" />
         <p id="confirm-error" class="hidden text-sm text-red-500 mt-1">Passwords do not match</p>
       </div>
@@ -69,6 +70,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
 
 <script>
   import { actions } from 'astro:actions';
+  import { toast } from '../components/starwind/toast';
 
   const form = document.getElementById('register-form') as HTMLFormElement | null;
   const emailInput = document.getElementById('email') as HTMLInputElement | null;
@@ -218,32 +220,12 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       }
 
       if (result.success) {
+        toast.success('Account created! Redirecting to login...');
         window.location.assign('/login?registered=true');
         return;
       }
     } catch (fetchError) {
       console.error('REST API failed, trying Astro actions:', fetchError);
-    }
-
-    // Fallback to Astro actions
-    try {
-      const { data, error } = await actions.auth.lightSignUp({
-        email: email,
-        password: password,
-        name: name,
-      });
-
-      setLoading(false);
-
-      if (error || !data?.success) {
-        const msg = error?.message || data?.error?.message || 'Registration failed';
-        showError(msg);
-        return;
-      }
-
-      window.location.assign('/login?registered=true');
-    } catch (actionError) {
-      setLoading(false);
       showError('Registration failed. Please try again.');
     }
   });

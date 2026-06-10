@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getDb } from '@/lib/db';
 import { businesses } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 export const like = defineAction({

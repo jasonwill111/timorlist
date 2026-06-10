@@ -1,0 +1,117 @@
+/**
+ * Businesses Listing Query Functions
+ * 统一 businesses 列表查询
+ */
+import { getRawDb } from '@/lib/db';
+
+export interface BusinessListing {
+  id: string;
+  title: string;
+  slug: string;
+  category_id: string | null;
+  address: string | null;
+  profile_image_id: string | null;
+  tags: string | null;
+  likes: number | null;
+  saves: number | null;
+  views: number | null;
+  rating_average: number | null;
+  rating_count: number | null;
+  status: string | null;
+  about_us: string | null;
+  categoryName: string | null;
+}
+
+export interface CategoryRecord {
+  id: string;
+  name: string;
+  parentId: string | null;
+}
+
+export async function getBusinessCategories(): Promise<{ parentCats: CategoryRecord[]; categoryMap: Record<string, string>; childMap: Record<string, string[]> }> {
+  const db = await getRawDb();
+  if (!db) return { parentCats: [], categoryMap: {}, childMap: {} };
+
+  try {
+    const allCats = (await db.prepare(
+      'SELECT id, name, parent_id as parentId FROM business_categories'
+    ).all()).results as unknown as CategoryRecord[];
+
+    const parentCats = allCats.filter(c => !c.parentId);
+    const categoryMap: Record<string, string> = {};
+    const childMap: Record<string, string[]> = {};
+
+    for (const c of allCats) {
+      categoryMap[c.id] = c.name;
+      if (c.parentId) {
+        if (!childMap[c.parentId]) childMap[c.parentId] = [];
+        childMap[c.parentId].push(c.id);
+      }
+    }
+
+    return { parentCats, categoryMap, childMap };
+  } catch {
+    return { parentCats: [], categoryMap: {}, childMap: {} };
+  }
+}
+
+export async function getBusinessListing(
+  search: string = '',
+  parentCat: string = '',
+  childCat: string = '',
+  page: number = 1,
+  limit: number = 12,
+) {
+  const db = await getRawDb();
+  if (!db) return { results: [], total: 0, totalPages: 0 };
+
+  const offset = (page - 1) * limit;
+  const conditions: string[] = ["status IN ('active', 'published', 'live')"];
+  const params: (string | number)[] = [];
+
+  if (search) {
+    const pattern = `%${search.toLowerCase()}%`;
+    conditions.push("(LOWER(title) LIKE ? OR LOWER(about_us) LIKE ?)");
+    params.push(pattern, pattern);
+  }
+
+  if (childCat) {
+    conditions.push("category_id = ?");
+    params.push(childCat);
+  } else if (parentCat) {
+    const childMap = (await getBusinessCategories()).childMap;
+    const childIds = childMap[parentCat] || [];
+    if (childIds.length > 0) {
+      const placeholders = childIds.map(() => '?').join(', ');
+      conditions.push(`category_id IN (${placeholders})`);
+      params.push(...childIds);
+    }
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  try {
+    const countResult = await db.prepare(
+      `SELECT COUNT(*) as count FROM businesses ${whereClause}`
+    ).bind(...params).first() as { count: number } | undefined;
+    const total = countResult?.count || 0;
+
+    const dataResult = await db.prepare(`
+      SELECT id, title, slug, category_id, address, profile_image_id, tags, likes, saves, views,
+             rating_average, rating_count, status, about_us
+      FROM businesses ${whereClause}
+      ORDER BY created_at DESC LIMIT ? OFFSET ?
+    `).bind(...params, limit, offset).all();
+
+    const rows = (dataResult as unknown as { results: Omit<BusinessListing, 'categoryName'>[] } | null)?.results || [];
+    const { categoryMap } = await getBusinessCategories();
+    const results = rows.map(b => ({
+      ...b,
+      categoryName: b.category_id ? categoryMap[b.category_id] || '' : '',
+    }));
+
+    return { results, total, totalPages: Math.ceil(total / limit) };
+  } catch {
+    return { results: [], total: 0, totalPages: 0 };
+  }
+}

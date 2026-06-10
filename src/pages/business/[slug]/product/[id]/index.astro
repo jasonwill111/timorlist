@@ -3,12 +3,14 @@
 export const prerender = false;
 
 import Layout from '@layouts/Layout.astro';
-import { Button } from '@components/ui/button';
-import { getRawDb } from '@/lib/db';
+import { Button } from '@/components/fulldev/button';
+import { Card, CardContent } from '@/components/fulldev/card';
+import { ArrowLeft, ChevronLeft, ChevronRight } from '@lucide/astro';
+import ShareDialog from '@/components/fulldev/share-dialog/ShareDialog.astro';
 import { createBreadcrumbSchema } from '@/lib/seo';
+import { getProductWithDetails } from '@/lib/db/queries/products';
 
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
-const db = await getRawDb();
 const { slug } = Astro.params;
 
 // Extract product ID from path: /business/[slug]/product/[id]
@@ -16,76 +18,32 @@ const pathParts = Astro.url.pathname.split('/').filter(Boolean);
 const productIdIndex = pathParts.indexOf('product');
 const productId = productIdIndex >= 0 ? pathParts[productIdIndex + 1] : '';
 
-if (!productId || !db) {
+if (!productId) {
   return Astro.redirect('/businesses');
 }
 
-// SSR: Load product with raw SQL
-interface ProductRow {
-  id: string; title: string; description: string | null;
-  productType: string | null; priceFields: string | null;
-  specifications: string | null; businessId: string; categoryId: string;
-}
-interface BusinessRow {
-  id: string; title: string; slug: string;
-  contactNumber: string | null; countryCode: string | null;
-  profileImageId: string | null;
-}
-interface CategoryRow { id: string; name: string; }
+const result = await getProductWithDetails(productId);
 
-let product: ProductRow | null = null;
-let business: BusinessRow | null = null;
-let category: CategoryRow | null = null;
-
-try {
-  product = await db
-    .prepare('SELECT id, title, description, product_type as productType, price_fields as priceFields, specifications, business_id as businessId, category_id as categoryId FROM products WHERE id = ? AND (deleted_at IS NULL OR deleted_at = 0) LIMIT 1')
-    .bind(productId)
-    .first() as ProductRow | null;
-} catch (e) {
-  console.error('[product detail] product query failed:', e instanceof Error ? e.message : String(e));
+// Redirect if not found or slug mismatch
+if (!result || result.business?.slug !== slug) {
+  return Astro.redirect(result ? `/business/${result.business?.slug || ''}` : '/businesses');
 }
 
-// Redirect if not found
-if (!product) {
-  return Astro.redirect('/businesses');
-}
-
-try {
-  business = await db
-    .prepare('SELECT id, title, slug, contact_number as contactNumber, country_code as countryCode, profile_image_id as profileImageId FROM businesses WHERE id = ? LIMIT 1')
-    .bind(product.businessId)
-    .first() as BusinessRow | null;
-} catch (e) {
-  console.error('[product detail] business query failed:', e instanceof Error ? e.message : String(e));
-}
-
-// Redirect if business slug mismatch
-if (!business || business.slug !== slug) {
-  return Astro.redirect(`/business/${business?.slug || ''}`);
-}
-
-try {
-  if (product.categoryId) {
-    category = await db
-      .prepare('SELECT id, name FROM business_categories WHERE id = ? LIMIT 1')
-      .bind(product.categoryId)
-      .first() as CategoryRow | null;
-  }
-} catch (e) {
-  console.error('[product detail] category query failed:', e instanceof Error ? e.message : String(e));
-}
+const { product, business, category } = result;
 
 // Canonical URL
 const canonicalUrl = `${siteUrl}/business/${slug}/product/${productId}`;
+
+// Product images now stored via media table (entityType: 'products')
+const images: string[] = product.images || [];
 
 // Title & description
 const pageTitle = `${product.title} - TimorUp`;
 const pageDesc = product.description?.substring(0, 160) || `${product.title} - ${business.title}`;
 
 // Parse specifications and price fields
-const specifications = product.specifications ? JSON.parse(product.specifications) : null;
-const priceFields = product.priceFields ? JSON.parse(product.priceFields) : null;
+const specifications = product.specifications as Record<string, unknown> | null;
+const priceFields = product.priceFields as Record<string, unknown>[] | null;
 
 // Get price from specifications.pricing
 const pricing = specifications?.pricing;
@@ -119,9 +77,9 @@ const productTypeLabels: Record<string, string> = {
     "description": product.description,
     "url": canonicalUrl,
     "image": images.map((id: string) => `/api/media/${id}`),
-    "offers": product.price ? {
+    "offers": firstPrice ? {
       "@type": "Offer",
-      "price": product.price.replace(/[^0-9.]/g, ''),
+      "price": firstPrice.replace(/[^0-9.]/g, ''),
       "priceCurrency": "USD"
     } : undefined,
     "seller": {
@@ -161,7 +119,7 @@ const productTypeLabels: Record<string, string> = {
             <div class="max-w-xl mx-auto">
               <div id="main-image" class="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md">
                 {images.length > 0 ? (
-                  <img id="current-image" src={`/api/media/${images[0]?.mediaId}`} alt={product.title} class="w-full h-full object-cover" />
+                  <img id="current-image" src={`/api/media/${images[0]}`} alt={product.title} class="w-full h-full object-cover" />
                 ) : (
                   <div class="w-full h-full flex items-center justify-center text-6xl font-bold text-muted-foreground bg-gradient-to-br from-amber-100 to-amber-200">
                     {product.title.charAt(0)}
@@ -182,7 +140,7 @@ const productTypeLabels: Record<string, string> = {
                     class={`thumbnail-btn w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${index === 0 ? 'border-primary' : 'border-transparent hover:border-muted-foreground/30'}`}
                     data-index={index}
                   >
-                    <img src={`/api/media/${img.mediaId}`} aria-hidden="true" alt="" class="w-full h-full object-cover" />
+                    <img src={`/api/media/${img}`} aria-hidden="true" alt="" class="w-full h-full object-cover" />
                   </Button>
                 ))}
                 <Button variant="ghost" size="icon" id="scroll-right" class="flex-shrink-0 w-10 h-20 rounded-lg bg-muted hover:bg-muted/80">
@@ -228,7 +186,7 @@ const productTypeLabels: Record<string, string> = {
                 </div>
               </a>
               <div class="flex items-center gap-2 flex-shrink-0">
-                <ShareDialog url={`${siteUrl}/business/${slug}/product/${productId}`} title={product.title} client:visible />
+                <ShareDialog url={`${siteUrl}/business/${slug}/product/${productId}`} title={product.title} />
                 {business.contactNumber && (
                   <a
                     href={`https://wa.me/${business.contactNumber.replace(/\s/g, '')}?text=Hi, I'm interested in "${product.title}" from ${encodeURIComponent(business.title)}`}
@@ -273,7 +231,7 @@ const productTypeLabels: Record<string, string> = {
             <!-- Action Buttons -->
             <div class="flex gap-2 mt-4">
               <div class="flex-1">
-                <ShareDialog url={`${siteUrl}/business/${slug}/product/${productId}`} title={product.title} client:visible />
+                <ShareDialog url={`${siteUrl}/business/${slug}/product/${productId}`} title={product.title} />
               </div>
               {business.contactNumber && (
                 <a

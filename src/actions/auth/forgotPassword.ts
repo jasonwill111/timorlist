@@ -1,7 +1,7 @@
 // Auth Server Action - Forgot Password
 import { defineAction } from 'astro:actions';
 import { z } from 'zod';
-import { initAuth } from '@/lib/auth';
+import { getAuth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 export const forgotPassword = defineAction({
   accept: 'form',
@@ -9,12 +9,12 @@ export const forgotPassword = defineAction({
     email: z.email({ error: 'Valid email required' }),
   }),
   handler: async (input) => {
-    const result = checkRateLimit(`forgot:${input.email}`);
+    const result = await checkRateLimit(`forgot:${input.email}`);
     if (!result.allowed) {
       return { success: false, error: { code: 'RATE_LIMITED', message: 'Too many requests. Please try again later.' } };
     }
     try {
-      const auth = await initAuth();
+      const auth = await getAuth();
       // Use listUsers to check if user exists (better-auth API varies by version)
       const api = auth.api as { listUsers?: (opts: { body: { emails?: string[] } }) => Promise<{ users?: unknown[] }> };
       if (api?.listUsers) {

@@ -1,0 +1,5 @@
+---
+import ShareDialog from './ShareDialog.astro';
+const { url, title, description, class: className } = Astro.props;
+---
+<ShareDialog url={url} title={title} description={description} class={className} />

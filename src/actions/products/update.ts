@@ -6,7 +6,7 @@ import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { canEditBusiness } from '@/lib/subscription';
 import { requireAdmin } from '@/lib/admin-auth';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 const VALID_PRODUCT_TYPES = [
   'product', 'service', 'virtual', 'ticket', 'rental', 'subscription'

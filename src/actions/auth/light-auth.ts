@@ -6,17 +6,26 @@ import { createErrorResponse } from '@/lib/errors';
 import { ErrorCode } from '@/lib/errors';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { hash as bcryptHash, compare as bcryptCompare } from 'bcryptjs';
-import { env } from 'cloudflare:workers';
-
-// Session constants
-const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+import { getRawDb } from '@/lib/db';
 
 const emailSchema = z.string().email({ error: 'Valid email required' });
 
-/**
- * Simplified sign-in using direct D1 queries
- * Avoids better-auth overhead to stay under 10ms CPU limit
- */
+function generateSessionToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
+
+function generateId(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = crypto.getRandomValues(new Uint8Array(21));
+  return Array.from(bytes, b => chars[b % chars.length]).join('');
+}
+
+const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+
 export const lightSignIn = defineAction({
   accept: 'json',
   input: z.object({
@@ -25,8 +34,7 @@ export const lightSignIn = defineAction({
     rememberMe: z.boolean().optional().default(false),
   }),
   handler: async (input) => {
-    // Rate limit check (in-memory, fast)
-    const rateLimit = checkRateLimit('auth-sign-in');
+    const rateLimit = await checkRateLimit('auth-sign-in');
     if (!rateLimit.allowed) {
       return createErrorResponse(
         ErrorCode.AUTH_RATE_LIMITED,
@@ -35,12 +43,11 @@ export const lightSignIn = defineAction({
     }
 
     try {
-      const db = env.DB as D1Database;
+      const db = await getRawDb();
       if (!db) {
-        return createErrorResponse(ErrorCode.SERVER_ERROR, 'Database unavailable');
+        return createErrorResponse(ErrorCode.SERVER_DB_ERROR, 'Database unavailable');
       }
 
-      // Direct D1 query for user
       const userResult = await db
         .prepare('SELECT id, email, name, role FROM user WHERE email = ?')
         .bind(input.email.toLowerCase())
@@ -50,7 +57,6 @@ export const lightSignIn = defineAction({
         return createErrorResponse(ErrorCode.AUTH_INVALID_CREDENTIALS, 'Invalid email or password');
       }
 
-      // Direct D1 query for account (contains password hash)
       const accountResult = await db
         .prepare('SELECT password FROM account WHERE userId = ? AND providerId = ?')
         .bind(userResult.id, 'email')
@@ -60,7 +66,6 @@ export const lightSignIn = defineAction({
         return createErrorResponse(ErrorCode.AUTH_INVALID_CREDENTIALS, 'Invalid email or password');
       }
 
-      // Verify password using bcryptjs (async, Workers-compatible)
       const storedHash = accountResult.password as string;
       const passwordValid = await bcryptCompare(input.password, storedHash);
 
@@ -68,15 +73,18 @@ export const lightSignIn = defineAction({
         return createErrorResponse(ErrorCode.AUTH_INVALID_CREDENTIALS, 'Invalid email or password');
       }
 
-// Session stored in D1 only - KV writes removed as they were never read and created inconsistency risk
-      // Store session in database (required by better-auth pattern)
+      const sessionToken = generateSessionToken();
+      const expiresAt = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
+      const now = Math.floor(Date.now() / 1000);
+
       await db
         .prepare(`
           INSERT INTO session (id, userId, token, expiresAt, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?, ?)
         `)
-        .bind(sessionToken, userResult.id, sessionToken, expiresAt, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000))
+        .bind(generateId(), userResult.id, sessionToken, expiresAt, now, now)
         .run();
+
       return {
         success: true,
         user: {
@@ -94,9 +102,6 @@ export const lightSignIn = defineAction({
   },
 });
 
-/**
- * Simplified sign-up using direct D1 queries
- */
 export const lightSignUp = defineAction({
   accept: 'json',
   input: z.object({
@@ -105,8 +110,7 @@ export const lightSignUp = defineAction({
     name: z.string().min(1),
   }),
   handler: async (input) => {
-    // Rate limit check
-    const rateLimit = checkRateLimit('auth-sign-up');
+    const rateLimit = await checkRateLimit('auth-sign-up');
     if (!rateLimit.allowed) {
       return createErrorResponse(
         ErrorCode.AUTH_RATE_LIMITED,
@@ -115,12 +119,11 @@ export const lightSignUp = defineAction({
     }
 
     try {
-      const db = env.DB as D1Database;
+      const db = await getRawDb();
       if (!db) {
-        return createErrorResponse(ErrorCode.SERVER_ERROR, 'Database unavailable');
+        return createErrorResponse(ErrorCode.SERVER_DB_ERROR, 'Database unavailable');
       }
 
-      // Check if user exists
       const existingUser = await db
         .prepare('SELECT id FROM user WHERE email = ?')
         .bind(input.email.toLowerCase())
@@ -130,12 +133,10 @@ export const lightSignUp = defineAction({
         return createErrorResponse(ErrorCode.AUTH_USER_EXISTS, 'Email already registered');
       }
 
-      // Hash password with bcrypt (10 rounds for speed)
       const passwordHash = await bcryptHash(input.password, 10);
       const userId = generateId();
       const now = Math.floor(Date.now() / 1000);
 
-      // Create user
       await db
         .prepare(`
           INSERT INTO user (id, email, name, role, createdAt, updatedAt, emailVerified)
@@ -144,7 +145,6 @@ export const lightSignUp = defineAction({
         .bind(userId, input.email.toLowerCase(), input.name, now, now)
         .run();
 
-      // Create account with password
       const accountId = generateId();
       await db
         .prepare(`
@@ -169,19 +169,3 @@ export const lightSignUp = defineAction({
     }
   },
 });
-
-// ============== Utility Functions ==============
-
-function generateSessionToken(): string {
-  const bytes = crypto.getRandomValues(new Uint8Array(32));
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-}
-
-function generateId(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const bytes = crypto.getRandomValues(new Uint8Array(21));
-  return Array.from(bytes, b => chars[b % chars.length]).join('');
-}

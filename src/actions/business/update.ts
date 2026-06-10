@@ -6,7 +6,7 @@ import { getDb } from '@/lib/db';
 import { businesses } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { updateBusiness } from '@/lib/db/queries/businesses';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 async function purgeCache(path: string): Promise<void> {

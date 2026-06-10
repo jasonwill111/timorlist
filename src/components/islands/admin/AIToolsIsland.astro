@@ -1,0 +1,342 @@
+---
+/**
+ * AIToolsIsland - Admin AI content generators island
+ * Replaces inline <script> from pages/admin/ai-tools.astro
+ * Handles Listing/SKU/Blog/Landing generation via tabs + forms
+ * Uses safe DOM APIs (textContent, classList) + DOMPurify for HTML
+ */
+---
+
+<script>
+  import { actions } from 'astro:actions';
+  import DOMPurify from 'dompurify';
+  import { toast } from '@/lib/toast';
+
+  // AI Generator interfaces
+  interface PriceField { label: string; value: string; unit: string; }
+  interface GeneratedListing {
+    title: string; entityType: string; categoryId: string | null;
+    contactName: string | null; contactNumber: string | null;
+    countryCode: string; email: string | null; address: string | null;
+    aboutUs: string | null; tags: string[];
+  }
+  interface GeneratedSku {
+    title: string; productType: string; skuDescription: string;
+    priceFields: PriceField[];
+  }
+  interface GeneratedBlog {
+    title: string; excerpt: string; content: string; tags: string[];
+    slug: string; status: string;
+  }
+
+  type ActionResult<T = unknown> = { success: boolean; data?: T; error?: { message?: string } } | { data?: { success: boolean; error?: { message?: string } } };
+
+  function unwrapActionResult<T>(result: ActionResult<T>): T {
+    if (result && typeof result === 'object') {
+      if ('data' in result && result.data) return result.data as T;
+      if ('success' in result) return result as unknown as T;
+    }
+    return result as unknown as T;
+  }
+
+  // Tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const sections: Record<string, HTMLElement | null> = {
+    listing: document.getElementById('listing-section'),
+    sku: document.getElementById('sku-section'),
+    blog: document.getElementById('blog-section'),
+    landing: document.getElementById('landing-section'),
+  };
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.getAttribute('data-tab');
+      tabBtns.forEach(b => {
+        b.classList.remove('border-primary', 'text-primary');
+        b.classList.add('border-transparent', 'text-muted-foreground');
+      });
+      btn.classList.remove('border-transparent', 'text-muted-foreground');
+      btn.classList.add('border-primary', 'text-primary');
+      Object.values(sections).forEach(s => s?.classList.add('hidden'));
+      sections[tab as string]?.classList.remove('hidden');
+    });
+  });
+
+  // ============== LISTING GENERATOR ==============
+  let generatedListing: GeneratedListing | null = null;
+
+  document.getElementById('listing-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = (document.getElementById('listing-title') as HTMLInputElement).value;
+    const entityType = (document.getElementById('listing-entity-type') as HTMLSelectElement).value;
+    const categoryId = (document.getElementById('listing-category') as HTMLSelectElement).value;
+    const contactName = (document.getElementById('listing-contact') as HTMLInputElement).value;
+    const phone = (document.getElementById('listing-phone') as HTMLInputElement).value;
+    const email = (document.getElementById('listing-email') as HTMLInputElement).value;
+    const address = (document.getElementById('listing-address') as HTMLInputElement).value;
+    const about = (document.getElementById('listing-about') as HTMLTextAreaElement).value;
+    const tags = (document.getElementById('listing-tags') as HTMLInputElement).value;
+
+    document.getElementById('listing-loading')?.classList.remove('hidden');
+    document.getElementById('listing-preview')?.classList.add('hidden');
+    document.getElementById('listing-empty')?.classList.add('hidden');
+    const statusEl = document.getElementById('listing-status');
+    if (statusEl) { statusEl.textContent = 'Generating...'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-yellow-100'; }
+
+    try {
+      const result = await actions.admin.aiGenerate({
+        type: 'listing',
+        data: { title, entityType, categoryId, contactName, phone, email, address, about, tags }
+      });
+      const actionResult = unwrapActionResult<{ success: boolean; error?: { message?: string }; object?: GeneratedListing }>(result);
+      if (!actionResult.success) throw new Error(actionResult.error?.message || 'Generation failed');
+
+      const aiData = actionResult.object || {};
+      generatedListing = {
+        ...aiData,
+        title: aiData.title || title,
+        entityType: aiData.entityType || entityType,
+        categoryId: categoryId || null,
+        contactName: aiData.contactName || contactName,
+        contactNumber: aiData.contactNumber || phone,
+        countryCode: '+670',
+        email: aiData.email || email,
+        address: aiData.address || address,
+        aboutUs: aiData.aboutUs || about,
+        tags: aiData.tags || (tags ? tags.split(',').map((t: string) => t.trim()) : []),
+      };
+
+      document.getElementById('preview-listing-title')!.textContent = generatedListing.title;
+      document.getElementById('preview-listing-type')!.textContent = generatedListing.entityType;
+      document.getElementById('preview-listing-contact')!.textContent = `${generatedListing.contactName || '-'} | ${generatedListing.contactNumber || '-'} | ${generatedListing.email || '-'}`;
+      document.getElementById('preview-listing-address')!.textContent = generatedListing.address || '-';
+      document.getElementById('preview-listing-tags')!.textContent = Array.isArray(generatedListing.tags) ? generatedListing.tags.join(', ') : '-';
+
+      document.getElementById('listing-preview')?.classList.remove('hidden');
+      if (statusEl) { statusEl.textContent = 'Generated'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-green-100'; }
+      toast.success('Listing generated');
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Listing generation error:', error);
+      const errorMsg = error.message?.includes('permission') || error.message?.includes('unauthorized')
+        ? 'MiniMax API permission denied. Check API key and quota.'
+        : 'Failed to generate listing: ' + (error.message || 'Unknown error');
+      toast.error(errorMsg);
+      if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-red-100'; }
+      document.getElementById('listing-empty')?.classList.remove('hidden');
+    } finally {
+      document.getElementById('listing-loading')?.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('listing-copy-btn')?.addEventListener('click', () => {
+    if (generatedListing) {
+      navigator.clipboard.writeText(JSON.stringify(generatedListing, null, 2));
+      toast.success('Copied to clipboard');
+    }
+  });
+
+  document.getElementById('listing-save-btn')?.addEventListener('click', async () => {
+    if (!generatedListing) return;
+    try {
+      const result = await actions.admin.listings.create(generatedListing);
+      if (result.success) toast.success('Listing created! ID: ' + result.data?.id);
+      else toast.error('Failed to save: ' + (result.error?.message || 'Unknown error'));
+    } catch { toast.error('Failed to save listing'); }
+  });
+
+  // ============== SKU GENERATOR ==============
+  let generatedSku: GeneratedSku | null = null;
+
+  document.getElementById('sku-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = (document.getElementById('sku-title') as HTMLInputElement).value;
+    const productType = (document.getElementById('sku-type') as HTMLSelectElement).value;
+    const description = (document.getElementById('sku-description') as HTMLTextAreaElement).value;
+    const priceLabel = (document.getElementById('sku-price-label') as HTMLInputElement).value;
+    const priceValue = (document.getElementById('sku-price-value') as HTMLInputElement).value;
+    const priceUnit = (document.getElementById('sku-price-unit') as HTMLInputElement).value;
+
+    document.getElementById('sku-loading')?.classList.remove('hidden');
+    document.getElementById('sku-preview')?.classList.add('hidden');
+    document.getElementById('sku-empty')?.classList.add('hidden');
+    const statusEl = document.getElementById('sku-status');
+    if (statusEl) { statusEl.textContent = 'Generating...'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-yellow-100'; }
+
+    try {
+      const result = await actions.admin.aiGenerate({
+        type: 'sku',
+        data: { title, productType, description, priceFields: priceValue ? [{ label: priceLabel || 'Price', value: priceValue, unit: priceUnit || '' }] : [] }
+      });
+      const actionResult = unwrapActionResult<{ success: boolean; error?: { message?: string }; object?: GeneratedSku }>(result);
+      if (!actionResult.success) throw new Error(actionResult.error?.message || 'Generation failed');
+
+      const aiData = actionResult.object || {};
+      generatedSku = {
+        title: aiData.title || title,
+        productType: aiData.productType || productType,
+        skuDescription: aiData.description || description,
+        priceFields: aiData.priceFields || (priceValue ? [{ label: priceLabel || 'Price', value: priceValue, unit: priceUnit || '' }] : []),
+      };
+
+      document.getElementById('preview-sku-title')!.textContent = generatedSku.title;
+      document.getElementById('preview-sku-type')!.textContent = generatedSku.productType;
+      document.getElementById('preview-sku-price')!.textContent = generatedSku.priceFields.map((p: PriceField) => `${p.label}: $${p.value}${p.unit}`).join(', ');
+      document.getElementById('preview-sku-desc')!.textContent = generatedSku.skuDescription;
+
+      document.getElementById('sku-preview')?.classList.remove('hidden');
+      if (statusEl) { statusEl.textContent = 'Generated'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-green-100'; }
+      toast.success('SKU generated');
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('SKU generation error:', error);
+      const errorMsg = error.message?.includes('permission') || error.message?.includes('unauthorized')
+        ? 'MiniMax API permission denied. Check API key and quota.'
+        : 'Failed to generate SKU: ' + (error.message || 'Unknown error');
+      toast.error(errorMsg);
+      if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-red-100'; }
+      document.getElementById('sku-empty')?.classList.remove('hidden');
+    } finally {
+      document.getElementById('sku-loading')?.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('sku-copy-btn')?.addEventListener('click', () => {
+    if (generatedSku) {
+      navigator.clipboard.writeText(JSON.stringify(generatedSku, null, 2));
+      toast.success('Copied to clipboard');
+    }
+  });
+
+  // ============== BLOG GENERATOR ==============
+  let generatedBlog: GeneratedBlog | null = null;
+
+  document.getElementById('blog-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const topic = (document.getElementById('blog-topic') as HTMLInputElement).value;
+    const type = (document.getElementById('blog-type') as HTMLSelectElement).value;
+    const length = (document.getElementById('blog-length') as HTMLSelectElement).value;
+    const prompt = (document.getElementById('blog-prompt') as HTMLTextAreaElement).value;
+
+    document.getElementById('blog-loading')?.classList.remove('hidden');
+    document.getElementById('blog-preview')?.classList.add('hidden');
+    document.getElementById('blog-empty')?.classList.add('hidden');
+    const statusEl = document.getElementById('blog-status');
+    if (statusEl) { statusEl.textContent = 'Generating...'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-yellow-100'; }
+
+    try {
+      const result = await actions.admin.aiGenerate({ type: 'blog', data: { topic, type, length, prompt } });
+      const actionResult = unwrapActionResult<{ success: boolean; error?: { message?: string }; object?: GeneratedBlog }>(result);
+      if (!actionResult.success) throw new Error(actionResult.error?.message || 'Generation failed');
+
+      const aiData = actionResult.object || {};
+      generatedBlog = {
+        title: aiData.title || topic, excerpt: aiData.excerpt || '', content: aiData.content || '',
+        tags: aiData.tags || [], slug: aiData.slug || '', status: aiData.status || 'draft',
+        topic, type, length,
+      };
+      document.getElementById('preview-blog-title')!.textContent = generatedBlog.title;
+      document.getElementById('preview-blog-excerpt')!.textContent = (generatedBlog.excerpt || generatedBlog.content || '').substring(0, 200);
+      document.getElementById('preview-blog-content')!.innerHTML = DOMPurify.sanitize((generatedBlog.content || '').replace(/\n/g, '<br>'), { ALLOWED_TAGS: ['br'] });
+      document.getElementById('blog-preview')?.classList.remove('hidden');
+      if (statusEl) { statusEl.textContent = 'Generated'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-green-100'; }
+      toast.success('Blog article generated');
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Blog generation error:', error);
+      const errorMsg = error.message?.includes('permission') || error.message?.includes('unauthorized')
+        ? 'MiniMax API permission denied. Check API key and quota.'
+        : 'Failed to generate blog: ' + (error.message || 'Unknown error');
+      toast.error(errorMsg);
+      if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-red-100'; }
+      document.getElementById('blog-empty')?.classList.remove('hidden');
+    } finally {
+      document.getElementById('blog-loading')?.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('blog-copy-btn')?.addEventListener('click', () => {
+    if (generatedBlog) {
+      navigator.clipboard.writeText(JSON.stringify(generatedBlog, null, 2));
+      toast.success('Copied to clipboard');
+    }
+  });
+
+  // ============== LANDING PAGE GENERATOR ==============
+  let generatedLanding: any = null;
+
+  document.getElementById('landing-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = (document.getElementById('landing-title') as HTMLInputElement).value;
+    const type = (document.getElementById('landing-type') as HTMLSelectElement).value;
+    const description = (document.getElementById('landing-description') as HTMLTextAreaElement).value;
+    const prompt = (document.getElementById('landing-prompt') as HTMLTextAreaElement).value;
+
+    document.getElementById('landing-loading')?.classList.remove('hidden');
+    document.getElementById('landing-preview')?.classList.add('hidden');
+    document.getElementById('landing-empty')?.classList.add('hidden');
+    const statusEl = document.getElementById('landing-status');
+    if (statusEl) { statusEl.textContent = 'Generating...'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-yellow-100'; }
+
+    try {
+      const result = await actions.admin.aiGenerate({ type: 'landing', data: { title, type, description, prompt } });
+      const actionResult = unwrapActionResult<{ success: boolean; error?: { message?: string }; object?: any }>(result);
+      if (!actionResult.success) throw new Error(actionResult.error?.message || 'Generation failed');
+
+      const aiData = actionResult.object || {};
+      generatedLanding = {
+        hero: aiData.hero || { title: title, subtitle: description },
+        landingDescription: aiData.description || '',
+        features: aiData.features || [],
+        cta: aiData.cta || {},
+        type, title, prompt,
+      };
+
+      document.getElementById('preview-landing-hero-title')!.textContent = generatedLanding.hero?.title || title;
+      document.getElementById('preview-landing-hero-subtitle')!.textContent = generatedLanding.hero?.subtitle || description;
+      document.getElementById('preview-landing-desc')!.textContent = generatedLanding.landingDescription || '';
+
+      const featuresEl = document.getElementById('preview-landing-features')!;
+      featuresEl.replaceChildren();
+      const features = (generatedLanding.features || []) as Array<{ title: string; description: string }>;
+      if (features.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No features generated';
+        featuresEl.appendChild(li);
+      } else {
+        features.forEach((f) => {
+          const li = document.createElement('li');
+          const strong = document.createElement('strong');
+          strong.textContent = f.title || '';
+          li.appendChild(strong);
+          li.appendChild(document.createTextNode(`: ${f.description || ''}`));
+          featuresEl.appendChild(li);
+        });
+      }
+
+      document.getElementById('landing-preview')?.classList.remove('hidden');
+      if (statusEl) { statusEl.textContent = 'Generated'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-green-100'; }
+      toast.success('Landing page generated');
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Landing generation error:', error);
+      const errorMsg = error.message?.includes('permission') || error.message?.includes('unauthorized')
+        ? 'MiniMax API permission denied. Check API key and quota.'
+        : 'Failed to generate landing page: ' + (error.message || 'Unknown error');
+      toast.error(errorMsg);
+      if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'px-2 py-1 text-xs rounded-full bg-red-100'; }
+      document.getElementById('landing-empty')?.classList.remove('hidden');
+    } finally {
+      document.getElementById('landing-loading')?.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('landing-copy-btn')?.addEventListener('click', () => {
+    if (generatedLanding) {
+      navigator.clipboard.writeText(JSON.stringify(generatedLanding, null, 2));
+      toast.success('Copied to clipboard');
+    }
+  });
+</script>
+</content>
+</invoke>

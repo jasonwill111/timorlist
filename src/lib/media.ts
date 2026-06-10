@@ -76,6 +76,7 @@ export async function uploadToR2(
   mimeType: string
 ): Promise<{ url: string; size: number }> {
   const bucket = getR2Bucket();
+  if (!bucket) throw new Error('R2 bucket not configured');
   const publicUrl = getR2PublicUrl();
 
   try {
@@ -131,6 +132,7 @@ export async function uploadImageToR2(
     }
 
     const bucket = getR2Bucket();
+    if (!bucket) return { success: false, error: "R2 bucket not configured" };
     const publicUrl = getR2PublicUrl();
 
     await bucket.put(key, processed.data, {
@@ -158,6 +160,7 @@ export async function uploadImageToR2(
 export async function deleteFromR2(key: string): Promise<boolean> {
   try {
     const bucket = getR2Bucket();
+    if (!bucket) return false;
     await bucket.delete(key);
     return true;
   } catch (error) {
@@ -170,10 +173,11 @@ export async function deleteFromR2(key: string): Promise<boolean> {
 export async function deleteFolderFromR2(prefix: string): Promise<boolean> {
   try {
     const bucket = getR2Bucket();
+    if (!bucket) return false;
     let cursor: string | undefined;
 
     do {
-      const result = await bucket.list({ prefix, cursor, limit: 1000 });
+      const result = await bucket.list({ prefix, ...(cursor !== undefined && { cursor }), limit: 1000 });
       for (const obj of result.objects ?? []) {
         if (obj.key) {
           await bucket.delete(obj.key);
@@ -323,6 +327,7 @@ export function buildR2Key(params: {
 // List files with a given prefix
 export async function listByPrefix(prefix: string, limit = 100): Promise<R2Object[]> {
   const bucket = getR2Bucket();
+  if (!bucket) return [];
   const result = await bucket.list({ prefix, limit });
   return result.objects;
 }

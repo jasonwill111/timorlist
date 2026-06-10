@@ -70,8 +70,8 @@ export async function GET() {
       loc: `/${page.loc}`,
       priority: page.priority,
       changefreq: page.changefreq,
-      lastmod: today
-    });
+      lastmod: today,
+    } as SitemapUrl);
   }
 
   try {

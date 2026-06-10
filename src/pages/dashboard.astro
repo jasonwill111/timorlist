@@ -3,51 +3,17 @@
 export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
-import { CardHeader } from '../components/ui/card';
-import { CardTitle } from '../components/ui/card';
-import { CardDescription } from '../components/ui/card';
-import { CardContent } from '../components/ui/card';
-import { getRawDb } from '@/lib/db';
+import { Button } from '../components/fulldev/button';
+import { Card } from '../components/fulldev/card';
+import { CardHeader } from '../components/fulldev/card';
+import { CardTitle } from '../components/fulldev/card';
+import { CardDescription } from '../components/fulldev/card';
+import { CardContent } from '../components/fulldev/card';
+import { resolveUserFromCookie } from '@/lib/db/queries/auth';
 
-// Check auth via session cookie using raw SQL (avoids Drizzle schema mismatches)
 const cookieHeader = Astro.request.headers.get('cookie') || '';
-let user: { id: string; name: string; email: string } | null = null;
+const user = await resolveUserFromCookie(cookieHeader);
 
-try {
-  const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
-
-  if (tokenMatch) {
-    const db = await getRawDb();
-    if (db) {
-      const session = await db.prepare('SELECT userId, expiresAt FROM session WHERE token = ? LIMIT 1')
-        .bind(tokenMatch[1])
-        .first() as { userId: string; expiresAt: number | string } | null;
-
-      if (session) {
-        // Handle both seconds (number < 1e12) and milliseconds
-        const expiresAtMs = typeof session.expiresAt === 'number'
-          ? (session.expiresAt < 1e12 ? session.expiresAt * 1000 : session.expiresAt)
-          : new Date(session.expiresAt).getTime();
-
-        if (expiresAtMs > Date.now()) {
-          const userRecord = await db.prepare('SELECT id, name, email FROM user WHERE id = ? LIMIT 1')
-            .bind(session.userId)
-            .first() as { id: string; name: string; email: string } | null;
-
-          if (userRecord) {
-            user = { id: userRecord.id, name: userRecord.name || '', email: userRecord.email };
-          }
-        }
-      }
-    }
-  }
-} catch (e) {
-  console.error('Dashboard auth check failed:', e);
-}
-
-// Redirect if not logged in
 if (!user) {
   return Astro.redirect('/login?redirect=/dashboard');
 }

@@ -1,25 +1,17 @@
 ---
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select } from '@/components/ui/select';
+import { Button } from '@/components/fulldev/button';
+import { Input } from '@/components/fulldev/input';
+import { Textarea } from '@/components/fulldev/textarea';
+import { Select } from '@/components/fulldev/select';
+import { Label } from '@/components/fulldev/label';
 // Admin new listing page - for listings table
 export const prerender = false;
 
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
 import { actions } from 'astro:actions';
-import { getDb } from '@/lib/db';
-import { listingCategories } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { getAllListingCategories } from '@/lib/db/queries/listings';
 
-const db = await getDb();
-
-// Get all listing categories grouped by parent
-const allCategories = await db
-  .select()
-  .from(listingCategories)
-  .orderBy(listingCategories.name)
-  .all();
+const allCategories = await getAllListingCategories();
 const parentCategories = allCategories.filter(c => !c.parentId);
 const getChildren = (parentId: string) => allCategories.filter(c => c.parentId === parentId);
 
@@ -77,7 +69,7 @@ const conditions = [
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Condition</label>
+            <Label>Condition</Label>
             <Select name="condition" class="w-full h-10 px-3 rounded-md border border-input bg-background">
               <option value="">Select condition...</option>
               {conditions.map(cond => (

@@ -1,98 +1,29 @@
 ---
 export const prerender = false;
 import Layout from '../layouts/Layout.astro';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
+import { Button } from '../components/fulldev/button';
+import { Input } from '../components/fulldev/input';
 import BusinessCard from '../components/business/BusinessCard.astro';
-import { getRawDb } from '@/lib/db';
+import { getCategoriesForSearch, searchBusinesses } from '@/lib/db/queries/search';
 
 const searchParams = Astro.url.searchParams;
 const query = searchParams.get('q') || '';
 const page = parseInt(searchParams.get('page') || '1', 10);
 const LIMIT = 12;
-const offset = (page - 1) * LIMIT;
 
-// Short cache for search results (dynamic content)
 Astro.response.headers.set('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=120');
 
-interface BusinessRecord {
-  id: string;
-  title: string;
-  slug: string;
-  category_id: string | null;
-  address: string | null;
-  profile_image_id: string | null;
-  tags: string | null;
-  likes: number | null;
-  saves: number | null;
-  views: number | null;
-  status: string | null;
-  about_us: string | null;
-  categoryName: string | null;
-}
-
-interface CategoryRecord {
-  id: string;
-  name: string;
-  parentId: string | null;
-}
-
-let categoryMap: Record<string, string> = {};
-let searchResults: BusinessRecord[] = [];
-let total = 0;
-
-// Build category map for display
-try {
-  const db = await getRawDb();
-  if (db) {
-    const categories = (await db.prepare('SELECT id, name, parent_id as parentId FROM business_categories').all()).results as CategoryRecord[];
-    categories.forEach(c => {
-      categoryMap[c.id] = c.name;
-    });
-  }
-} catch (e) {
-  console.log('Categories error:', e);
-}
-
-// Perform server-side search
-if (query) {
-  try {
-    const db = await getRawDb();
-    if (db) {
-      const searchPattern = `%${query.toLowerCase()}%`;
-      
-      // Count total matching results
-      const countResult = await db.prepare(`
-        SELECT COUNT(*) as count FROM businesses 
-        WHERE status IN ('active', 'published', 'live')
-          AND (LOWER(title) LIKE ? OR LOWER(about_us) LIKE ?)
-      `).bind(searchPattern, searchPattern).first() as { count: number } | undefined;
-      total = countResult?.count || 0;
-      
-      // Fetch paginated results
-      const dataResult = await db.prepare(`
-        SELECT id, title, slug, category_id, address, profile_image_id as profileImageId,
-               tags, likes, saves, views, status, about_us as aboutUs
-        FROM businesses
-        WHERE status IN ('active', 'published', 'live')
-          AND (LOWER(title) LIKE ? OR LOWER(about_us) LIKE ?)
-        ORDER BY 
-          CASE WHEN LOWER(title) LIKE ? THEN 0 ELSE 1 END,
-          likes DESC
-        LIMIT ? OFFSET ?
-      `).bind(searchPattern, searchPattern, searchPattern, LIMIT, offset).all();
-      
-      searchResults = (dataResult.results as BusinessRecord[]).map(b => ({
-        ...b,
-        categoryName: b.category_id ? categoryMap[b.category_id] || '' : ''
-      }));
-    }
-  } catch (e) {
-    console.error('Search error:', e);
-  }
-}
-
+// Search
+const categoryMap = query ? await getCategoriesForSearch() : {};
+const searchResults = query ? await searchBusinesses(query, page, LIMIT) : null;
+const total = searchResults?.total ?? 0;
 const totalPages = Math.ceil(total / LIMIT);
+const results = searchResults?.results ?? [];
+
+// Enrich results with category names
+for (const r of results) {
+  r.categoryName = r.category_id ? categoryMap[r.category_id] || '' : '';
+}
 
 // Build pagination URL helper
 const buildUrl = (pageNum: number) => {
@@ -140,10 +71,10 @@ const buildUrl = (pageNum: number) => {
           <span class="text-lg text-muted-foreground">{total} result{total !== 1 ? 's' : ''} found</span>
         </div>
 
-        {searchResults.length > 0 ? (
+        {results.length > 0 ? (
           <>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {searchResults.map(b => (
+              {results.map(b => (
                 <BusinessCard
                   title={b.title}
                   slug={b.slug}

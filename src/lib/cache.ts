@@ -19,7 +19,7 @@ async function getKVNamespace(): Promise<KVNamespace | null> {
   if (_kv) return _kv;
   try {
     const { env } = await import('cloudflare:workers');
-    const session = (env as Record<string, unknown>).SESSION as KVNamespace;
+    const session = (env as unknown as Record<string, unknown>).SESSION as KVNamespace;
     _kv = session;
     return _kv;
   } catch {

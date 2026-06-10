@@ -6,7 +6,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/db/schema';
 import { canCreateSku } from '@/lib/subscription';
 import { verifyBusinessExists } from '@/lib/db/queries/businesses';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 const CreateProductSchema = z.object({

@@ -5,7 +5,7 @@ import { getDb } from '@/lib/db';
 import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/admin-auth';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 export const deleteProduct = defineAction({

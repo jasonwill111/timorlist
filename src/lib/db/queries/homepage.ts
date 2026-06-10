@@ -63,7 +63,7 @@ function safeJsonParse<T>(str: unknown, fallback: T): T {
   }
 }
 
-async function selectFeaturedEntity(table: typeof businesses, display: string, slug: string) {
+async function selectFeaturedEntity(table: any, display: string, slug: string) {
   const db = await getDb();
   if (!db) return [] as FeaturedBusiness[];
 

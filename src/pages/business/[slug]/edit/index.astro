@@ -2,16 +2,19 @@
 export const prerender = false;
 
 import Layout from '@/layouts/Layout.astro';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/fulldev/button'
+import { Label } from '@/components/fulldev/label';
 import { actions } from 'astro:actions';
-import { Card } from '@/components/ui/card';
-import { CardHeader } from '@/components/ui/card';
-import { CardTitle } from '@/components/ui/card';
-import { CardDescription } from '@/components/ui/card';
-import { CardContent } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/fulldev/card';
+import { CardHeader } from '@/components/fulldev/card';
+import { CardTitle } from '@/components/fulldev/card';
+import { CardDescription } from '@/components/fulldev/card';
+import { CardContent } from '@/components/fulldev/card';
+import { Select } from '@/components/fulldev/select';
+import { Input } from '@/components/fulldev/input';
+import { Textarea } from '@/components/fulldev/textarea';
+import OperatingHoursIsland from '@/components/islands/business/OperatingHoursIsland.astro';
+import { HiddenField } from '@/components/fulldev/hidden';
 ---
 
 <Layout title="Edit Business - TimorUp">
@@ -61,7 +64,7 @@ import { Textarea } from '@/components/ui/textarea';
             </CardHeader>
             <CardContent class="space-y-4">
               <div>
-                <label for="title" class="block text-sm font-medium mb-1">Business Name *</label>
+                <Label for="title">Business Name *</Label>
                 <Input
                   type="text"
                   id="title"
@@ -72,7 +75,7 @@ import { Textarea } from '@/components/ui/textarea';
               </div>
 
               <div>
-                <label for="slug" class="block text-sm font-medium mb-1">URL Slug *</label>
+                <Label for="slug">URL Slug *</Label>
                 <Input
                   type="text"
                   id="slug"
@@ -84,7 +87,7 @@ import { Textarea } from '@/components/ui/textarea';
               </div>
 
               <div>
-                <label for="category" class="block text-sm font-medium mb-1">Category *</label>
+                <Label for="category">Category *</Label>
                 <Select
                   id="category"
                   name="categoryId"
@@ -104,7 +107,7 @@ import { Textarea } from '@/components/ui/textarea';
             <CardContent class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label for="contactName" class="block text-sm font-medium mb-1">Contact Person</label>
+                  <Label for="contactName">Contact Person</Label>
                   <Input
                     type="text"
                     id="contactName"
@@ -113,7 +116,7 @@ import { Textarea } from '@/components/ui/textarea';
                   />
                 </div>
                 <div>
-                  <label for="contactNumber" class="block text-sm font-medium mb-1">Phone Number</label>
+                  <Label for="contactNumber">Phone Number</Label>
                   <Input
                     type="tel"
                     id="contactNumber"
@@ -123,7 +126,7 @@ import { Textarea } from '@/components/ui/textarea';
               </div>
 
               <div>
-                <label for="email" class="block text-sm font-medium mb-1">Email</label>
+                <Label for="email">Email</Label>
                 <Input
                   type="email"
                   id="email"
@@ -133,7 +136,7 @@ import { Textarea } from '@/components/ui/textarea';
               </div>
 
               <div>
-                <label for="address" class="block text-sm font-medium mb-1">Address</label>
+                <Label for="address">Address</Label>
                 <Textarea
                   id="address"
                   name="address"
@@ -145,7 +148,7 @@ import { Textarea } from '@/components/ui/textarea';
 
               <!-- Map Location -->
               <div class="mt-4">
-                <label class="block text-sm font-medium mb-2">Business Location</label>
+                <h3 class="text-sm font-medium mb-2">Business Location</h3>
                 <p class="text-xs text-muted-foreground mb-2">Click on the map to set your location, or enter coordinates manually</p>
 
                 <div id="map-container" class="h-64 rounded-lg border mb-3" style="min-height: 250px;">
@@ -157,7 +160,7 @@ import { Textarea } from '@/components/ui/textarea';
 
                 <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label for="latitude" class="block text-xs font-medium mb-1">Latitude</label>
+                    <Label for="latitude">Latitude</Label>
                     <Input
                       type="number"
                       id="latitude"
@@ -167,7 +170,7 @@ import { Textarea } from '@/components/ui/textarea';
                     />
                   </div>
                   <div>
-                    <label for="longitude" class="block text-xs font-medium mb-1">Longitude</label>
+                    <Label for="longitude">Longitude</Label>
                     <Input
                       type="number"
                       id="longitude"
@@ -191,9 +194,9 @@ import { Textarea } from '@/components/ui/textarea';
             </CardHeader>
             <CardContent>
               <div>
-                <label for="aboutUs" class="block text-sm font-medium mb-1">About Us</label>
+                <Label for="aboutUs">About Us</Label>
                 <div id="aboutUs-editor"></div>
-                <input type="hidden" id="aboutUs" name="aboutUs" />
+                <HiddenField id="aboutUs" name="aboutUs" />
               </div>
             </CardContent>
           </Card>
@@ -207,9 +210,7 @@ import { Textarea } from '@/components/ui/textarea';
             <CardContent class="space-y-3">
               <p class="text-xs text-muted-foreground">Leave time empty or check "Closed" for days you're not open</p>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm" id="hours-container">
-                <!-- Hours will be generated by JavaScript -->
-              </div>
+              <OperatingHoursIsland containerId="hours-container" client:only="astro" />
             </CardContent>
           </Card>
 
@@ -220,7 +221,7 @@ import { Textarea } from '@/components/ui/textarea';
             </CardHeader>
             <CardContent class="space-y-4">
               <div>
-                <label for="yearOfEstablishment" class="block text-sm font-medium mb-1">Year Established</label>
+                <Label for="yearOfEstablishment">Year Established</Label>
                 <Input
                   type="number"
                   id="yearOfEstablishment"
@@ -231,7 +232,7 @@ import { Textarea } from '@/components/ui/textarea';
                 />
               </div>
               <div>
-                <label for="tags" class="block text-sm font-medium mb-1">Tags</label>
+                <Label for="tags">Tags</Label>
                 <Input
                   type="text"
                   id="tags"
@@ -248,14 +249,14 @@ import { Textarea } from '@/components/ui/textarea';
             </CardHeader>
             <CardContent class="space-y-4">
               <div>
-                <label for="facebookUrl" class="block text-sm font-medium mb-1">
+                <Label for="facebookUrl">
                   <span class="inline-flex items-center gap-2">
                     <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
                     Facebook
                   </span>
-                </label>
+                </Label>
                 <Input
                   type="url"
                   id="facebookUrl"
@@ -265,14 +266,14 @@ import { Textarea } from '@/components/ui/textarea';
               </div>
 
               <div>
-                <label for="instagramUrl" class="block text-sm font-medium mb-1">
+                <Label for="instagramUrl">
                   <span class="inline-flex items-center gap-2">
                     <svg class="w-4 h-4 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
                     Instagram
                   </span>
-                </label>
+                </Label>
                 <Input
                   type="url"
                   id="instagramUrl"
@@ -281,14 +282,14 @@ import { Textarea } from '@/components/ui/textarea';
                 />
               </div>
               <div>
-                <label for="tiktokUrl" class="block text-sm font-medium mb-1">
+                <Label for="tiktokUrl">
                   <span class="inline-flex items-center gap-2">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
                     </svg>
                     TikTok
                   </span>
-                </label>
+                </Label>
                 <Input
                   type="url"
                   id="tiktokUrl"
@@ -315,7 +316,7 @@ import { Textarea } from '@/components/ui/textarea';
                 <p class="text-xs text-muted-foreground">JPG, PNG up to 5MB each (max 6 photos)</p>
               </div>
               <div id="gallery-preview" class="grid grid-cols-3 gap-2"></div>
-              <input type="hidden" id="gallery-media-ids" name="galleryMediaIds" />
+              <HiddenField id="gallery-media-ids" name="galleryMediaIds" />
             </CardContent>
           </Card>
 
@@ -333,6 +334,7 @@ import { Textarea } from '@/components/ui/textarea';
 </Layout>
 
 <script>
+  import DOMPurify from 'dompurify';
   import { geocodeAddress } from '@/lib/geo';
   import { getSubscriptionDashboard } from '@/lib/subscription';
 
@@ -519,7 +521,7 @@ import { Textarea } from '@/components/ui/textarea';
       div.dataset.id = id;
 
       if (type === 'video') {
-        div.innerHTML = `
+        div.innerHTML = DOMPurify.sanitize(`
           <video src="${url}" class="w-full h-full object-cover" muted loop />
           <div class="absolute inset-0 flex items-center justify-center bg-black/30">
             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -531,16 +533,16 @@ import { Textarea } from '@/components/ui/textarea';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
-        `;
+        `);
       } else {
-        div.innerHTML = `
+        div.innerHTML = DOMPurify.sanitize(`
           <img src="${url}" alt="Gallery photo" class="w-full h-full object-cover" />
           <button type="button" class="remove-gallery absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
-        `;
+        `);
       }
 
       div.querySelector('.remove-gallery')?.addEventListener('click', () => {
@@ -745,8 +747,11 @@ import { Textarea } from '@/components/ui/textarea';
     // Pre-select category after loadCategories runs
     window.__pendingCategoryId = business.categoryId;
 
-    // Opening hours
-    populateOpeningHours(business.openingHours);
+    // Opening hours - handled by OperatingHoursIsland
+    const hoursContainer = document.getElementById('hours-container');
+    if (hoursContainer && business.openingHours) {
+      (hoursContainer as HTMLElement).dataset.initialHours = business.openingHours;
+    }
 
     // Init map with existing coords
     const lat = business.locationLat;
@@ -786,62 +791,6 @@ import { Textarea } from '@/components/ui/textarea';
 
   // Opening hours
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-  function populateOpeningHours(hoursJson: string | null) {
-    let hours: Record<string, string> = {};
-    if (hoursJson) {
-      try { hours = typeof hoursJson === 'string' ? JSON.parse(hoursJson) : hoursJson; } catch { hours = {}; }
-    }
-
-    const container = document.getElementById('hours-container');
-    if (!container) return;
-
-    container.innerHTML = days.map((day, index) => {
-      const value = hours[day] || '';
-      const isClosed = value === 'closed';
-      const [open = '09:00', close = '18:00'] = isClosed ? ['09:00', '18:00'] : value.split('-');
-
-      return `
-        <div class="flex items-center gap-2 p-2 border rounded-lg">
-          <input type="checkbox" id="${day}-closed" name="${day}-closed" data-action="toggle-closed" data-day="${day}" class="rounded" ${isClosed ? 'checked' : ''} />
-          <label for="${day}-closed" class="w-20 font-medium">${dayLabels[index]}</label>
-          <input
-            type="time"
-            id="${day}-open"
-            name="${day}-open"
-            data-action="time-input"
-            data-day="${day}"
-            class="border rounded px-2 py-1 text-sm"
-            value="${open}"
-            ${isClosed ? 'disabled' : ''}
-          />
-          <span>to</span>
-          <input
-            type="time"
-            id="${day}-close"
-            name="${day}-close"
-            data-action="time-input"
-            data-day="${day}"
-            class="border rounded px-2 py-1 text-sm"
-            value="${close}"
-            ${isClosed ? 'disabled' : ''}
-          />
-        </div>
-      `;
-    }).join('');
-    // Apply initial disabled state based on checked state
-    const closedCheckboxes = container.querySelectorAll('[data-action="toggle-closed"]');
-    closedCheckboxes.forEach((cb) => {
-      const day = (cb as HTMLElement).dataset.day;
-      if (day && (cb as HTMLInputElement).checked) {
-        const timeInputs = container.querySelectorAll(`[data-day="${day}"][data-action="time-input"]`);
-        timeInputs.forEach(input => {
-          (input as HTMLInputElement).disabled = true;
-        });
-      }
-    });
-  }
   // Event delegation for business hours inputs
   document.addEventListener('change', (e) => {
     const target = e.target as HTMLElement;

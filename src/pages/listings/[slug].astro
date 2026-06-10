@@ -1,99 +1,37 @@
 ---
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
-import { getRawDb } from '@/lib/db';
+import { getListingBySlug } from '@/lib/db/queries/getListingBySlug';
+import { buildWhatsAppLink } from '@/lib/utils';
 import { Eye, Heart, Bookmark } from '@lucide/astro';
-import { ShareDialog } from '@/components/ui/share-dialog';
-import { TipTapRenderer } from '@/components/ui/tip-tap-renderer';
+import { ShareDialog } from '@/components/fulldev/share-dialog';
+import { TipTapRenderer } from '@/components/fulldev/tip-tap-renderer';
 import { createBreadcrumbSchema } from '@/lib/seo';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/404');
 
-interface Listing {
-  id: string;
-  title: string;
-  slug: string;
-  description: string | null;
-  price: string | null;
-  condition: string | null;
-  location: string | null;
-  address: string | null;
-  contactName: string | null;
-  contactNumber: string | null;
-  countryCode: string | null;
-  email: string | null;
-  imageIds: string | null;
-  tags: string | null;
-  likes: number | null;
-  saves: number | null;
-  views: number | null;
-  status: string | null;
-  categoryId: string | null;
-  createdAt: number | null;
-  updatedAt: number | null;
-}
-
-let listing: Listing | null = null;
-let category: { name: string } | null = null;
-let images: { id: string; r2_key: string; alt: string | null }[] = [];
-
-try {
-  const db = await getRawDb();
-  if (db) {
-    listing = await db.prepare(`
-      SELECT id, title, slug, description, price, condition, location, address,
-             contact_name as contactName, contact_number as contactNumber, country_code as countryCode, email,
-             image_ids as imageIds, tags,
-             likes, saves, views, status, category_id as categoryId,
-             created_at as createdAt, updated_at as updatedAt
-      FROM listings WHERE slug = ? LIMIT 1
-    `).bind(slug).first() as Listing | null;
-
-    if (listing) {
-      if (listing.categoryId) {
-        category = await db.prepare('SELECT name FROM listing_categories WHERE id = ? LIMIT 1')
-          .bind(listing.categoryId).first() as { name: string } | null;
-      }
-      if (listing.imageIds) {
-        try {
-          const ids = typeof listing.imageIds === 'string' ? JSON.parse(listing.imageIds) : listing.imageIds;
-          if (Array.isArray(ids) && ids.length > 0) {
-            const placeholders = ids.map(() => '?').join(',');
-            const imgsResult = await db.prepare(`SELECT id, r2_key, alt FROM media WHERE id IN (${placeholders})`)
-              .bind(...ids).all();
-            images = (imgsResult.results as any) || [];
-          }
-        } catch {}
-      }
-    }
-  }
-} catch (e) {
-  console.error('Listing query failed:', e);
-}
-
+const { listing, category, listingType, images } = await getListingBySlug(slug);
 if (!listing) return Astro.redirect('/listings');
 
 Astro.response.headers.set('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=600');
 
 const listingTypeMap: Record<string, string> = {
-  'job': 'JobPosting',
-  'product': 'Product',
-  'service': 'Service',
-  'property': 'RealEstateAgent',
-  'vehicle': 'Product',
-  'wanted': 'Demand',
+  'job': 'JobPosting', 'product': 'Product', 'service': 'Service',
+  'property': 'RealEstateAgent', 'vehicle': 'Product', 'wanted': 'Demand',
 };
 
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
 const canonicalUrl = `${siteUrl}/listings/${slug}`;
 
-const parsedImages = listing.imageIds ? (typeof listing.imageIds === 'string' ? JSON.parse(listing.imageIds) : listing.imageIds) : [];
-const imageUrls = images.length > 0 ? images.map(i => `${siteUrl}/api/media/${i.id}`) : parsedImages;
+const parsedImageIds: string[] = listing.imageIds ? JSON.parse(listing.imageIds) : [];
+const imageUrls = images.length > 0
+  ? images.map(i => `${siteUrl}/api/media/${i.id}`)
+  : parsedImageIds;
 
 const productSchema = {
   "@context": "https://schema.org",
-  "@type": listingTypeMap[listing.listingType?.toLowerCase() || ''] || 'Product',
+  "@type": listingTypeMap[listingType?.toLowerCase() || ''] || 'Product',
   "name": listing.title,
   "description": listing.description,
   "url": canonicalUrl,
@@ -104,14 +42,13 @@ const productSchema = {
     "priceCurrency": "USD",
     "availability": "https://schema.org/InStock"
   } : undefined,
-  "category": listing.listingType,
+  "category": listingType,
 };
 
-const tags = listing.tags ? (typeof listing.tags === 'string' ? JSON.parse(listing.tags) : listing.tags) : [];
-const waNumber = (listing.contactNumber || '').replace(/\D/g, '');
-const waLink = listing.contactNumber
-  ? `https://wa.me/${(listing.countryCode || '+670').replace('+', '')}${waNumber}?text=${encodeURIComponent('Hi, I saw your listing: ' + listing.title)}`
-  : '';
+const tags: string[] = listing.tags
+  ? (typeof listing.tags === 'string' ? JSON.parse(listing.tags) : listing.tags)
+  : [];
+const waLink = buildWhatsAppLink(listing.contactNumber, listing.countryCode ?? '+670', 'Hi, I saw your listing: ' + listing.title);
 const createdAt = listing.createdAt ? new Date(listing.createdAt * 1000) : null;
 ---
 
@@ -144,8 +81,8 @@ const createdAt = listing.createdAt ? new Date(listing.createdAt * 1000) : null;
           <div>
             <h1 class="text-2xl sm:text-3xl font-bold mb-2">{listing.title}</h1>
             <div class="flex gap-2 flex-wrap">
-              {listing.listingType && (
-                <span class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm capitalize">{listing.listingType}</span>
+              {listingType && (
+                <span class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm capitalize">{listingType}</span>
               )}
               {category && (
                 <span class="inline-block px-3 py-1 bg-muted text-foreground rounded-full text-sm">{category.name}</span>

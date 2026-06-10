@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { getDb } from '@/lib/db';
 import { businesses, latestUpdates } from '@/db/schema';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
-import { initAuth } from '@/lib/auth';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { getAuth } from '@/lib/auth';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 import { sanitizeHtml } from '@/lib/sanitize';
 
 
@@ -22,7 +22,7 @@ if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not ava
 
     try {
       // Authenticate
-      const authApi = (await initAuth()).api;
+      const authApi = (await getAuth()).api;
       const cookieValue = cookies.get('better-auth.session_token')?.value || '';
 
       const session = await authApi.getSession({
@@ -138,7 +138,7 @@ export const deleteUpdate = defineAction({
 if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not available");
 
     try {
-      const authApi = (await initAuth()).api;
+      const authApi = (await getAuth()).api;
       const cookieValue = cookies.get('better-auth.session_token')?.value || '';
       const session = await authApi.getSession({
         headers: { cookie: cookieValue ? `better-auth.session_token=${cookieValue}` : '' },

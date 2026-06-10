@@ -1,0 +1,66 @@
+---
+/**
+ * ProductsIsland - Composite layer (refactored from 829 lines)
+ * Renders ProductsTableIsland + ProductsFormIsland, wires CustomEvent communication.
+ */
+import ProductsTableIsland from './ProductsTableIsland.astro';
+import ProductsFormIsland from './ProductsFormIsland.astro';
+
+interface ProductData {
+  id: string;
+  businessId: string | null;
+  categoryId: string | null;
+  title: string | null;
+  slug: string | null;
+  description: string | null;
+  productType: string | null;
+  priceFields: string | null;
+  specifications: string | null;
+  images: string | null;
+  active: number | null;
+  createdAt: number | null;
+  businessTitle?: string;
+}
+
+interface BusinessOption {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  products: ProductData[];
+  businessOptions: BusinessOption[];
+}
+
+const { products, businessOptions } = Astro.props;
+---
+
+<!-- Inject business options into window for table island -->
+<script define:vars={{ businessOptions }}>
+  window.__productBusinessOptions = businessOptions;
+</script>
+
+<!-- Table island: display + event dispatching -->
+<ProductsTableIsland
+  products={products}
+  businessOptions={businessOptions}
+/>
+
+<!-- Form island: modal + CRUD JS, listens to sku-create/sku-edit/sku-delete -->
+<ProductsFormIsland businessOptions={businessOptions} />
+
+<script>
+  // Parent event bus: table dispatches events → form island listens directly
+  // But we need to also reload data after save/delete, so parent coordinates:
+
+  let currentProducts = [...(window as any).__currentProducts || []];
+
+  // After sku-saved / sku-deleted, the page should reload data.
+  // Since ProductsIsland is a client island, we reload the page to get fresh data.
+  document.addEventListener('sku-saved', () => {
+    window.location.reload();
+  });
+  document.addEventListener('sku-deleted', () => {
+    window.location.reload();
+  });
+</script>

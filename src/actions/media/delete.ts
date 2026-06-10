@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { getDb } from '@/lib/db';
 import { media } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { initAuth } from '@/lib/auth';
+import { getAuth } from '@/lib/auth';
 import { getR2Bucket } from '@/lib/media';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 export const deleteMedia = defineAction({
@@ -16,7 +16,7 @@ export const deleteMedia = defineAction({
   handler: async (input) => {
     const db = await getDb();
 if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, "Database not available");
-    const auth = await initAuth();
+    const auth = await getAuth();
     const sessionResult = await auth.api.getSession({ headers: { cookie: '' } }).catch(() => null);
     const user = (sessionResult as { user?: { id: string; role?: string } } | null)?.user;
 

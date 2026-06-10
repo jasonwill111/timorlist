@@ -86,7 +86,7 @@ export function generateZodSchema<T extends SQLiteTable>(
 function tableColumns(table: SQLiteTable): Record<string, SQLiteColumn> {
   // Drizzle's internal column tracking via Symbol.for('drizzle:columns')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const columnsMap = (table as Record<string, Record<string, SQLiteColumn>>)[Symbol.for('drizzle:columns')] ?? {};
+  const columnsMap = (table as unknown as Record<string, Record<string, SQLiteColumn>>)[Symbol.for('drizzle:columns')] ?? {};
   return columnsMap;
 }
 

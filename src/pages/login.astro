@@ -1,7 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
+import { Input } from '../components/fulldev/input';
+import { Button } from '../components/fulldev/button'
+import { Label } from '@/components/fulldev/label';
+import { Checkbox } from '@/components/fulldev/checkbox';
 import AuthCard from '../components/forms/AuthCard.astro';
 import FormMessage from '../components/forms/FormMessage.astro';
 import PasswordInput from '../components/forms/PasswordInput.astro';
@@ -18,7 +20,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       <FormMessage id="form-message" type="error" />
 
       <div>
-        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+        <Label for="email">Email</Label>
         <div class="relative">
           <Input
             id="email"
@@ -37,7 +39,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium mb-1">Password</label>
+        <Label for="password">Password</Label>
         <div class="relative">
           <PasswordInput
             id="password"
@@ -56,15 +58,10 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
 
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <input
-            id="remember-me"
-            name="rememberMe"
-            type="checkbox"
-            class="h-4 w-4 rounded border-gray-300"
-          />
-          <label for="remember-me" class="ml-2 text-sm text-muted-foreground">
+          <Checkbox id="remember-me" name="rememberMe" />
+          <Label for="remember-me">
             Remember me
-          </label>
+          </Label>
         </div>
         <a href="/forgot-password" class="text-sm text-muted-foreground hover:underline">
           Forgot password?
@@ -112,6 +109,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
 
 <script>
   import { actions } from 'astro:actions';
+  import { toast } from '../components/starwind/toast';
 
   const form = document.getElementById('login-form') as HTMLFormElement | null;
   const emailInput = document.getElementById('email') as HTMLInputElement | null;
@@ -242,6 +240,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
 
       if (result.error) {
         showError(result.error);
+        toast.error(result.error);
         return;
       }
 
@@ -249,17 +248,20 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
         // If the response includes Set-Cookie, the browser already set it via the header
         const setCookie = response.headers.get('set-cookie');
         if (setCookie) {
+          toast.success('Login successful!');
           window.location.assign('/account');
         } else {
           // Fallback: manually set cookie if header wasn't present
           const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
           document.cookie = `better-auth.session_token=${result.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
+          toast.success('Login successful!');
           window.location.assign('/account');
         }
         return;
       }
     } catch (fetchError) {
       console.error('REST API failed, trying Astro actions:', fetchError);
+      showError('Authentication failed. Please try again.');
     }
 
     // Fallback to Astro actions
@@ -282,6 +284,7 @@ import PasswordInput from '../components/forms/PasswordInput.astro';
       if (data?.token) {
         const cookieExpiry = rememberMe ? 7 * 24 * 60 * 60 : undefined;
         document.cookie = `better-auth.session_token=${data.token}; path=/; max-age=${cookieExpiry || ''}; SameSite=Lax`;
+        toast.success('Login successful!');
         window.location.assign('/account');
       }
     } catch (actionError) {

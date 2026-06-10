@@ -1,0 +1,84 @@
+---
+/**
+ * ServicePackagesIsland - Composite layer (refactored from 548 lines)
+ * Renders ServicePackagesTableIsland + ServicePackagesFormIsland, wires events.
+ */
+import ServicePackagesTableIsland from './ServicePackagesTableIsland.astro';
+import ServicePackagesFormIsland from './ServicePackagesFormIsland.astro';
+
+export interface PackageVariant {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  durationValue: number;
+  durationUnit: string;
+  limits: {
+    skuLimit?: number;
+    maxImages?: number;
+    maxVideos?: number;
+    maxBusinessImages?: number;
+    maxBusinessVideos?: number;
+  };
+  features: string[];
+}
+
+export interface ServicePackageData {
+  id: string;
+  name: string;
+  slug: string;
+  serviceRelationTo: string;
+  description: string | null;
+  variants: PackageVariant[];
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: number | null;
+  updatedAt: number | null;
+}
+
+interface Props {
+  packages: ServicePackageData[];
+  userRole?: string;
+  totalCount?: number;
+  subscriptionCount?: number;
+  listingCount?: number;
+  activeCount?: number;
+}
+
+const {
+  packages,
+  userRole = '',
+  totalCount,
+  subscriptionCount,
+  listingCount,
+  activeCount,
+} = Astro.props;
+---
+
+<!-- Inject packages into window for form island delete fallback -->
+<script define:vars={{ packages }}>
+  window.__spPackages = packages;
+</script>
+
+<!-- Table island: display + stats + event dispatching -->
+<ServicePackagesTableIsland
+  packages={packages}
+  userRole={userRole}
+  totalCount={totalCount}
+  subscriptionCount={subscriptionCount}
+  listingCount={listingCount}
+  activeCount={activeCount}
+/>
+
+<!-- Form island: modal + save/delete JS, listens to sp-create/sp-edit -->
+<ServicePackagesFormIsland />
+
+<script>
+  // After sp-saved / sp-deleted, reload to reflect changes
+  document.addEventListener('sp-saved', () => {
+    window.location.reload();
+  });
+  document.addEventListener('sp-deleted', () => {
+    window.location.reload();
+  });
+</script>

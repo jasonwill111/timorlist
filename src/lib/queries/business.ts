@@ -121,7 +121,7 @@ if (!db) throw new Error("Database not available");
       ...result,
       profileImageUrl,
       bannerImageUrl,
-    });
+    }) as Result<BusinessWithCategory | null>;
   } catch (err) {
     return error(err instanceof Error ? err : new Error(String(err)));
   }
@@ -168,7 +168,7 @@ if (!db) throw new Error("Database not available");
       .limit(1)
       .get() ?? undefined;
 
-    return success(result ?? null);
+    return success(result ?? null) as Result<BusinessWithCategory | null>;
   } catch (err) {
     return error(err instanceof Error ? err : new Error(String(err)));
   }
@@ -284,7 +284,7 @@ if (!db) throw new Error("Database not available");
       total,
       page,
       totalPages: Math.ceil(total / limit),
-    });
+    }) as Result<SearchBusinessesResult>;
   } catch (err) {
     return error(err instanceof Error ? err : new Error(String(err)));
   }
@@ -343,7 +343,7 @@ if (!db) throw new Error("Database not available");
       .limit(limit)
       .all();
 
-    return success(results);
+    return success(results) as Result<BusinessWithCategory[]>;
   } catch (err) {
     return error(err instanceof Error ? err : new Error(String(err)));
   }
@@ -390,7 +390,7 @@ if (!db) throw new Error("Database not available");
       .orderBy(desc(businesses.createdAt))
       .all();
 
-    return success(results);
+    return success(results) as Result<BusinessWithCategory[]>;
   } catch (err) {
     return error(err instanceof Error ? err : new Error(String(err)));
   }

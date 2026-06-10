@@ -1,0 +1,54 @@
+---
+/**
+ * MediaIsland - Admin media library interactive handlers
+ * Replaces inline <script> from pages/admin/media.astro
+ * Handles copy-url, delete-media actions via event delegation
+ */
+import { actions } from 'astro:actions';
+import { toast } from '@/lib/toast';
+---
+
+<script>
+  import { actions } from 'astro:actions';
+  import { toast } from '@/lib/toast';
+
+  // Event delegation for copy and delete actions
+  document.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('[data-action]') as HTMLElement | null;
+    if (!btn) return;
+
+    const action = btn.dataset.action;
+
+    if (action === 'copy-url') {
+      const url = btn.dataset.url;
+      if (url) {
+        try {
+          await navigator.clipboard.writeText(url);
+          toast.success('URL copied to clipboard');
+        } catch {
+          toast.error('Failed to copy URL');
+        }
+      }
+    } else if (action === 'delete-media') {
+      const id = btn.dataset.id;
+      if (!id) return;
+
+      if (!confirm('Delete this media? This cannot be undone.')) return;
+
+      try {
+        const result = await actions.media.deleteMedia({ id });
+
+        if (result.success) {
+          // Remove from DOM using safe DOM API
+          btn.closest('[data-media-item]')?.remove();
+          toast.success('Media deleted');
+        } else {
+          toast.error(result.error?.message || 'Failed to delete');
+        }
+      } catch {
+        toast.error('Failed to delete media');
+      }
+    }
+  });
+</script>

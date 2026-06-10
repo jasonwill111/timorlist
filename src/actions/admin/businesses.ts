@@ -75,6 +75,7 @@ export const adminBusinesses = {
       const db = await getDb();
       if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, 'Database not available');
       const now = Math.floor(Date.now() / 1000);
+      const userId = (await import('@/lib/admin-auth').then(m => m.getAdminUser()))?.id ?? 'unknown';
       const newBusiness = {
         id: `biz-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         title: input.title,
@@ -82,6 +83,7 @@ export const adminBusinesses = {
         email: input.email || null,
         contactNumber: input.contactNumber || null,
         aboutUs: input.aboutUs || null,
+        ownerId: userId,
         status: 'draft' as const,
         createdAt: now,
         updatedAt: now,

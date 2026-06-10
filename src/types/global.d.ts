@@ -11,8 +11,26 @@ declare global {
     SESSION: KVNamespace;
     MEDIA_BUCKET: R2Bucket;
     R2_PUBLIC_URL?: string;
+    SITE_URL?: string;
     MINIMAX_API_KEY?: string;
   }
+
+  // cloudflare:workers env augmentation
+  const env: Env;
+}
+
+declare module 'cloudflare:workers' {
+  namespace Cloudflare {
+    interface Env {
+      DB: D1Database;
+      SESSION: KVNamespace;
+      MEDIA_BUCKET: R2Bucket;
+      SITE_URL?: string;
+    }
+  }
+}
+
+declare global {
   interface Window {
     authFetch: (url: string, options?: RequestInit) => Promise<Response>;
     editCategory: (id: string) => void;

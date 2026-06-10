@@ -1,0 +1,203 @@
+---
+/**
+ * ServicePackagesTableIsland - Packages list, stats, table
+ * Part of ServicePackagesIsland split. Dispatches CustomEvents for edit/create actions.
+ */
+import { Badge } from '@/components/fulldev/badge';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/fulldev/table';
+
+export interface PackageVariant {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  durationValue: number;
+  durationUnit: string;
+  limits: {
+    skuLimit?: number;
+    maxImages?: number;
+    maxVideos?: number;
+    maxBusinessImages?: number;
+    maxBusinessVideos?: number;
+  };
+  features: string[];
+}
+
+export interface ServicePackageData {
+  id: string;
+  name: string;
+  slug: string;
+  serviceRelationTo: string;
+  description: string | null;
+  variants: PackageVariant[];
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: number | null;
+  updatedAt: number | null;
+}
+
+interface Props {
+  packages: ServicePackageData[];
+  userRole?: string;
+  totalCount?: number;
+  subscriptionCount?: number;
+  listingCount?: number;
+  activeCount?: number;
+}
+
+const {
+  packages,
+  userRole = '',
+  totalCount,
+  subscriptionCount,
+  listingCount,
+  activeCount,
+} = Astro.props;
+
+const canEdit = userRole === 'super_admin';
+const total = totalCount ?? packages.length;
+const subs = subscriptionCount ?? packages.filter(p => p.serviceRelationTo === 'business').length;
+const list = listingCount ?? packages.filter(p => p.serviceRelationTo === 'listing').length;
+const active = activeCount ?? packages.filter(p => p.isActive).length;
+---
+
+<!-- Page Header -->
+<div class="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+  <div class="min-w-0">
+    <h1 class="text-lg md:text-2xl font-bold truncate">Service Packages</h1>
+    <p class="text-xs md:text-sm text-muted-foreground hidden sm:block">Manage subscription packages pricing and limits</p>
+  </div>
+  {canEdit && (
+    <button
+      id="add-plan-btn"
+      class="text-xs px-2 py-1 h-7 border rounded-lg hover:bg-muted flex items-center gap-1 whitespace-nowrap md:text-sm md:px-4 md:h-9"
+    >
+      + Add Plan
+    </button>
+  )}
+</div>
+
+<!-- Important Notice -->
+<div class="mb-4 bg-amber-50 dark:bg-amber-900/30 border-2 border-amber-400 dark:border-amber-600 rounded-lg p-3">
+  <div class="flex items-start gap-2">
+    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <p class="text-amber-800 dark:text-amber-300 text-xs md:text-sm">
+      <span class="font-semibold">Note:</span> Changes to plan limits apply to new subscriptions only. Existing subscriptions retain their original limits.
+    </p>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+  <div class="bg-card border rounded-lg p-3 text-center">
+    <p class="text-xl md:text-2xl font-bold">{total}</p>
+    <p class="text-xs text-muted-foreground">Total</p>
+  </div>
+  <div class="bg-card border rounded-lg p-3 text-center">
+    <p class="text-xl md:text-2xl font-bold text-green-600">{subs}</p>
+    <p class="text-xs text-muted-foreground">Subscriptions</p>
+  </div>
+  <div class="bg-card border rounded-lg p-3 text-center">
+    <p class="text-xl md:text-2xl font-bold text-blue-600">{list}</p>
+    <p class="text-xs text-muted-foreground">Listings</p>
+  </div>
+  <div class="bg-card border rounded-lg p-3 text-center">
+    <p class="text-xl md:text-2xl font-bold text-amber-600">{active}</p>
+    <p class="text-xs text-muted-foreground">Active</p>
+  </div>
+</div>
+
+<!-- Plans Table -->
+<div class="bg-card border rounded-lg overflow-x-auto">
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Package</TableHead>
+        <TableHead class="hidden md:table-cell">Type</TableHead>
+        <TableHead>Price</TableHead>
+        <TableHead class="hidden lg:table-cell">SKU Limit</TableHead>
+        <TableHead class="hidden lg:table-cell">Images</TableHead>
+        <TableHead class="hidden lg:table-cell">Variants</TableHead>
+        <TableHead class="text-center">Status</TableHead>
+        <TableHead class="text-right">Actions</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {packages.length === 0 ? (
+        <TableRow>
+          <TableCell colspan="8" class="text-center p-8 text-muted-foreground">No packages found</TableCell>
+        </TableRow>
+      ) : (
+        packages.map((pkg) => {
+          const firstVariant = pkg.variants[0] || {};
+          const price = firstVariant.price ?? 0;
+          const skuLimit = firstVariant.limits?.skuLimit ?? '-';
+          const maxImages = firstVariant.limits?.maxImages ?? '-';
+          const variantCount = pkg.variants.length || 0;
+          return (
+            <TableRow class="hover:bg-muted/50">
+              <TableCell>
+                <div class="font-medium">{pkg.name}</div>
+                <div class="text-xs text-muted-foreground">{pkg.slug}</div>
+              </TableCell>
+              <TableCell class="hidden md:table-cell">
+                <Badge variant="purple" size="sm">{pkg.serviceRelationTo}</Badge>
+              </TableCell>
+              <TableCell class="font-semibold">${price}</TableCell>
+              <TableCell class="hidden lg:table-cell">{skuLimit}</TableCell>
+              <TableCell class="hidden lg:table-cell">{maxImages}</TableCell>
+              <TableCell class="hidden lg:table-cell">{variantCount} variant{variantCount !== 1 ? 's' : ''}</TableCell>
+              <TableCell class="text-center">
+                <Badge variant={pkg.isActive ? 'success' : 'secondary'} size="sm">
+                  {pkg.isActive ? 'Active' : 'Inactive'}
+                </Badge>
+              </TableCell>
+              <TableCell class="text-right">
+                {canEdit ? (
+                  <button
+                    data-action="edit-plan"
+                    data-plan-id={pkg.id}
+                    class="inline-flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors rounded-md px-2 py-1"
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <span class="text-xs text-muted-foreground">View only</span>
+                )}
+              </TableCell>
+            </TableRow>
+          );
+        })
+      )}
+    </TableBody>
+  </Table>
+</div>
+
+<script>
+  // "Add Plan" button — dispatch create event
+  document.getElementById('add-plan-btn')?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('sp-create', { detail: {} }));
+  });
+
+  // Edit button delegation — dispatch edit event with plan data
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-action]') as HTMLElement | null;
+    if (!btn) return;
+    if (btn.dataset.action === 'edit-plan') {
+      const planId = btn.dataset.planId;
+      if (planId) {
+        const pkg = (window as any).__spPackages?.find((p: any) => p.id === planId);
+        document.dispatchEvent(new CustomEvent('sp-edit', { detail: { planId, pkg } }));
+      }
+    }
+  });
+</script>

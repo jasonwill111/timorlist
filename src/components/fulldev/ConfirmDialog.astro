@@ -1,0 +1,47 @@
+---
+import type { ComponentProps } from "astro/types"
+import { Button } from "@/components/fulldev/button"
+import AlertDialog from "@/components/fulldev/alert-dialog/alert-dialog.astro"
+import AlertDialogTrigger from "@/components/fulldev/alert-dialog/alert-dialog-trigger.astro"
+import AlertDialogContent from "@/components/fulldev/alert-dialog/alert-dialog-content.astro"
+import AlertDialogHeader from "@/components/fulldev/alert-dialog/alert-dialog-header.astro"
+import AlertDialogTitle from "@/components/fulldev/alert-dialog/alert-dialog-title.astro"
+import AlertDialogDescription from "@/components/fulldev/alert-dialog/alert-dialog-description.astro"
+import AlertDialogFooter from "@/components/fulldev/alert-dialog/alert-dialog-footer.astro"
+import AlertDialogCancel from "@/components/fulldev/alert-dialog/alert-dialog-cancel.astro"
+import AlertDialogAction from "@/components/fulldev/alert-dialog/alert-dialog-action.astro"
+
+type Props = {
+  id: string
+  title: string
+  message: string
+  confirmText?: string
+  cancelText?: string
+  variant?: "default" | "destructive"
+}
+
+const {
+  id,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  variant = "default",
+} = Astro.props
+---
+
+<AlertDialog>
+  <AlertDialogTrigger data-slot="confirm-dialog-trigger" id={`${id}-trigger`} />
+  <AlertDialogContent id={id}>
+    <AlertDialogHeader>
+      <AlertDialogTitle>{title}</AlertDialogTitle>
+      <AlertDialogDescription>{message}</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+      <AlertDialogAction variant={variant === "destructive" ? "destructive" : "default"}>
+        {confirmText}
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>

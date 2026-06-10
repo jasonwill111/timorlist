@@ -1,0 +1,73 @@
+{
+  "$schema": "https://starwind.dev/schema.json",
+  "tailwind": {
+    "content": [
+      "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"
+    ]
+  },
+  "componentDir": "src/components/starwind",
+  "utilsDir": "src/lib/utils",
+  "components": [
+    {
+      "name": "button",
+      "version": "2.3.3"
+    },
+    {
+      "name": "input",
+      "version": "1.3.3"
+    },
+    {
+      "name": "select",
+      "version": "1.9.0"
+    },
+    {
+      "name": "dropdown",
+      "version": "2.0.0"
+    },
+    {
+      "name": "separator",
+      "version": "1.0.2"
+    },
+    {
+      "name": "toast",
+      "version": "1.0.2"
+    },
+    {
+      "name": "dropzone",
+      "version": "1.2.4"
+    },
+    {
+      "name": "pagination",
+      "version": "3.0.4"
+    },
+    {
+      "name": "progress",
+      "version": "1.1.3"
+    },
+    {
+      "name": "color-picker",
+      "version": "1.1.0"
+    },
+    {
+      "name": "scroll-area",
+      "version": "1.0.0"
+    },
+    {
+      "name": "hover-card",
+      "version": "1.0.0"
+    },
+    {
+      "name": "context-menu",
+      "version": "1.0.0"
+    },
+    {
+      "name": "image",
+      "version": "1.0.2"
+    },
+    {
+      "name": "item",
+      "version": "1.0.3"
+    }
+  ],
+  "baseDir": "./src/components/starwind"
+}

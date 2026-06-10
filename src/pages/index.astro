@@ -2,10 +2,10 @@
 // Dynamic page with full SSR for SEO
 
 import Layout from '../layouts/Layout.astro';
-import { Button } from '../components/ui/button';
+import { Button } from '../components/fulldev/button';
 import HomepageContent from '../components/islands/HomepageContent.astro';
-import LucideIcon from '../components/ui/LucideIcon.astro';
-import CarouselBanner from '../components/ui/CarouselBanner.astro';
+import LucideIcon from '../components/fulldev/LucideIcon.astro';
+import CarouselBanner from '../components/fulldev/CarouselBanner.astro';
 
 // Cache: Homepage high traffic - 60s browser, 2min CDN
 Astro.response.headers.set(

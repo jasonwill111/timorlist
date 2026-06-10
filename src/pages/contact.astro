@@ -1,9 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { Button } from '@components/ui/button';
-import { Textarea } from '@components/ui/textarea';
-import { Select } from '@components/ui/select';
-import { Input } from '@components/ui/input';
+import { Button } from '@/components/fulldev/button';
+import { Textarea } from '@/components/fulldev/textarea';
+import { Select } from '@/components/fulldev/select';
+import { Input } from '@/components/fulldev/input';
+import { Label } from '@/components/fulldev/label';
 
 export const prerender = true;
 ---
@@ -27,7 +28,7 @@ export const prerender = true;
         <h2 class="text-xl font-bold mb-6">Send us a Message</h2>
         <form id="contact-form" class="space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium mb-1">Name *</label>
+            <Label for="name">Name *</Label>
             <Input
               type="text"
               id="name"
@@ -38,7 +39,7 @@ export const prerender = true;
             />
           </div>
           <div>
-            <label for="email" class="block text-sm font-medium mb-1">Email *</label>
+            <Label for="email">Email *</Label>
             <Input
               type="email"
               id="email"
@@ -64,7 +65,7 @@ export const prerender = true;
             />
           </div>
           <div>
-            <label for="message" class="block text-sm font-medium mb-1">Message *</label>
+            <Label for="message">Message *</Label>
           <Textarea
             id="message"
             name="message"

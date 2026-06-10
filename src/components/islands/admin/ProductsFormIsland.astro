@@ -1,0 +1,299 @@
+---
+/**
+ * ProductsFormIsland — SKU modal form, TipTap editor, image upload.
+ * Part of ProductsIsland split (ProductsTableIsland + ProductsFormIsland → ProductsIsland).
+ * CustomEvent contract: listens to sku-create / sku-edit / sku-delete;
+ * dispatches sku-saved / sku-deleted on success.
+ */
+import { Select } from '@/components/fulldev/select';
+import { Input } from '@/components/fulldev/input';
+import { SKU_SERVICE_TYPES } from '@/lib/constants';
+
+interface BusinessOption { value: string; label: string; }
+interface Props { businessOptions: BusinessOption[]; }
+
+const { businessOptions } = Astro.props;
+const businessOptionsJson = JSON.stringify(businessOptions);
+---
+
+<script id="form-business-data" type="application/json" set:html={businessOptionsJson}></script>
+
+<div id="sku-modal" class="fixed inset-0 bg-black/50 z-[60] hidden items-center justify-center p-4">
+  <div class="bg-card border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="p-4 border-b flex items-center justify-between sticky top-0 bg-card z-10">
+      <h2 id="modal-title" class="text-lg font-semibold leading-snug">Create Product</h2>
+      <button id="close-modal" class="p-1 hover:bg-muted rounded" aria-label="Close">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <form id="sku-form" class="p-4 space-y-4">
+      <input type="hidden" id="sku-id" name="id" value="" />
+
+      <div>
+        <label for="sku-business" class="block text-sm font-medium mb-1">Business *</label>
+        <Select id="sku-business" name="businessId" required options={[{value:'',label:'Select a business...'}]} class="w-full px-3 py-2 border rounded-md text-sm bg-background" />
+      </div>
+      <div>
+        <label for="sku-title" class="block text-sm font-medium mb-1">Product/Service Name *</label>
+        <Input type="text" id="sku-title" name="title" required class="w-full" placeholder="e.g., Hourly Massage Service" />
+      </div>
+      <div>
+        <label for="sku-service-type" class="block text-sm font-medium mb-1">Product Type</label>
+        <Select id="sku-service-type" name="productType" options={SKU_SERVICE_TYPES.map(t => ({value:t.value,label:`${t.icon} ${t.label}`}))} class="w-full px-3 py-2 border rounded-md text-sm bg-background" />
+      </div>
+
+      <div id="price-fields-container" data-field-count="1">
+        <label class="block text-sm font-medium mb-2">Pricing Options</label>
+        <div id="price-fields" class="space-y-2"></div>
+        <button type="button" id="add-price-field" class="mt-2 text-xs text-primary hover:underline border-0 bg-transparent p-0">+ Add another price option</button>
+      </div>
+
+      <div id="specifications-container" class="hidden">
+        <label class="block text-sm font-medium mb-2">Industry Specifications</label>
+        <p class="text-xs text-muted-foreground mb-2">Fill in relevant details based on the service type</p>
+        <div id="specifications-fields" class="space-y-3"></div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Product Images</label>
+        <div id="sku-image-upload" class="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer">
+          <p class="text-sm text-muted-foreground">Click or drag to upload images/videos</p>
+          <input type="file" id="sku-image-file" accept="image/*,video/mp4,video/webm,video/quicktime" multiple class="hidden" />
+        </div>
+        <div id="sku-image-preview" class="mt-2 grid grid-cols-4 gap-2 hidden"></div>
+        <input type="hidden" id="sku-media-ids" name="mediaIds" value="" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Description</label>
+        <div id="editor-toolbar" class="flex flex-wrap gap-1 p-2 border border-b-0 rounded-t-md bg-muted/30">
+          <button type="button" data-command="toggleBold" class="toolbar-btn" title="Bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg></button>
+          <button type="button" data-command="toggleItalic" class="toolbar-btn" title="Italic"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 4h-9 M14 20H5 M15 4L9 20"/></svg></button>
+          <button type="button" data-command="toggleUnderline" class="toolbar-btn" title="Underline"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 4v6a6 6 0 0 0 12 0V4 M4 20h16"/></svg></button>
+          <div class="w-px bg-border mx-1"></div>
+          <button type="button" data-command="toggleHeading" data-level="1" class="toolbar-btn text-xs font-bold" title="H1">H1</button>
+          <button type="button" data-command="toggleHeading" data-level="2" class="toolbar-btn text-xs font-bold" title="H2">H2</button>
+          <div class="w-px bg-border mx-1"></div>
+          <button type="button" data-command="toggleBulletList" class="toolbar-btn" title="Bullet List"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13 M8 12h13 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01"/></svg></button>
+          <button type="button" data-command="toggleOrderedList" class="toolbar-btn" title="Ordered List"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11 M10 12h11 M10 18h11 M4 6h1v4 M4 10h2 M4 14h2l-2 4h2"/></svg></button>
+          <button type="button" data-command="toggleBlockquote" class="toolbar-btn" title="Quote"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
+          <div class="w-px bg-border mx-1"></div>
+          <button type="button" data-command="undo" class="toolbar-btn" title="Undo"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5H3"/></svg></button>
+          <button type="button" data-command="redo" class="toolbar-btn" title="Redo"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a5 5 0 0 0-5 5v0a5 5 0 0 0 5 5h10"/></svg></button>
+        </div>
+        <div id="tiptap-editor" class="prose-editor border rounded-b-md" data-placeholder="Brief description..."></div>
+        <input type="hidden" id="sku-description" name="description" value="" />
+      </div>
+
+      <div class="flex gap-2 justify-end pt-2">
+        <button type="button" id="cancel-btn" class="px-3 py-1 border rounded-md text-xs h-8 hover:bg-muted">Cancel</button>
+        <button type="submit" class="px-3 py-1 bg-primary text-primary-foreground rounded-md text-xs h-8 hover:opacity-90">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .prose-editor { min-height: 150px; padding: 0.75rem; }
+  .prose-editor :global(.ProseMirror) { min-height: 120px; outline: none; }
+  .prose-editor :global(.ProseMirror p.is-editor-empty:first-child::before) { content: attr(data-placeholder); color: #9ca3af; pointer-events: none; float: left; height: 0; }
+  .prose-editor :global(.ProseMirror p) { margin: 0.5em 0; }
+  .prose-editor :global(.ProseMirror h1) { font-size: 1.5rem; font-weight: bold; margin: 1em 0 0.5em; }
+  .prose-editor :global(.ProseMirror h2) { font-size: 1.25rem; font-weight: bold; margin: 0.75em 0 0.5em; }
+  .prose-editor :global(.ProseMirror ul), .prose-editor :global(.ProseMirror ol) { padding-left: 1.5em; margin: 0.5em 0; }
+  .prose-editor :global(.ProseMirror blockquote) { border-left: 3px solid #d1d5db; padding-left: 1em; margin: 0.5em 0; color: #6b7280; }
+  .toolbar-btn { padding: 0.375rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; transition: all 0.15s; cursor: pointer; background: transparent; border: 1px solid transparent; }
+  .toolbar-btn:hover { background: #e5e7eb; }
+  .toolbar-btn.active { background: #fef3c7; color: #92400e; }
+  :global(.dark) .toolbar-btn:hover { background: #374151; }
+  :global(.dark) .toolbar-btn.active { background: #78350f; color: #fef3c7; }
+</style>
+
+<script>
+  import { escapeHtml } from '@/lib/sanitize';
+  import { buildPriceFieldsHtml, buildSpecFieldHtml, buildMediaThumbnail, buildAddPriceRowHtml } from '@/lib/form-builders';
+  import { getPriceUnitsForServiceType } from '@/lib/constants';
+  import { productConfig } from '@/lib/product-config';
+
+  const businessOptions: any[] = JSON.parse((document.getElementById('form-business-data') as HTMLScriptElement)?.textContent || '[]');
+  let editingId: string | null = null, skuMediaIds: string[] = [], editor: any = null, editorLoaded = false;
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024, MAX_VIDEO_SIZE = 8 * 1024 * 1024;
+  const IMAGE_TYPES = ['image/jpeg','image/png','image/gif','image/webp'];
+  const VIDEO_TYPES = ['video/mp4','video/webm','video/quicktime'];
+  import('@/lib/video-compress').then(({ preloadFFmpeg }) => preloadFFmpeg());
+
+  function $(id: string) { return document.getElementById(id); }
+  const sel = (id: string) => $(id) as HTMLSelectElement;
+  const inp = (id: string) => $(id) as HTMLInputElement;
+
+  function populateBusinesses(selectedId = '') {
+    const s = sel('sku-business'); if (!s) return;
+    s.innerHTML = '<option value="">Select a business...</option>' + businessOptions.map((b: any) => `<option value="${b.value}"${b.value === selectedId ? ' selected' : ''}>${escapeHtml(b.label)}</option>`).join('');
+  }
+
+  function renderPriceFields(productType = 'product', existingFields: any[] = []) {
+    const c = $('price-fields'); if (!c) return;
+    c.innerHTML = buildPriceFieldsHtml(productType, existingFields);
+    $('price-fields-container')!.dataset.fieldCount = String(existingFields.length || 1);
+  }
+
+  function renderSpecificationFields(productType = 'product', existingSpecs: Record<string, any> = {}) {
+    const container = $('specifications-container'), fieldsContainer = $('specifications-fields');
+    if (!container || !fieldsContainer) return;
+    const fields = productConfig.getSpecificationFields(productType) || [];
+    if (!fields.length) { container.classList.add('hidden'); return; }
+    container.classList.remove('hidden');
+    fieldsContainer.innerHTML = fields.map((f: any) => buildSpecFieldHtml(f, existingSpecs[f.key] || '')).join('');
+  }
+
+  async function initEditor(initialContent = '') {
+    if (!editorLoaded) {
+      try {
+        const [core, starter, underline, placeholder] = await Promise.all([
+          import('@tiptap/core'), import('@tiptap/starter-kit'),
+          import('@tiptap/extension-underline'), import('@tiptap/extension-placeholder'),
+        ]);
+        (window as any).__tiptapEditor = core.Editor;
+        (window as any).__tiptapStarterKit = starter.default;
+        (window as any).__tiptapUnderline = underline.default;
+        (window as any).__tiptapPlaceholder = placeholder.default;
+        editorLoaded = true;
+      } catch (err) { console.error('[SKU Form] Editor load failed:', err); return; }
+    }
+    const Editor = (window as any).__tiptapEditor;
+    const el = $('tiptap-editor') as HTMLElement; if (!el) return;
+    if (editor) editor.destroy();
+    editor = new Editor({
+      element: el,
+      extensions: [(window as any).__tiptapStarterKit, (window as any).__tiptapUnderline, ((window as any).__tiptapPlaceholder as any).configure({ placeholder: el.dataset.placeholder || 'Start writing...' })],
+      content: initialContent, immediatelyRender: false,
+      onUpdate: ({ editor: e }: any) => { inp('sku-description').value = e.getHTML(); },
+    });
+    inp('sku-description').value = initialContent;
+    return editor;
+  }
+
+  function setupToolbar() {
+    document.querySelectorAll('[data-command]').forEach(btn => {
+      (btn as HTMLElement).addEventListener('click', () => {
+        if (!editor) return;
+        const cmd = (btn as HTMLElement).dataset.command, level = (btn as HTMLElement).dataset.level;
+        if (cmd === 'toggleHeading' && level) editor.chain().focus().toggleHeading({ level: parseInt(level) }).run();
+        else if (cmd === 'undo') editor.chain().focus().undo().run();
+        else if (cmd === 'redo') editor.chain().focus().redo().run();
+        else { const fn = (editor.chain().focus() as any)[cmd]; if (typeof fn?.run === 'function') fn.run(); }
+      });
+    });
+  }
+
+  async function handleUpload(files: FileList) {
+    const preview = $('sku-image-preview')!, uploadArea = $('sku-image-upload')!;
+    for (const file of files) {
+      if (skuMediaIds.length >= 4) break;
+      const isImage = IMAGE_TYPES.includes(file.type), isVideo = VIDEO_TYPES.includes(file.type);
+      if (!isImage && !isVideo) continue;
+      if (isImage && file.size > MAX_IMAGE_SIZE) { alert(`Image too large: ${(file.size/1024/1024).toFixed(1)}MB. Max: 2MB`); continue; }
+      if (isVideo && file.size > MAX_VIDEO_SIZE) { alert(`Video too large: ${(file.size/1024/1024).toFixed(1)}MB. Max: 8MB`); continue; }
+      let toUpload = file;
+      if (isVideo) {
+        const { compressVideo } = await import('@/lib/video-compress');
+        const statusDiv = Object.assign(document.createElement('div'), { className: 'absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs rounded-lg z-10', textContent: 'Processing...' });
+        (uploadArea as HTMLElement).style.position = 'relative'; uploadArea.appendChild(statusDiv);
+        try {
+          const result = await compressVideo(file, { maxSize: MAX_VIDEO_SIZE, onProgress: (p: any) => { statusDiv.textContent = p.message; } });
+          if (!result.withinLimit) { alert('Video still too large after compression'); statusDiv.remove(); continue; }
+          toUpload = result.file; statusDiv.textContent = 'Uploading...';
+        } catch { statusDiv.remove(); alert('Video processing failed'); continue; }
+      }
+      try {
+        const { actions } = await import('astro:actions');
+        const result: any = await actions.media.uploadMedia({ file: toUpload, category: 'sku' });
+        if (result.success && result.data?.id) {
+          skuMediaIds.push(result.data.id);
+          preview.insertAdjacentHTML('beforeend', buildMediaThumbnail(result.data.id, result.data.url, file.type.startsWith('video')));
+          preview.classList.remove('hidden');
+          inp('sku-media-ids').value = skuMediaIds.join(',');
+        }
+      } catch (err) { console.error('Upload error:', err); }
+    }
+  }
+
+  function openModal() { $('sku-modal')?.classList.remove('hidden'); $('sku-modal')?.classList.add('flex'); setTimeout(() => (editor as any)?.commands?.focus?.(), 100); }
+  function closeModal() {
+    const m = $('sku-modal'); m?.classList.add('hidden'); m?.classList.remove('flex');
+    editingId = null;
+    $('sku-form')?.reset();
+    inp('sku-id').value = '';
+    $('modal-title')!.textContent = 'Create Product';
+    if (editor) editor.commands?.clearContent?.();
+    inp('sku-description').value = '';
+    skuMediaIds = [];
+    const preview = $('sku-image-preview')!; preview.innerHTML = ''; preview.classList.add('hidden');
+    inp('sku-media-ids').value = '';
+  }
+
+  async function loadAndOpenForEdit(id: string) {
+    try {
+      const data = await (await fetch(`/api/products/${id}`)).json();
+      if (!data.id) { alert('SKU not found'); return; }
+      editingId = id;
+      $('modal-title')!.textContent = 'Edit SKU';
+      inp('sku-id').value = id;
+      (inp('sku-title') as any).value = data.title || '';
+      populateBusinesses(data.businessId || '');
+      sel('sku-service-type').value = data.productType || 'product';
+      renderPriceFields(data.productType || 'product', data.priceFields ? JSON.parse(data.priceFields) : []);
+      renderSpecificationFields(data.productType || 'product', data.specifications ? JSON.parse(data.specifications) : {});
+      await initEditor(data.description || ''); setupToolbar(); openModal();
+    } catch { alert('Failed to load SKU'); }
+  }
+
+  // ── Event wiring ─────────────────────────────────────────────────────────
+
+  document.addEventListener('sku-create', () => { populateBusinesses(); renderPriceFields('product'); renderSpecificationFields('product'); editingId = null; $('modal-title')!.textContent = 'Create Product'; initEditor('').then(() => setupToolbar()); openModal(); });
+  document.addEventListener('sku-edit', (e: any) => loadAndOpenForEdit(e.detail.id));
+  document.addEventListener('sku-delete', async (e: any) => { if (!confirm('Delete this SKU?')) return; try { const res = await fetch(`/api/products/${e.detail.id}`, { method: 'DELETE' }); if (res.ok) document.dispatchEvent(new CustomEvent('sku-deleted', { detail: { id: e.detail.id } })); else alert('Delete failed'); } catch { alert('Delete failed'); } });
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const rmPrice = target.closest('[data-action="remove-price-field"]');
+    if (rmPrice) { rmPrice.closest('.price-field-row')?.remove(); return; }
+    const rmMedia = target.closest('[data-action="remove-media"]');
+    if (rmMedia) { const id = (rmMedia as HTMLElement).dataset.mediaId; if (id) { skuMediaIds = skuMediaIds.filter(m => m !== id); rmMedia.closest('.relative.aspect-square')?.remove(); inp('sku-media-ids').value = skuMediaIds.join(','); } }
+  });
+
+  $('add-price-field')?.addEventListener('click', () => { const c = $('price-fields-container')!; const idx = parseInt(c.dataset.fieldCount || '1'); const pt = sel('sku-service-type').value || 'product'; $('price-fields')?.insertAdjacentHTML('beforeend', buildAddPriceRowHtml(pt, idx)); c.dataset.fieldCount = String(idx + 1); });
+  sel('sku-service-type').addEventListener('change', (e) => { const pt = (e.target as HTMLSelectElement).value; renderPriceFields(pt); renderSpecificationFields(pt); });
+  $('sku-image-upload')?.addEventListener('click', () => $('sku-image-file')?.click());
+  $('sku-image-file')?.addEventListener('change', (e) => { const files = (e.target as HTMLInputElement).files; if (files) handleUpload(files); (e.target as HTMLInputElement).value = ''; });
+  $('close-modal')?.addEventListener('click', closeModal);
+  $('cancel-btn')?.addEventListener('click', closeModal);
+  $('sku-modal')?.addEventListener('click', (e) => { if ((e.target as HTMLElement).id === 'sku-modal') closeModal(); });
+
+  $('sku-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target as HTMLFormElement);
+    const fieldCount = parseInt($('price-fields-container')!.dataset.fieldCount || '1');
+    const priceFields: any[] = [];
+    for (let i = 0; i < fieldCount; i++) { const l = fd.get(`priceLabel_${i}`), v = fd.get(`priceValue_${i}`), u = fd.get(`priceUnit_${i}`); if (l || v) priceFields.push({ label: l, value: v || '', unit: u || '' }); }
+    const productType = fd.get('productType') as string;
+    const specs: Record<string, any> = {};
+    (productConfig.getSpecificationFields(productType) || []).forEach((field: any) => {
+      const key = `spec_${field.key}`, val = fd.get(key);
+      if (field.type === 'checkbox') specs[field.key] = val === 'true';
+      else if (field.type === 'tags') specs[field.key] = val ? (val as string).split(',').map((v: string) => v.trim()).filter(Boolean) : [];
+      else if (val) specs[field.key] = field.type === 'number' ? Number(val) : val;
+    });
+    const skuData = { title: fd.get('title'), businessId: fd.get('businessId'), productType, priceFields: priceFields.length ? JSON.stringify(priceFields) : null, specifications: Object.keys(specs).length ? specs : null, description: inp('sku-description').value, isAdmin: true };
+    if (!skuData.businessId) { alert('Please select a business'); return; }
+    if (!skuData.title) { alert('Please enter a title'); return; }
+    try {
+      const url = editingId ? `/api/products/${editingId}` : '/api/products';
+      const res = await fetch(url, { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(skuData) });
+      if (res.ok) { closeModal(); document.dispatchEvent(new CustomEvent('sku-saved', { detail: { editingId } })); }
+      else { const err = await res.json(); alert('Failed: ' + (err.message || 'Unknown error')); }
+    } catch { alert('Failed to save SKU'); }
+  });
+</script>

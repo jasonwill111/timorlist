@@ -3,14 +3,14 @@
 export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
-import { CardHeader } from '../components/ui/card';
-import { CardTitle } from '../components/ui/card';
-import { CardDescription } from '../components/ui/card';
-import { CardContent } from '../components/ui/card';
-import { CardFooter } from '../components/ui/card';
-import ToastContainer from '../components/ui/toast/ToastContainer.astro';
+import { Button } from '../components/fulldev/button';
+import { Card } from '../components/fulldev/card';
+import { CardHeader } from '../components/fulldev/card';
+import { CardTitle } from '../components/fulldev/card';
+import { CardDescription } from '../components/fulldev/card';
+import { CardContent } from '../components/fulldev/card';
+import { CardFooter } from '../components/fulldev/card';
+import ToastContainer from '../components/fulldev/toast/ToastContainer.astro';
 
 ---
 
@@ -23,8 +23,24 @@ import ToastContainer from '../components/ui/toast/ToastContainer.astro';
       </CardHeader>
       <CardContent>
         <div id="verification-status" class="text-center py-4">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p class="text-muted-foreground">Verifying your email...</p>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" id="verify-spinner"></div>
+          <!-- Static success state -->
+          <div id="verify-success" class="hidden">
+            <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p id="verify-success-msg" class="text-lg font-medium text-green-600"></p>
+          </div>
+          <!-- Static error state -->
+          <div id="verify-error" class="hidden">
+            <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p id="verify-error-msg" class="text-lg font-medium text-red-600"></p>
+            <a href="/login" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 h-11 rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200 mt-4">
+              Go to Login
+            </a>
+          </div>
         </div>
       </CardContent>
       <CardFooter class="justify-center">
@@ -70,50 +86,24 @@ import ToastContainer from '../components/ui/toast/ToastContainer.astro';
   }
 
   function showSuccess(message: string) {
-    if (!statusContainer) return;
-    // Use textContent for user messages to prevent XSS
-    statusContainer.textContent = '';
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('class', 'w-16 h-16 text-green-500 mx-auto mb-4');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
-
-    const p = document.createElement('p');
-    p.className = 'text-lg font-medium text-green-600';
-    p.textContent = message;
-
-    statusContainer.appendChild(svg);
-    statusContainer.appendChild(p);
+    const spinner = document.getElementById('verify-spinner');
+    const successEl = document.getElementById('verify-success');
+    const msgEl = document.getElementById('verify-success-msg');
+    if (!successEl || !msgEl) return;
+    spinner?.classList.add('hidden');
+    successEl.classList.remove('hidden');
+    msgEl.textContent = message;
     toast.success(message);
   }
 
   function showError(message: string) {
-    if (!statusContainer) return;
-    // Use textContent for user messages to prevent XSS
-    statusContainer.textContent = '';
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('class', 'w-16 h-16 text-red-500 mx-auto mb-4');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />';
-
-    const p = document.createElement('p');
-    p.className = 'text-lg font-medium text-red-600';
-    p.textContent = message;
-
-    const link = document.createElement('a');
-    link.href = '/login';
-    link.className = 'inline-flex items-center justify-center gap-2 px-4 py-2.5 h-11 rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200 mt-4';
-    link.textContent = 'Go to Login';
-
-    statusContainer.appendChild(svg);
-    statusContainer.appendChild(p);
-    statusContainer.appendChild(link);
+    const spinner = document.getElementById('verify-spinner');
+    const errorEl = document.getElementById('verify-error');
+    const msgEl = document.getElementById('verify-error-msg');
+    if (!errorEl || !msgEl) return;
+    spinner?.classList.add('hidden');
+    errorEl.classList.remove('hidden');
+    msgEl.textContent = message;
     toast.error(message);
   }
 

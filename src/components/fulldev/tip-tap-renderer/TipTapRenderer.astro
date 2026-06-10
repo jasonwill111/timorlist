@@ -1,0 +1,244 @@
+---
+/**
+ * Unified TipTap Renderer Component
+ * Renders TipTap-generated HTML content consistently across all entity types
+ * 
+ * Supports: businesses, listings, blogs, non-profits, public-sectors, products
+ */
+
+interface Props {
+  /** HTML content from TipTap editor */
+  content: string | null | undefined;
+  /** CSS class for the container */
+  class?: string;
+  /** Optional prose size variant */
+  size?: 'sm' | 'md' | 'lg';
+  /** Enable/disable link sanitization */
+  sanitizeLinks?: boolean;
+}
+
+const {
+  content,
+  class: className = '',
+  size = 'md',
+  sanitizeLinks = true,
+} = Astro.props;
+
+// Size-based prose classes
+const sizeClasses = {
+  sm: 'prose-sm',
+  md: 'prose-base',
+  lg: 'prose-lg',
+};
+
+// Sanitize function - removes potentially dangerous attributes while preserving safe HTML
+function sanitizeHtml(html: string): string {
+  if (!html) return '';
+  
+  // If sanitizeLinks is false, skip link sanitization
+  if (!sanitizeLinks) {
+    return html;
+  }
+  
+  // Allow only safe attributes in links
+  return html.replace(
+    /<a\s+([^>]*?)>/gi,
+    (match, attrs) => {
+      // Keep only href, title, target, rel attributes
+      const allowedAttrs = attrs.match(/(href|title|target|rel)=["'][^"']*["']/gi) || [];
+      // Add noopener/noreferrer for security
+      const secureAttrs = allowedAttrs
+        .map(attr => {
+          if (attr.startsWith('href=')) {
+            // Validate href is safe (http, https, mailto, or relative)
+            const urlMatch = attr.match(/href=["']([^"']*)["']/);
+            if (urlMatch) {
+              const url = urlMatch[1];
+              const isSafe = 
+                url.startsWith('http://') || 
+                url.startsWith('https://') ||
+                url.startsWith('mailto:') ||
+                url.startsWith('#') ||
+                url.startsWith('/');
+              if (!isSafe) return 'href="#"';
+            }
+          }
+          return attr;
+        })
+        .join(' ');
+      
+      // Ensure target="_blank" has rel="noopener noreferrer"
+      if (allowedAttrs.some(a => a.includes('target='))) {
+        if (!allowedAttrs.some(a => a.includes('rel='))) {
+          secureAttrs.push('rel="noopener noreferrer"');
+        }
+      }
+      
+      return `<a ${secureAttrs}>`;
+    }
+  );
+}
+
+// Process TipTap HTML content
+const processedContent = content ? sanitizeHtml(content) : '';
+const proseClass = sizeClasses[size];
+---
+
+{processedContent ? (
+  <div class={`tiptap-renderer ${proseClass} ${className}`} set:html={processedContent} />
+) : (
+  <div class={`tiptap-renderer ${proseClass} ${className} empty`}>
+    <slot />
+  </div>
+)}
+<style>
+  @reference "../../../styles/globals.css";
+  
+  .tiptap-renderer {
+  }
+
+  /* Headings */
+  .tiptap-renderer :global(h1) {
+    @apply text-2xl font-bold mb-4 text-foreground;
+  }
+
+  .tiptap-renderer :global(h2) {
+    @apply text-xl font-semibold mb-3 text-foreground;
+  }
+
+  .tiptap-renderer :global(h3) {
+    @apply text-lg font-semibold mb-2 text-foreground;
+  }
+
+  .tiptap-renderer :global(h4) {
+    @apply text-base font-medium mb-2 text-foreground;
+  }
+
+  /* Paragraphs */
+  .tiptap-renderer :global(p) {
+    @apply mb-4 last:mb-0;
+  }
+
+  /* Links */
+  .tiptap-renderer :global(a) {
+    @apply text-primary hover:underline;
+  }
+
+  /* Lists */
+  .tiptap-renderer :global(ul),
+  .tiptap-renderer :global(ol) {
+    @apply mb-4 pl-6;
+  }
+
+  .tiptap-renderer :global(ul) {
+    @apply list-disc;
+  }
+
+  .tiptap-renderer :global(ol) {
+    @apply list-decimal;
+  }
+
+  .tiptap-renderer :global(li) {
+    @apply mb-2;
+  }
+
+  .tiptap-renderer :global(li > ul),
+  .tiptap-renderer :global(li > ol) {
+    @apply mt-2 mb-0;
+  }
+
+  /* Blockquotes */
+  .tiptap-renderer :global(blockquote) {
+    @apply border-l-4 border-primary pl-4 py-1 my-4 italic text-muted-foreground;
+  }
+
+  /* Code */
+  .tiptap-renderer :global(code) {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .tiptap-renderer :global(pre) {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto my-4;
+  }
+
+  .tiptap-renderer :global(pre code) {
+    @apply bg-transparent p-0 text-sm;
+  }
+
+  /* Images */
+  .tiptap-renderer :global(img) {
+    @apply rounded-lg max-w-full h-auto my-4;
+  }
+
+  .tiptap-renderer :global(figure) {
+    @apply my-4;
+  }
+
+  .tiptap-renderer :global(figcaption) {
+    @apply text-sm text-muted-foreground text-center mt-2;
+  }
+
+  /* Tables */
+  .tiptap-renderer :global(table) {
+    @apply w-full border-collapse my-4;
+  }
+
+  .tiptap-renderer :global(th),
+  .tiptap-renderer :global(td) {
+    @apply border border-border px-4 py-2 text-left;
+  }
+
+  .tiptap-renderer :global(th) {
+    @apply bg-muted font-semibold;
+  }
+
+  .tiptap-renderer :global(tr:nth-child(even)) {
+    @apply bg-muted/50;
+  }
+
+  /* Horizontal rule */
+  .tiptap-renderer :global(hr) {
+    @apply my-8 border-border;
+  }
+
+  /* Strong and emphasis */
+  .tiptap-renderer :global(strong) {
+    @apply font-semibold;
+  }
+
+  .tiptap-renderer :global(em) {
+    @apply italic;
+  }
+
+  /* Address */
+  .tiptap-renderer :global(address) {
+    @apply italic my-4;
+  }
+
+  /* Empty state */
+  .tiptap-renderer.empty {
+    @apply text-muted-foreground italic;
+  }
+
+  /* Size variants */
+  .tiptap-renderer.prose-sm :global(p) {
+    @apply text-sm mb-3;
+  }
+
+  .tiptap-renderer.prose-lg :global(p) {
+    @apply text-lg mb-5;
+  }
+
+  /* Dark mode adjustments */
+  .dark .tiptap-renderer :global(pre) {
+    @apply bg-card;
+  }
+
+  .dark .tiptap-renderer :global(th) {
+    @apply bg-card;
+  }
+
+  .dark .tiptap-renderer :global(tr:nth-child(even)) {
+    @apply bg-card/50;
+  }
+</style>

@@ -1,0 +1,1 @@
+export { default as HiddenField } from "./index.astro"

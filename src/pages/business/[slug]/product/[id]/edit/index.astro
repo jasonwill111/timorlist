@@ -2,15 +2,14 @@
 // Edit Product page
 export const prerender = false;
 import Layout from '@layouts/Layout.astro';
-import { Button } from '@components/ui/button';
-import { Input } from '@components/ui/input';
-import { Label } from '@components/ui/label';
-import { Card } from '@components/ui/card';
-import { Select } from '@components/ui/select';
-import { getDb } from '@/lib/db';
-import { productCategories } from '@/db/schema';
-const db = await getDb();
-const allCategories = db ? await db.select().from(productCategories).all() : [];
+import { Button } from '@/components/fulldev/button';
+import { Input } from '@/components/fulldev/input';
+import { Label } from '@/components/fulldev/label';
+import { Card } from '@/components/fulldev/card';
+import { Select } from '@/components/fulldev/select';
+import { getProductCategories } from '@/lib/db/queries/products';
+
+const allCategories = await getProductCategories();
 
 const PRODUCT_TYPES = [
   { value: 'product', label: 'Product (Physical/Digital)' },
@@ -155,7 +154,7 @@ const UNIT_OPTIONS = [
             <div>
               <Label for="description">Description</Label>
               <div id="description-editor"></div>
-              <input type="hidden" id="description" name="description" value="" />
+              <HiddenField id="description" name="description" value="" />
             </div>
 
             <!-- Product Images -->
@@ -174,7 +173,7 @@ const UNIT_OPTIONS = [
               
               <!-- Image Preview -->
               <div id="image-preview" class="grid grid-cols-4 gap-2 mt-4"></div>
-              <input type="hidden" id="media-ids" name="mediaIds" value="" />
+              <HiddenField id="media-ids" name="mediaIds" />
             </div>
 
             <!-- Error Message -->

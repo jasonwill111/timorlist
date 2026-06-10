@@ -42,10 +42,10 @@ export const listings = {
       const authResult = await requireAdmin(cookies);
       if ('error' in authResult) return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Authentication required');
 
-      const listings = await listListings({
-        status: input?.status,
-        search: input?.search,
-      });
+      const filters = input
+      ? { ...(input.status !== undefined && { status: input.status }), ...(input.search !== undefined && { search: input.search }) }
+      : undefined;
+      const listings = await listListings(filters);
 
       return { success: true, data: listings };
     },
@@ -58,25 +58,27 @@ export const listings = {
       const authResult = await requireAdmin(cookies);
       if ('error' in authResult) return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Authentication required');
 
-      const result = await createListing({
+      const createInput: Parameters<typeof createListing>[0] = {
         title: input.title,
-        slug: input.slug,
-        categoryId: input.categoryId,
         description: input.description,
-        price: input.price,
-        condition: input.condition,
-        location: input.location,
-        locationLat: input.locationLat,
-        locationLng: input.locationLng,
-        contactName: input.contactName,
-        contactNumber: input.contactNumber,
         countryCode: input.countryCode,
-        email: input.email || undefined,
-        tags: input.tags,
-        imageIds: input.imageIds,
         status: input.status,
         ownerId: input.ownerId || authResult.userId,
-      });
+      };
+      if (input.slug !== undefined) createInput.slug = input.slug;
+      if (input.categoryId !== undefined) createInput.categoryId = input.categoryId;
+      if (input.price !== undefined) createInput.price = input.price;
+      if (input.condition !== undefined) createInput.condition = input.condition;
+      if (input.location !== undefined) createInput.location = input.location;
+      if (input.locationLat !== undefined) createInput.locationLat = input.locationLat;
+      if (input.locationLng !== undefined) createInput.locationLng = input.locationLng;
+      if (input.contactName !== undefined) createInput.contactName = input.contactName;
+      if (input.contactNumber !== undefined) createInput.contactNumber = input.contactNumber;
+      if (input.email !== undefined) createInput.email = input.email || null;
+      if (input.tags !== undefined) createInput.tags = input.tags;
+      if (input.imageIds !== undefined) createInput.imageIds = input.imageIds;
+
+      const result = await createListing(createInput);
 
       return { success: true, data: result };
     },
@@ -90,7 +92,12 @@ export const listings = {
       if ('error' in authResult) return createErrorResponse(ErrorCode.AUTH_REQUIRED, 'Authentication required');
 
       const { id, ...data } = input;
-      await updateListing({ id, ...data });
+      const updateInput: { id: string; title?: string; description?: string; slug?: string; status?: 'draft' | 'published' } = { id };
+      if (data.title !== undefined) updateInput.title = data.title;
+      if (data.description !== undefined) updateInput.description = data.description;
+      if (data.slug !== undefined) updateInput.slug = data.slug;
+      if (data.status !== undefined) updateInput.status = data.status;
+      await updateListing(updateInput);
 
       return { success: true };
     },

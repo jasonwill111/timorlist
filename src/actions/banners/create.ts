@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getDb } from '@/lib/db';
 import { adBanners } from '@/db/schema';
 import { getAdminUser } from '@/lib/admin-auth';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 const CreateBannerSchema = z.object({

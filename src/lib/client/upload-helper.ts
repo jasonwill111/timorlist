@@ -172,4 +172,4 @@ export async function uploadFiles(
 
 // Legacy export for backward compatibility
 // Note: uploadWithCompression removed - use uploadFile instead
-export type { UploadOptions, UploadResult } from './upload-helper';
+

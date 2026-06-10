@@ -78,19 +78,19 @@ export async function uploadMedia(
       body: formData,
     });
 
-    const data = await response.json();
+    const data: { success: boolean; data?: Record<string, any>; isDuplicate?: boolean; error?: { message?: string } } = await response.json();
 
     if (data.success) {
       return {
         success: true,
         media: {
-          id: data.data.id,
-          url: data.data?.url,
-          filename: data.data.filename,
-          mimeType: data.data.mimeType,
-          size: data.data.size,
-          width: data.data.width,
-          height: data.data.height,
+          id: data.data!.id,
+          url: data.data?.url ?? '',
+          filename: data.data!.filename,
+          mimeType: data.data!.mimeType,
+          size: data.data!.size,
+          width: data.data!.width,
+          height: data.data!.height,
           hash,
           entityType,
           entityId,
@@ -98,7 +98,7 @@ export async function uploadMedia(
           r2Key: data.data?.url,
           createdAt: Math.floor(Date.now() / 1000) as any,
         },
-        isDuplicate: data.isDuplicate,
+        isDuplicate: data.isDuplicate ?? false,
       };
     } else {
       return { success: false, error: data.error?.message || 'Upload failed' };

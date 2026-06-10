@@ -3,184 +3,90 @@
 export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
-import { Button } from '../../components/ui/button';
-import { Card } from '../../components/ui/card';
-import LocationMap from '../../components/ui/LocationMap.astro';
-import MediaGallery from '../../components/ui/MediaGallery.astro';
+import { Button } from '../../components/fulldev/button';
+import { Card } from '../../components/fulldev/card';
+import LocationMap from '../../components/fulldev/LocationMap.astro';
+import MediaGallery from '../../components/fulldev/MediaGallery.astro';
 import UpdatesSection from '../../components/UpdatesSection.astro';
 import ProductsSection from '../../components/islands/ProductsSection.astro';
-import { TipTapRenderer } from '@/components/ui/tip-tap-renderer';
-import { ShareDialog } from '@/components/ui/share-dialog';
+import { TipTapRenderer } from '@/components/fulldev/tip-tap-renderer';
+import { ShareDialog } from '@/components/fulldev/share-dialog';
 import { Eye, Heart, Bookmark, Globe, MapPin, Tag, Clock } from '@lucide/astro';
 import { getSubscriptionDashboard } from '@/lib/subscription';
-import { getDb } from '@/lib/db';
-const db = await getDb();
-if (!db) {
-  console.error('[business/[slug]] Database not available');
-  return Astro.redirect('/businesses');
-}
-import { businesses, businessCategories, reviews, media, latestUpdates } from '@/db/schema';
-import { eq, desc, inArray } from 'drizzle-orm';
+import {
+  getBusinessBySlug,
+  getBusinessCategory,
+  getBusinessReviews,
+  getBusinessGallery,
+  getBusinessUpdates,
+  isBusinessOwner as checkBusinessOwner,
+} from '@/lib/db/queries/business-detail';
 import { createBreadcrumbSchema } from '@/lib/seo';
 
 const { slug } = Astro.params;
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
 const canonicalUrl = `${siteUrl}/business/${slug}`;
-// SSR: Load business data from businesses table with error handling
-let business;
-try {
-  business = await db.select()
-    .from(businesses)
-    .where(eq(businesses.slug, slug ?? ''))
-    .get();
-} catch (e) {
-  console.error('Business query failed:', e instanceof Error ? e.message : String(e));
-  return Astro.redirect('/businesses');
-}
 
+// Load business data via query function
+let business = await getBusinessBySlug(slug ?? '');
 if (!business) {
   return Astro.redirect('/businesses');
 }
 
-// Get subscription status from orders table (not from business.subscriptionStatus)
+// Check owner for draft pages
+const isOwner = await checkBusinessOwner(Astro.request, business.id);
+const cacheControl = business.status === 'draft' && isOwner
+  ? 'no-store'
+  : 'public, max-age=120, s-maxage=600, stale-while-revalidate=600';
+
+// Subscription
 const subscriptionInfo = await getSubscriptionDashboard(business.id);
 const subscriptionStatus = subscriptionInfo?.status || 'none';
-const planExpiresAt = subscriptionInfo?.expiresAt || null;
+const planExpiresAt = subscriptionInfo?.expiresAt ?? null;
 
-// Calculate grace period end date from planExpiresAt
-const GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+// Grace period calculations
+const GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
 const gracePeriodEndDate = planExpiresAt
   ? new Date(planExpiresAt.getTime() + GRACE_PERIOD_MS)
   : null;
-
 const now = new Date();
 const isInGracePeriod = gracePeriodEndDate
   ? subscriptionStatus === 'expired' && now < gracePeriodEndDate
   : false;
-
 const isExpiredBeyondGrace = subscriptionStatus === 'expired' && (!gracePeriodEndDate || now >= gracePeriodEndDate);
-
 const daysRemaining = gracePeriodEndDate
   ? Math.max(0, Math.ceil((gracePeriodEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
   : 0;
-
-// Check pending_payment status - show message to owner
 const isPending = business.status === 'pending_payment';
 
-// Draft pages only visible to owner (check via session)
-let isOwner = false;
-let cacheControl = 'public, max-age=120, s-maxage=600, stale-while-revalidate=600';
-
-if (business.status === 'draft') {
-  const cookieHeader = Astro.request.headers.get('cookie') || '';
-  const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
-
-  if (tokenMatch) {
-    const { sessions } = await import('@/db/schema');
-    const session = await db.select()
-      .from(sessions)
-      .where(eq(sessions.token, tokenMatch[1]))
-      .limit(1)
-      .get();
-
-    if (session && session.userId === business.ownerId) {
-      isOwner = true;
-      cacheControl = 'no-store';
-    }
-  }
-
-  // Non-owner viewing draft = redirect
-  if (!isOwner) {
-    return Astro.redirect('/businesses');
-  }
-}
-// Safe JSON parser with fallback
-function safeJsonParse(str: unknown, fallback: unknown): unknown {
+// JSON helpers
+const safeJsonParse = (str: unknown, fallback: unknown): unknown => {
   if (!str || typeof str !== 'string') return fallback;
-  try {
-    return JSON.parse(str);
-  } catch {
-    return fallback;
-  }
-}
+  try { return JSON.parse(str); } catch { return fallback; }
+};
 
-const tags = safeJsonParse(business.tags, []) as string[];
-const openingHours = safeJsonParse(business.openingHours, null);
-const socialLinks = safeJsonParse(business.socialLinks, {}) as Record<string, string>;
+const tags = (safeJsonParse(business.tags, []) as string[]) as string[];
+const openingHours = safeJsonParse(business.openingHours, null) as Record<string, unknown> | null;
+const socialLinks = (safeJsonParse(business.socialLinks, {}) as Record<string, string>) as Record<string, string>;
 
-// Load related data with error handling
-interface ReviewRecord {
-  id: string;
-  rating: number;
-  comment: string | null;
-  userName: string | null;
-  createdAt: number;
-}
-interface UpdateRecord {
-  id: string;
-  content: string;
-  createdAt: number;
-}
+// Load related data via query functions
 let category = null;
 let parentCategory = null;
-let businessReviews: ReviewRecord[] = [];
-let galleryImages: { id: string; url: string }[] = [];
-let updates: UpdateRecord[] = [];
-
-try {
-  category = business.categoryId
-    ? await db.select().from(businessCategories).where(eq(businessCategories.id, business.categoryId)).get()
-    : null;
-  // Get parent category if exists
+if (business.categoryId) {
+  category = await getBusinessCategory(business.categoryId);
   if (category?.parentId) {
-    parentCategory = await db.select().from(businessCategories).where(eq(businessCategories.id, category.parentId)).get();
+    parentCategory = await getBusinessCategory(category.parentId);
   }
-} catch (e) {
-  console.error('Category query failed:', e);
 }
-
-try {
-  businessReviews = await db.select()
-    .from(reviews)
-    .where(eq(reviews.businessId, business.id))
-    .orderBy(desc(reviews.createdAt))
-    .all();
-} catch (e) {
-  console.error('Reviews query failed:', e);
-}
-
-try {
-  const galleryMedia = await db.select({ id: media.id })
-    .from(media)
-    .where(eq(media.entityId, business.id))
-    .where(eq(media.entityType, 'businesses'))
-    .orderBy(media.sortOrder)
-    .all();
-  galleryImages = galleryMedia.map(m => ({ id: m.id, url: `/api/media/${m.id}` }));
-} catch (e) {
-  console.error('Gallery query failed:', e);
-}
-
-try {
-  const latestUpdatesData = await db.select()
-    .from(latestUpdates)
-    .where(eq(latestUpdates.typeId, business.id))
-    .where(eq(latestUpdates.type, 'business'))
-    .orderBy(desc(latestUpdates.createdAt))
-    .limit(4)
-    .all();
-  updates = latestUpdatesData.map(u => ({
-    ...u,
-    images: safeJsonParse(u.images, []),
-  }));
-} catch (e) {
-  console.error('Updates query failed:', e);
-}
+const businessReviews = await getBusinessReviews(business.id);
+const galleryImages = await getBusinessGallery(business.id);
+const updates = await getBusinessUpdates(business.id);
 
 const pageTitle = `${business.title} - TimorUp`;
 const pageDesc = business.aboutUs?.substring(0, 160) || `${business.title} - ${category?.name || 'Business'} in Timor-Leste`;
 Astro.response.headers.set('Cache-Control', cacheControl);
 ---
+
 
 <Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
   <!-- Pending Approval Banner -->

@@ -1,94 +1,22 @@
 ---
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
-import { getRawDb } from '@/lib/db';
+import { getEntityBySlug } from '@/lib/db/queries/getEntityBySlug';
+import { buildWhatsAppLink } from '@/lib/utils';
 import { Eye, Heart, Bookmark, Globe, MapPin, Tag, Clock } from '@lucide/astro';
-import { ShareDialog } from '@/components/ui/share-dialog';
-import { TipTapRenderer } from '@/components/ui/tip-tap-renderer';
+import { TipTapRenderer } from '@/components/fulldev/tip-tap-renderer';
 import { createBreadcrumbSchema } from '@/lib/seo';
 
 const { slug } = Astro.params;
 const siteUrl = import.meta.env.SITE || 'https://timorup.com';
 const canonicalUrl = `${siteUrl}/non-profit/${slug}`;
 
-interface NonProfitRecord {
-  id: string;
-  title: string;
-  slug: string;
-  aboutUs: string | null;
-  contact_name: string | null;
-  contact_number: string | null;
-  country_code: string | null;
-  email: string | null;
-  address: string | null;
-  year_of_establishment: number | null;
-  opening_hours: string | null;
-  tags: string | null;
-  social_links: string | null;
-  likes: number | null;
-  saves: number | null;
-  views: number | null;
-  category_id: string | null;
-  status: string | null;
-  profile_image_id: string | null;
-  photo_gallery: string | null;
-}
-
-let entity: NonProfitRecord | null = null;
-let category: { name: string } | null = null;
-let socialLinks: Record<string, string> = {};
-let tags: string[] = [];
-let galleryImages: { id: string; r2_key: string; alt: string | null }[] = [];
-let profileImage: { r2_key: string; alt: string | null } | null = null;
-
-try {
-  const db = await getRawDb();
-  if (db) {
-    entity = await db.prepare(`
-      SELECT id, title, slug, aboutUs, contact_name, contact_number, country_code, email,
-             address, year_of_establishment, opening_hours, tags, social_links,
-             likes, saves, views, category_id, status, profile_image_id, photo_gallery
-      FROM non_profits WHERE slug = ? LIMIT 1
-    `).bind(slug).first() as NonProfitRecord | null;
-
-    if (entity) {
-      if (entity.category_id) {
-        category = await db.prepare('SELECT name FROM non_profit_categories WHERE id = ? LIMIT 1')
-          .bind(entity.category_id).first() as { name: string } | null;
-      }
-      if (entity.social_links) {
-        try { socialLinks = JSON.parse(entity.social_links); } catch {}
-      }
-      if (entity.tags) {
-        try { tags = JSON.parse(entity.tags); } catch {}
-      }
-      if (entity.profile_image_id) {
-        profileImage = await db.prepare('SELECT r2_key, alt FROM media WHERE id = ? LIMIT 1')
-          .bind(entity.profile_image_id).first() as any;
-      }
-      if (entity.photo_gallery) {
-        try {
-          const ids = JSON.parse(entity.photo_gallery);
-          if (Array.isArray(ids) && ids.length > 0) {
-            const placeholders = ids.map(() => '?').join(',');
-            galleryImages = ((await db.prepare(`SELECT id, r2_key, alt FROM media WHERE id IN (${placeholders})`).bind(...ids).all()).results as any) || [];
-          }
-        } catch {}
-      }
-    }
-  }
-} catch (e) {
-  console.error('Nonprofit query failed:', e);
-}
-
+const { entity, category, socialLinks, tags, galleryImages, profileImage } = await getEntityBySlug(slug, 'non-profit');
 if (!entity) return Astro.redirect('/non-profits');
 
 Astro.response.headers.set('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=1200');
 
-const waNumber = (entity.contact_number || '').replace(/\D/g, '');
-const waLink = entity.contact_number
-  ? `https://wa.me/${(entity.country_code || '+670').replace('+', '')}${waNumber}?text=${encodeURIComponent('Hi, I am interested in: ' + entity.title)}`
-  : '';
+const waLink = buildWhatsAppLink(entity.contact_number, entity.country_code ?? '+670', 'Hi, I am interested in: ' + entity.title);
 
 const breadcrumbSchema = createBreadcrumbSchema([
   { name: 'Home', url: siteUrl },

@@ -1,0 +1,41 @@
+---
+import { Button } from '@/components/fulldev/button'
+
+type Props = {
+  id: string
+  slug?: string | null
+  status?: string | null
+  entityType?: 'listing' | 'product' | 'blog'
+  onEdit?: string
+  onDelete?: string
+  onToggle?: string
+}
+
+const { id, slug, status, entityType = 'listing', onEdit, onDelete, onToggle } = Astro.props
+
+const statusLabel = status === 'published' ? 'Unpublish' : 'Publish'
+const viewUrl = slug ? `/${entityType === 'listing' ? 'listing' : entityType === 'product' ? 'product' : ''}/${slug}` : null
+---
+
+<div class="flex items-center gap-2" data-actions-for={id}>
+  {onEdit && (
+    <a href={onEdit} data-action="edit" data-id={id} class="text-sm text-primary hover:underline">
+      Edit
+    </a>
+  )}
+  {onToggle && (
+    <button data-action="toggle-status" data-id={id} data-status={status ?? ''} class="text-sm text-primary hover:underline">
+        {statusLabel}
+    </button>
+  )}
+  {onDelete && (
+    <button data-action="delete-entity" data-id={id} class="text-sm text-red-500 hover:underline">
+      Delete
+    </button>
+  )}
+  {viewUrl && (
+    <a href={viewUrl} target="_blank" rel="noopener" class="text-sm text-muted-foreground hover:text-foreground">
+      View
+    </a>
+  )}
+</div>

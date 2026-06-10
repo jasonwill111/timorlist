@@ -1,115 +1,31 @@
 ---
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
-import CarouselBanner from '../../components/ui/CarouselBanner.astro';
+import { Button } from '@/components/fulldev/button';
+import CarouselBanner from '../../components/fulldev/CarouselBanner.astro';
 import BusinessCard from '../../components/business/BusinessCard.astro';
-import { getRawDb } from '@/lib/db';
+import { getBusinessCategories, getBusinessListing } from '@/lib/db/queries/businesses-listing';
 
-const db = await getRawDb();
 const searchParams = Astro.url.searchParams;
 const search = searchParams.get('q') || '';
 const parentCat = searchParams.get('parent') || '';
 const childCat = searchParams.get('child') || '';
 const page = parseInt(searchParams.get('page') || '1', 10);
 const LIMIT = 12;
-const offset = (page - 1) * LIMIT;
 
-// Cache: Dynamic content with search/filter - short cache
 const hasSearchParams = search || parentCat || childCat;
-Astro.response.headers.set('Cache-Control', hasSearchParams 
+Astro.response.headers.set('Cache-Control', hasSearchParams
   ? 'public, max-age=30, s-maxage=60, stale-while-revalidate=120'
   : 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
 
-interface CategoryRecord { id: string; name: string; parentId: string | null; }
-let parentCats: CategoryRecord[] = [];
-const categoryMap: Record<string, string> = {};
-let childMap: Record<string, string[]> = {};
+const { parentCats, categoryMap, childMap } = await getBusinessCategories();
+const { results, total, totalPages } = await getBusinessListing(search, parentCat, childCat, page, LIMIT);
 
-try {
-  if (db) {
-    const allCats = (await db.prepare('SELECT id, name, parent_id as parentId FROM business_categories').all()).results as CategoryRecord[];
-    parentCats = allCats.filter(c => !c.parentId);
-    allCats.forEach(c => {
-      categoryMap[c.id] = c.name;
-      if (c.parentId) {
-        if (!childMap[c.parentId]) childMap[c.parentId] = [];
-        childMap[c.parentId].push(c.id);
-      }
-    });
-  }
-} catch (e) { console.log('Categories error:', e); }
-
-interface BusinessRecord {
-  id: string;
-  title: string;
-  slug: string;
-  category_id: string | null;
-  address: string | null;
-  profile_image_id: string | null;
-  tags: string | null;
-  likes: number | null;
-  saves: number | null;
-  views: number | null;
-  rating_average: number | null;
-  rating_count: number | null;
-  // Note: subscription_status field removed - derived dynamically from orders table via subscription.ts
-  status: string | null;
-  about_us: string | null;
-}
-// Build WHERE clause dynamically
-const conditions: string[] = ["status IN ('active', 'published', 'live')"];
-const params: (string | number)[] = [];
-
-// Search filter
-if (search) {
-  conditions.push("(LOWER(title) LIKE ? OR LOWER(about_us) LIKE ?)");
-  const searchPattern = `%${search.toLowerCase()}%`;
-  params.push(searchPattern, searchPattern);
+// Enrich results with category names
+for (const b of results) {
+  b.categoryName = b.category_id ? categoryMap[b.category_id] || '' : '';
 }
 
-// Category filter - handle both parent and child
-if (childCat) {
-  conditions.push("category_id = ?");
-  params.push(childCat);
-} else if (parentCat) {
-  const childIds = childMap[parentCat] || [];
-  if (childIds.length > 0) {
-    const placeholders = childIds.map(() => '?').join(', ');
-    conditions.push(`category_id IN (${placeholders})`);
-    params.push(...childIds);
-  }
-}
-
-const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
-// Count total (without LIMIT/OFFSET)
-let total = 0;
-try {
-  if (db) {
-    const countResult = await db.prepare(`SELECT COUNT(*) as count FROM businesses ${whereClause}`).bind(...params).first() as { count: number } | undefined;
-    total = countResult?.count || 0;
-  }
-} catch (e) { console.log('Count error:', e); }
-
-// Fetch paginated results (with OFFSET/LIMIT)
-const entities: BusinessRecord[] = [];
-try {
-  if (db) {
-    const dataResult = await db.prepare(`
-      SELECT id, title, slug, category_id, address, profile_image_id, tags, likes, saves, views,
-             rating_average, rating_count, status, about_us
-      FROM businesses
-      ${whereClause}
-      ORDER BY created_at DESC
-      LIMIT ? OFFSET ?
-    `).bind(...params, LIMIT, offset).all();
-    entities.push(...(dataResult.results as BusinessRecord[]));
-  }
-} catch (e) { console.log('Businesses query error:', e); }
-
-const totalPages = Math.ceil(total / LIMIT);
-
-// Build pagination URL helper
 const buildUrl = (pageNum: number) => {
   const p = new URLSearchParams();
   if (search) p.set('q', search);
@@ -131,17 +47,26 @@ const buildUrl = (pageNum: number) => {
 
     {parentCats.length > 0 && (
       <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <a href="/businesses" class={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${!parentCat ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>All</a>
+        <Button as="a" href="/businesses" variant={!parentCat ? 'default' : 'secondary'} size="sm">
+          All
+        </Button>
         {parentCats.map(c => (
-          <a href={`/businesses?parent=${c.id}`} class={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${parentCat === c.id ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>{c.name}</a>
+          <Button
+            as="a"
+            href={`/businesses?parent=${c.id}`}
+            variant={parentCat === c.id ? 'default' : 'secondary'}
+            size="sm"
+          >
+            {c.name}
+          </Button>
         ))}
       </div>
     )}
 
-    {entities.length > 0 ? (
+    {results.length > 0 ? (
       <>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {entities.map(b => (
+          {results.map(b => (
             <BusinessCard
               title={b.title}
               slug={b.slug}
@@ -164,29 +89,28 @@ const buildUrl = (pageNum: number) => {
         {totalPages > 1 && (
           <nav class="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
             {page > 1 && (
-              <a href={buildUrl(page - 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+              <Button as="a" href={buildUrl(page - 1)} variant="secondary" size="sm">
                 ← Previous
-              </a>
+              </Button>
             )}
-            
             {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
               const pageNum = i + 1;
               const isActive = pageNum === page;
               return (
-                <a 
-                  href={buildUrl(pageNum)} 
-                  class={`px-3 py-2 rounded-md text-sm ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                  aria-current={isActive ? 'page' : undefined}
+                <Button
+                  as="a"
+                  href={buildUrl(pageNum)}
+                  variant={isActive ? 'default' : 'secondary'}
+                  size="sm"
                 >
                   {pageNum}
-                </a>
+                </Button>
               );
             })}
-            
             {page < totalPages && (
-              <a href={buildUrl(page + 1)} class="px-3 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm">
+              <Button as="a" href={buildUrl(page + 1)} variant="secondary" size="sm">
                 Next →
-              </a>
+              </Button>
             )}
           </nav>
         )}
@@ -195,9 +119,9 @@ const buildUrl = (pageNum: number) => {
       <div class="text-center py-16">
         <h3 class="text-lg font-medium mb-2">No businesses found</h3>
         <p class="text-muted-foreground">Try a different category or search term</p>
-        <a href="/businesses" class="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md">
+        <Button as="a" href="/businesses" class="mt-4">
           View all businesses
-        </a>
+        </Button>
       </div>
     )}
   </div>

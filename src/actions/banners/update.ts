@@ -5,7 +5,7 @@ import { getDb } from '@/lib/db';
 import { adBanners } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getAdminUser } from '@/lib/admin-auth';
-import { createErrorResponse, ErrorCode } from '@/lib/errors';
+import { createErrorResponse, ErrorCode, getErrorMessage } from '@/lib/errors';
 
 
 const UpdateBannerSchema = z.object({

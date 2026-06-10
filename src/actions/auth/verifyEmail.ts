@@ -1,7 +1,7 @@
 // Auth Server Action - Verify Email
 import { defineAction } from 'astro:actions';
 import { z } from 'zod';
-import { initAuth } from '@/lib/auth';
+import { getAuth } from '@/lib/auth';
 
 export const verifyEmail = defineAction({
   accept: 'form',
@@ -10,11 +10,11 @@ export const verifyEmail = defineAction({
   }),
   handler: async (input) => {
     try {
-      const auth = await initAuth();
-      const api = auth.api as { verifyEmail?: (opts: { body: { token: string } }) => Promise<unknown> };
-      if (api?.verifyEmail) {
-        await api.verifyEmail({
-          body: { token: input.token }
+      const auth = await getAuth();
+      const authApi = auth.api as { verifyEmail?: (opts: { query: { token: string } }) => Promise<unknown> };
+      if (authApi?.verifyEmail) {
+        await authApi.verifyEmail({
+          query: { token: input.token }
         });
       }
       return { success: true };

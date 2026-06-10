@@ -3,103 +3,29 @@
 export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
-import { Card } from '@/components/ui/card';
-import { CardHeader } from '@/components/ui/card';
-import { CardTitle } from '@/components/ui/card';
-import { CardDescription } from '@/components/ui/card';
-import { CardContent } from '@/components/ui/card';
-import { CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { getDb, getRawDb } from '@/lib/db';
-import { businesses, orders, reviews } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/fulldev/card';
+import { Button } from '@/components/fulldev/button';
+import { Badge } from '@/components/fulldev/badge';
+import {
+  resolveUserFromCookie,
+  getUserPages,
+  getUserSubscription,
+} from '@/lib/db/queries/auth';
 
 const cookieHeader = Astro.request.headers.get('cookie') || '';
-let user: { id: string; name: string; email: string } | null = null;
-let userPages: Array<{ id: string; title: string; slug: string; entityType: string; status: string; createdAt: number | null }> = [];
-let subscription: { planSlug: string; amount: number; status: string; planExpiresAt: number | null } | null = null;
-let businessReviews: Array<{ id: string; rating: number; comment: string | null; reviewerName: string; createdAt: number | null; reply: string | null; repliedAt: number | null }> = [];
-
-try {
-  const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
-
-  if (tokenMatch) {
-    const db = await getRawDb();
-    if (db) {
-      const session = await db.prepare('SELECT userId, expiresAt FROM session WHERE token = ? LIMIT 1')
-        .bind(tokenMatch[1])
-        .first() as { userId: string; expiresAt: number | string } | null;
-      if (session) {
-        const expiresAtMs = typeof session.expiresAt === 'number'
-          ? (session.expiresAt < 1e12 ? session.expiresAt * 1000 : session.expiresAt)
-          : new Date(session.expiresAt).getTime();
-        if (expiresAtMs > Date.now()) {
-          const userRecord = await db.prepare('SELECT id, name, email FROM user WHERE id = ? LIMIT 1')
-            .bind(session.userId)
-            .first() as { id: string; name: string; email: string } | null;
-
-          if (userRecord) {
-            user = { id: userRecord.id, name: userRecord.name || '', email: userRecord.email };
-          }
-        }
-      }
-    }
-  }
-} catch (e) {
-  console.error('Account auth check failed:', e);
-}
+const user = await resolveUserFromCookie(cookieHeader);
 
 if (!user) {
   return Astro.redirect('/login?redirect=/account');
 }
 
-// Load user pages (businesses)
-try {
-  const db = await getDb();
-  if (db) {
-    // Get businesses
-    const businessList = await db.select({
-      id: businesses.id,
-      title: businesses.title,
-      slug: businesses.slug,
-      status: businesses.status,
-      createdAt: businesses.createdAt,
-    })
-    .from(businesses)
-    .where(eq(businesses.ownerId, user.id))
-    .all();
+// Load user pages
+const userPages = await getUserPages(user.id);
 
-    userPages = businessList.map(b => ({ ...b, entityType: 'business' }));
-
-    // Get subscription if any business exists
-    if (userPages.length > 0) {
-      const subOrder = await db.select({
-        planSlug: orders.servicePackageId,
-        amount: orders.amount,
-        status: orders.status,
-        planExpiresAt: orders.planExpiresAt,
-      })
-      .from(orders)
-      .where(eq(orders.typeId, userPages[0].id))
-      .where(eq(orders.type, 'business'))
-      .where(eq(orders.status, 'paid'))
-      .orderBy(desc(orders.planExpiresAt))
-      .limit(1)
-      .get();
-
-      if (subOrder) {
-        subscription = {
-          planSlug: subOrder.planSlug || 'basic-monthly',
-          amount: subOrder.amount,
-          status: subOrder.status,
-          planExpiresAt: subOrder.planExpiresAt,
-        };
-      }
-    }
-  }
-} catch (e) {
-  console.error('Failed to load user data:', e);
+// Load subscription for first business
+let subscription = null;
+if (userPages.length > 0) {
+  subscription = await getUserSubscription(userPages[0].id);
 }
 
 const isSubscriptionActive = subscription?.status === 'paid' && subscription?.planExpiresAt && subscription.planExpiresAt > Date.now() / 1000;

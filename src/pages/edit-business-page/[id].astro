@@ -1,20 +1,21 @@
 ---
-import { Textarea } from '../../components/ui/textarea'
+import { Textarea } from '../../components/fulldev/textarea'
 // This page needs SSR for personalized business data
 export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
-import { Select } from '../../components/ui/select';
-import { Input } from '../../components/ui/input'
-import { Button } from '../../components/ui/button';
+import { Select } from '../../components/fulldev/select';
+import { Input } from '../../components/fulldev/input'
+import { Button } from '../../components/fulldev/button';
 import { actions } from 'astro:actions';
 
-import { Card } from '../../components/ui/card'
-import { CardHeader } from '../../components/ui/card'
-import { CardTitle } from '../../components/ui/card'
-import { CardDescription } from '../../components/ui/card'
-import { CardContent } from '../../components/ui/card'
-import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
+import { Card } from '../../components/fulldev/card'
+import { CardHeader } from '../../components/fulldev/card'
+import { CardTitle } from '../../components/fulldev/card'
+import { CardDescription } from '../../components/fulldev/card'
+import { Label } from '@/components/fulldev/label';
+import { CardContent } from '../../components/fulldev/card'
+import ToastContainer from '../../components/fulldev/toast/ToastContainer.astro';
 
 ---
 
@@ -53,7 +54,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
         <CardContent class="space-y-6">
           <!-- Profile Image -->
           <div>
-            <label class="block text-sm font-medium mb-2">Profile Image</label>
+            <Label>Profile Image</Label>
             <p class="text-xs text-muted-foreground mb-2">Recommended: 200x200px (circular)</p>
             <div id="profile-image-upload" class="border-2 border-dashed rounded-lg aspect-square w-full max-w-xs flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors bg-muted/50 relative">
               <img id="profile-preview" class="hidden w-full h-full object-cover rounded-full" alt="Profile" />
@@ -69,7 +70,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
           
           <!-- Banner Image -->
           <div>
-            <label class="block text-sm font-medium mb-2">Banner Image</label>
+            <Label>Banner Image</Label>
             <p class="text-xs text-muted-foreground mb-2">Recommended: 1200x400px</p>
             <div id="banner-image-upload" class="border-2 border-dashed rounded-lg aspect-[3/1] w-full flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors bg-muted/50 relative">
               <img id="banner-preview" class="hidden w-full h-full object-cover rounded-lg" alt="Banner" />
@@ -93,7 +94,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
         </CardHeader>
         <CardContent class="space-y-4">
           <div>
-            <label for="title" class="block text-sm font-medium mb-1">Business Name *</label>
+            <Label for="title">Business Name *</Label>
             <Input 
               type="text" 
               id="title" 
@@ -104,7 +105,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
           </div>
           
           <div>
-            <label for="slug" class="block text-sm font-medium mb-1">URL Slug *</label>
+            <Label for="slug">URL Slug *</Label>
             <Input 
               type="text" 
               id="slug" 
@@ -116,7 +117,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
           </div>
 
           <div>
-            <label for="category" class="block text-sm font-medium mb-1">Category *</label>
+            <Label for="category">Category *</Label>
             <Select
               id="category"
               name="categoryId"
@@ -136,7 +137,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
         <CardContent class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="contactName" class="block text-sm font-medium mb-1">Contact Person</label>
+              <Label for="contactName">Contact Person</Label>
               <Input 
                 type="text" 
                 id="contactName" 
@@ -145,7 +146,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
               />
             </div>
             <div>
-              <label for="contactNumber" class="block text-sm font-medium mb-1">Phone Number</label>
+              <Label for="contactNumber">Phone Number</Label>
               <div class="flex">
                 <span class="px-3 py-2 border border-r-0 rounded-l-lg bg-muted">+670</span>
                 <Input 
@@ -159,7 +160,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
             </div>
           </div>
           <div>
-            <label for="email" class="block text-sm font-medium mb-1">Email</label>
+            <Label for="email">Email</Label>
             <Input 
               type="email" 
               id="email" 
@@ -168,7 +169,7 @@ import ToastContainer from '../../components/ui/toast/ToastContainer.astro';
             />
           </div>
           <div>
-            <label for="address" class="block text-sm font-medium mb-1">Address</label>
+            <Label for="address">Address</Label>
             <Textarea
               id="address"
               name="address"

@@ -3,30 +3,24 @@
 export const prerender = false;
 
 import Layout from '../../../../../layouts/Layout.astro';
-import { Button } from '../../../../../components/ui/button';
-import { Input } from '../../../../../components/ui/input';
-import { Textarea } from '../../../../../components/ui/textarea';
-import { Select } from '../../../../../components/ui/select';
-import { getDb } from '@/lib/db';
-import { businesses, businessCategories as categories } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import { INDUSTRIES } from '@/lib/constants';
+import { Button } from '../../../../../components/fulldev/button';
+import { Label } from '../../../../../components/fulldev/label';
+import { Input } from '../../../../../components/fulldev/input';
+import { Textarea } from '../../../../../components/fulldev/textarea';
+import { Select } from '../../../../../components/fulldev/select';
+import { getAllListingCategories } from '@/lib/db/queries/listings';
+import { getListingById } from '@/lib/db/queries/admin-listings';
+import { actions } from 'astro:actions';
+import { HiddenField } from '@/components/fulldev/hidden';
 
 const { id } = Astro.params;
-const db = await getDb();
 
-const listing = await db
-  .select()
-  .from(businesses)
-  .where(eq(businesses.id, id ?? ''))
-  .get();
-
+const listing = await getListingById(id ?? '');
 if (!listing) {
   return Astro.redirect('/admin/listings');
 }
 
-const allCategories = await db.select().from(categories).all();
-const tags = listing.tags ? JSON.parse(listing.tags) : [];
+const allCategories = await getAllListingCategories();
 ---
 
 <Layout title={`Edit ${listing.title} - Admin`} requireAuth adminOnly>
@@ -38,7 +32,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
       <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold leading-tight">Edit Listing</h1>
         <span class={`px-2 py-0.5 text-xs rounded-full ${
-          listing.status === 'live' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+          listing.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
         }`}>
           {listing.status || 'draft'}
         </span>
@@ -56,7 +50,7 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
             <div class="text-xs text-muted-foreground">Type cannot be changed after creation</div>
           </div>
         </div>
-        <input type="hidden" name="entityType" value="business" />
+        <HiddenField name="entityType" value="business" />
       </div>
 
       <!-- Basic Info -->
@@ -64,13 +58,13 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
         <h2 class="text-lg font-semibold leading-snug mb-4">Basic Information</h2>
         <div class="grid gap-4">
           <div>
-            <label class="block text-sm font-medium mb-1">Title *</label>
+            <Label for="title">Title *</Label>
             <Input name="title" value={listing.title} required />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-1">Category *</label>
+              <Label for="category">Category *</Label>
               <Select
                 name="categoryId"
                 required
@@ -86,54 +80,29 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
         <h2 class="text-lg font-semibold leading-snug mb-4">Contact Information</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium mb-1">Contact Name</label>
+            <Label for="contactName">Contact Name</Label>
             <Input name="contactName" value={listing.contactName || ''} />
           </div>
           <div class="grid grid-cols-3 gap-2">
             <div>
-              <label class="block text-sm font-medium mb-1">Code</label>
+              <Label for="countryCode">Code</Label>
               <Input name="countryCode" value={listing.countryCode || '+670'} />
             </div>
             <div class="col-span-2">
-              <label class="block text-sm font-medium mb-1">Phone</label>
+              <Label for="contactNumber">Phone</Label>
               <Input name="contactNumber" value={listing.contactNumber || ''} />
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Email</label>
+            <Label for="email">Email</Label>
             <Input name="email" type="email" value={listing.email || ''} />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1">Website</label>
-            <Input name="registrationUrl" value={listing.registrationUrl || ''} />
-          </div>
+                     </div>
         </div>
         <div class="mt-4">
-          <label class="block text-sm font-medium mb-1">Address</label>
+          <Label for="address">Address</Label>
           <Input name="address" value={listing.address || ''} />
-        </div>
-      </div>
-
-      <!-- About -->
-      <div class="bg-card rounded-lg border p-6">
-        <h2 class="text-lg font-semibold leading-snug mb-4">About</h2>
-        <div>
-          <label class="block text-sm font-medium mb-1">About Us</label>
-          <Textarea name="aboutUs" rows={4}>{listing.aboutUs || ''}</Textarea>
-        </div>
-        <div class="mt-4">
-          <label class="block text-sm font-medium mb-1">Tags (comma separated)</label>
-          <Input name="tags" value={tags.join(', ')} />
-        </div>
-        <div class="mt-4">
-          <label class="block text-sm font-medium mb-1">Year of Establishment</label>
-          <Input
-            name="yearOfEstablishment"
-            type="number"
-            value={listing.yearOfEstablishment || ''}
-            min="1900"
-            max="2026"
-          />
         </div>
       </div>
 
@@ -141,17 +110,13 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
       <div class="bg-card rounded-lg border p-6">
         <h2 class="text-lg font-semibold leading-snug mb-4">Status</h2>
         <div class="flex flex-wrap gap-4">
-          <label class="flex items-center gap-2">
-            <Input type="radio" name="status" value="draft" checked={listing.status === 'draft'} />
+          <Label for="status-draft">
+            <Input id="status-draft" type="radio" name="status" value="draft" checked={listing.status === 'draft'} />
             <span>Draft</span>
           </label>
-          <label class="flex items-center gap-2">
-            <Input type="radio" name="status" value="live" checked={listing.status === 'live'} />
-            <span>Live</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <Input type="radio" name="status" value="suspended" checked={listing.status === 'suspended'} />
-            <span>Suspended</span>
+          <Label for="status-published">
+            <Input id="status-published" type="radio" name="status" value="published" checked={listing.status === 'published'} />
+            <span>Published</span>
           </label>
         </div>
       </div>
@@ -181,27 +146,18 @@ const tags = listing.tags ? JSON.parse(listing.tags) : [];
       countryCode: formData.get('countryCode') || '+670',
       contactNumber: formData.get('contactNumber') || null,
       email: formData.get('email') || null,
-      registrationUrl: formData.get('registrationUrl') || null,
-      address: formData.get('address') || null,
-      aboutUs: formData.get('aboutUs') || null,
+           address: formData.get('address') || null,
       tags: formData.get('tags') ? formData.get('tags')?.toString().split(',').map(t => t.trim()) : null,
-      yearOfEstablishment: formData.get('yearOfEstablishment') ? parseInt(formData.get('yearOfEstablishment') as string) : null,
       status: formData.get('status'),
     };
 
     try {
-      const res = await fetch(window.location.pathname.replace('/edit', ''), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      if (res.ok) {
+      const result = await actions.admin.listings.update({ id: window.location.pathname.split('/').pop()!, ...data });
+      if (result.success) {
         alert('Listing updated successfully!');
-        window.location.reload();
+        window.location.href = '/admin/listings';
       } else {
-        const error = await res.json();
-        alert('Failed to update listing: ' + (error.message || 'Unknown error'));
+        alert('Failed: ' + (result.error?.message || 'Unknown error'));
       }
     } catch (err) {
       alert('Failed to update listing');

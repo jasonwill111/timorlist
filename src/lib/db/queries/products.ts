@@ -3,8 +3,8 @@
  * 统一 products 数据访问
  */
 import { getDb } from '@/lib/db';
-import { products } from '@/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { products, productCategories, businesses, businessCategories } from '@/db/schema';
+import { eq, desc, and, sql } from 'drizzle-orm';
 
 export interface ProductWithImages {
   id: string;
@@ -129,4 +129,59 @@ export async function canCreateProduct(
     currentCount,
     limit: skuLimit,
   };
+}
+
+/**
+ * 获取 product with business + category detail (for product/[id]/index page)
+ */
+export async function getProductWithDetails(productId: string): Promise<{
+  product: ProductWithImages;
+  business: { id: string; title: string; slug: string; contactNumber: string | null; countryCode: string | null; profileImageId: string | null } | null;
+  category: { id: string; name: string } | null;
+} | null> {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const product = await getProductById(productId);
+  if (!product) return null;
+
+  // Parallel fetch: business and category are independent
+  const [businessRow, categoryRow] = await Promise.all([
+    db
+      .select({
+        id: businesses.id,
+        title: businesses.title,
+        slug: businesses.slug,
+        contactNumber: businesses.contactNumber,
+        countryCode: businesses.countryCode,
+        profileImageId: businesses.profileImageId,
+      })
+      .from(businesses)
+      .where(eq(businesses.id, product.businessId))
+      .limit(1)
+      .get(),
+    product.categoryId
+      ? db
+          .select({ id: productCategories.id, name: productCategories.name })
+          .from(productCategories)
+          .where(eq(productCategories.id, product.categoryId))
+          .limit(1)
+          .get()
+      : Promise.resolve(null),
+  ]);
+
+  return {
+    product,
+    business: businessRow ?? null,
+    category: categoryRow ?? null,
+  };
+}
+
+/**
+ * 获取所有 product categories (flat list)
+ */
+export async function getProductCategories() {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  return db.select().from(productCategories).all();
 }

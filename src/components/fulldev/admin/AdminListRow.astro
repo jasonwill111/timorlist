@@ -1,0 +1,28 @@
+---
+import { Button } from "@/components/fulldev/button"
+
+type Props = {
+  id: string
+  name: string
+  status?: string
+  onToggle?: string
+  onDelete?: string
+  children?: any
+}
+
+const { id, name, status = 'active', onToggle, onDelete, children } = Astro.props
+---
+
+<tr class="border-b border-border hover:bg-muted/50">
+  <td class="px-4 py-2">{name}</td>
+  <td class="px-4 py-2">
+    <span class={`px-2 py-0.5 text-xs rounded-full ${status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+      {status}
+    </span>
+  </td>
+  <td class="px-4 py-2 flex gap-2">
+    {onToggle && <button data-action="toggle" data-id={id} data-status={status} class="text-sm text-primary hover:underline">Toggle</button>}
+    {onDelete && <button data-action="delete" data-id={id} class="text-sm text-red-500 hover:underline">Delete</button>}
+    {children}
+  </td>
+</tr>

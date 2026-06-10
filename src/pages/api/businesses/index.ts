@@ -159,7 +159,7 @@ if (!db) throw new Error("Database not available");
     const total = results.length;
 
     const categoryMap = new Map<string, string>();
-    const allCategories = await db.select().from(businessCategories).all() as unknown[];
+    const allCategories = await db.select().from(businessCategories).all() as { id: string; name: string }[];
     allCategories.forEach((cat) => categoryMap.set(cat.id, cat.name));
 
     const responseData = paginated.map((biz) => {

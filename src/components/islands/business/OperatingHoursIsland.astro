@@ -1,0 +1,97 @@
+---
+type Props = {
+  containerId?: string
+}
+
+const { containerId = "hours-container" } = Astro.props
+
+const DAYS = [
+  { key: "monday",    label: "Monday" },
+  { key: "tuesday",   label: "Tuesday" },
+  { key: "wednesday", label: "Wednesday" },
+  { key: "thursday",   label: "Thursday" },
+  { key: "friday",    label: "Friday" },
+  { key: "saturday",  label: "Saturday" },
+  { key: "sunday",    label: "Sunday" },
+]
+---
+
+<div
+  id={containerId}
+  data-slot="operating-hours"
+  data-island="true"
+  class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm"
+>
+  {DAYS.map(({ key, label }) => (
+    <div class="flex items-center gap-2 p-2 border rounded-lg">
+      <input type="checkbox" id={`${key}-closed`} name={`${key}-closed`}
+        data-action="toggle-closed" data-day={key} class="rounded" />
+      <label for={`${key}-closed`} class="w-20 font-medium text-sm">{label}</label>
+      <input type="time" id={`${key}-open`} name={`${key}-open`}
+        data-action="time-input" data-day={key}
+        class="border rounded px-2 py-1 text-sm disabled:opacity-50" />
+      <span class="text-sm text-muted-foreground">to</span>
+      <input type="time" id={`${key}-close`} name={`${key}-close`}
+        data-action="time-input" data-day={key}
+        class="border rounded px-2 py-1 text-sm disabled:opacity-50" />
+    </div>
+  ))}
+</div>
+
+<script>
+  function getSlug(): string {
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    return parts[1] || ''
+  }
+
+  async function applyInitialHours() {
+    const container = document.getElementById("hours-container")
+    if (!container) return
+
+    const slug = getSlug()
+    if (!slug) return
+
+    try {
+      const res = await fetch(`/api/businesses/${slug}`)
+      const data = await res.json()
+      const business = data?.data
+      if (!business?.openingHours) return
+
+      let hours: Record<string, string> = {}
+      try { hours = JSON.parse(business.openingHours) } catch { return }
+
+      const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+      days.forEach(day => {
+        const value = hours[day] || ""
+        const isClosed = value === "closed"
+        const [open="09:00", close="18:00"] = isClosed ? ["09:00","18:00"] : value.split("-")
+
+        const cb = container.querySelector<HTMLInputElement>(`#${day}-closed`)
+        const openInput = container.querySelector<HTMLInputElement>(`#${day}-open`)
+        const closeInput = container.querySelector<HTMLInputElement>(`#${day}-close`)
+
+        if (cb) cb.checked = isClosed
+        if (openInput) { openInput.value = open; openInput.disabled = isClosed }
+        if (closeInput) { closeInput.value = close; closeInput.disabled = isClosed }
+      })
+    } catch (e) {
+      // Silently ignore — island may load before parent fetch completes
+    }
+  }
+
+  document.addEventListener("change", (e) => {
+    const t = e.target as HTMLElement
+    if (t.dataset.action !== "toggle-closed") return
+    const day = t.dataset.day
+    if (!day) return
+    const c = t.closest("[data-island]") ?? document
+    c.querySelectorAll<HTMLInputElement>(`[data-day="${day}"][data-action="time-input"]`)
+      .forEach(i => { i.disabled = (t as HTMLInputElement).checked })
+  })
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", applyInitialHours)
+  } else {
+    applyInitialHours()
+  }
+</script>

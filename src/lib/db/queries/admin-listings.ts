@@ -8,6 +8,36 @@ import { eq, and, like, desc } from 'drizzle-orm';
 import { generateUniqueSlug } from '@/lib/utils';
 import { nanoid } from 'nanoid';
 
+export interface ListingRecord {
+  id: string;
+  title: string;
+  slug: string;
+  ownerId: string;
+  categoryId: string | null;
+  status: string;
+  description: string;
+  price: string | null;
+  condition: string | null;
+  location: string | null;
+  address: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
+  contactName: string | null;
+  contactNumber: string | null;
+  countryCode: string | null;
+  email: string | null;
+  imageIds: string | null;
+  tags: string | null;
+  likes: number;
+  saves: number;
+  views: number;
+  createdAt: number;
+  updatedAt: number;
+  lastRenewedAt: number | null;
+  parsedTags: string[];
+  parsedImageIds: string[];
+}
+
 export interface ListingFilters {
   status?: 'draft' | 'published';
   search?: string;
@@ -43,7 +73,6 @@ export interface UpdateListingInput extends Partial<Omit<CreateListingInput, 'ti
 
 /**
  * List listings with optional filters
- * Note: listingType removed - type derived from category hierarchy
  */
 export async function listListings(filters?: ListingFilters) {
   const db = await getDb();
@@ -66,7 +95,6 @@ export async function listListings(filters?: ListingFilters) {
 
 /**
  * Create a new listing
- * Plan expiry comes from orders table, not embedded in listings
  */
 export async function createListing(input: CreateListingInput): Promise<{ id: string; slug: string }> {
   const db = await getDb();
@@ -117,7 +145,6 @@ export async function updateListing(input: UpdateListingInput): Promise<void> {
   const { id, ...data } = input;
   const updateData: Record<string, unknown> = { updatedAt: Math.floor(Date.now() / 1000) };
 
-  // Only update provided fields
   if (data.title !== undefined) updateData.title = data.title;
   if (data.slug !== undefined) updateData.slug = data.slug;
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
@@ -145,4 +172,32 @@ export async function deleteListing(id: string): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
   await db.delete(listingsTable).where(eq(listingsTable.id, id)).run();
+}
+
+/**
+ * Get a single listing by ID
+ */
+
+export async function getListingById(id: string): Promise<ListingRecord | null> {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const row = await db
+    .select()
+    .from(listingsTable)
+    .where(eq(listingsTable.id, id))
+    .limit(1)
+    .get();
+
+  if (!row) return null;
+
+  const parsedTags: string[] = row.tags ? (() => {
+    try { return JSON.parse(row.tags as string); } catch { return []; }
+  })() : [];
+
+  const parsedImageIds: string[] = row.imageIds ? (() => {
+    try { return JSON.parse(row.imageIds as string); } catch { return []; }
+  })() : [];
+
+  return { ...row, parsedTags, parsedImageIds };
 }

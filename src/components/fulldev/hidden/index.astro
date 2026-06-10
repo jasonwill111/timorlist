@@ -1,0 +1,9 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+type Props = HTMLAttributes<"input"> & { name?: string; value?: string | number }
+
+const { name, value, ...rest } = Astro.props as Props & { name: string; value?: string | number }
+---
+
+<input type="hidden" name={name} value={value ?? ''} {...rest} />

@@ -1,14 +1,21 @@
 ---
 
 import AdminLayout from '@/layouts/AdminLayout.astro';
-import { getDb } from '@/lib/db';
-import { media, users } from '@/db/schema';
-import { eq, like, sql, desc, isNull, and } from 'drizzle-orm';
 import { actions } from 'astro:actions';
 import { getAdminUser } from '@/lib/admin-auth';
-import { Select } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { getMediaList } from '@/lib/db/queries/media-listing';
+import { Select } from '@/components/fulldev/select';
+import { Input } from '@/components/fulldev/input';
+import { Label } from '@/components/fulldev/label';
+import { Button } from '@/components/fulldev/button';
+import { Dropzone } from '@/components/starwind/dropzone';
+import MediaIsland from '@/components/islands/admin/MediaIsland.astro';
+import Pagination from '@/components/starwind/pagination/Pagination.astro';
+import PaginationContent from '@/components/starwind/pagination/PaginationContent.astro';
+import PaginationItem from '@/components/starwind/pagination/PaginationItem.astro';
+import PaginationLink from '@/components/starwind/pagination/PaginationLink.astro';
+import PaginationPrevious from '@/components/starwind/pagination/PaginationPrevious.astro';
+import PaginationNext from '@/components/starwind/pagination/PaginationNext.astro';
 
 
 // Check admin auth using KV session
@@ -25,45 +32,11 @@ const entityIdFilter = url.searchParams.get('entityId') || '';
 const categoryFilter = url.searchParams.get('category') || '';
 const page = parseInt(url.searchParams.get('page') || '1');
 const limit = 24;
-const offset = (page - 1) * limit;
 
-const db = await getDb();
-
-// Build query conditions
-const conditions = [];
-if (entityTypeFilter) {
-  conditions.push(eq(media.entityType, entityTypeFilter));
-}
-if (entityIdFilter) {
-  conditions.push(eq(media.entityId, entityIdFilter));
-}
-if (categoryFilter) {
-  conditions.push(eq(media.purpose, categoryFilter));
-}
-
-// Get total count
-const countResult = await db.select({ count: sql<number>`count(*)` }).from(media);
-const total = countResult[0]?.count || 0;
-
-// Get paginated results
-const mediaItems = conditions.length > 0
-  ? await db.select().from(media).where(and(...conditions)).orderBy(desc(media.createdAt)).limit(limit).offset(offset).all()
-  : await db.select().from(media).orderBy(desc(media.createdAt)).limit(limit).offset(offset).all();
-
-// Calculate total size
-const totalSize = mediaItems.reduce((acc, item) => acc + (item.size || 0), 0);
-const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
-
-// Get unique entity types for filter dropdown
-const allMedia = await db.select({ entityType: media.entityType, purpose: media.purpose }).from(media).all();
-const entityTypesMap = new Map<string, boolean>();
-const categoriesMap = new Map<string, boolean>();
-for (const item of allMedia) {
-  if (item.entityType) entityTypesMap.set(item.entityType, true);
-  if (item.purpose) categoriesMap.set(item.purpose, true);
-}
-const entityTypes = Array.from(entityTypesMap.keys()).map(e => ({ entityType: e }));
-const categories = Array.from(categoriesMap.keys()).map(c => ({ category: c }));
+// Load data via query function
+const { items: mediaItems, total, totalPages, totalSizeMB, entityTypes, categories } = await getMediaList(
+  entityTypeFilter, entityIdFilter, categoryFilter, page, limit
+);
 
 // Helper to format file size
 function formatSize(bytes: number | null): string {
@@ -87,7 +60,15 @@ function getThumbnailUrl(item: MediaData): string {
   return `/api/media/${item.id}`;
 }
 
-const totalPages = Math.ceil(total / limit);
+// Build pagination URL helper for admin/media
+const buildMediaUrl = (pageNum: number) => {
+  const p = new URLSearchParams();
+  if (entityTypeFilter) p.set('entityType', entityTypeFilter);
+  if (categoryFilter) p.set('category', categoryFilter);
+  if (entityIdFilter) p.set('entityId', entityIdFilter);
+  if (pageNum > 1) p.set('page', pageNum.toString());
+  return `/admin/media?${p.toString()}`;
+}
 ---
 
 <AdminLayout title="Media Library">
@@ -114,7 +95,7 @@ const totalPages = Math.ceil(total / limit);
     <div class="bg-card border rounded-xl p-4 mb-6">
       <form id="filter-form" class="flex flex-wrap gap-4 items-end">
         <div class="flex-1 min-w-[150px]">
-          <label class="block text-sm font-medium mb-1">Entity Type</label>
+          <Label>Entity Type</Label>
           <Select name="entityType" value={entityTypeFilter} options={[
             { value: "", label: "All Types" },
             { value: "business", label: "Business" },
@@ -126,7 +107,7 @@ const totalPages = Math.ceil(total / limit);
         </div>
 
         <div class="flex-1 min-w-[150px]">
-          <label class="block text-sm font-medium mb-1">Category</label>
+          <Label>Category</Label>
           <Select name="category" value={categoryFilter} options={[
             { value: "", label: "All Categories" },
             { value: "profile", label: "Profile" },
@@ -143,7 +124,7 @@ const totalPages = Math.ceil(total / limit);
         </div>
 
         <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium mb-1">Entity ID</label>
+          <Label>Entity ID</Label>
           <Input
             type="text"
             name="entityId"
@@ -172,7 +153,7 @@ const totalPages = Math.ceil(total / limit);
     ) : (
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {mediaItems.map((item) => (
-          <div class="bg-card border rounded-xl overflow-hidden group">
+          <div class="bg-card border rounded-xl overflow-hidden group" data-media-item={item.id}>
             <div class="aspect-square bg-muted relative">
               {item.type === 'image' ? (
                 <img
@@ -237,66 +218,27 @@ const totalPages = Math.ceil(total / limit);
 
     <!-- Pagination -->
     {totalPages > 1 && (
-      <div class="flex justify-center gap-2 mt-6">
-        {page > 1 && (
-          <a
-            href={`/admin/media?page=${page - 1}${entityTypeFilter ? `&entityType=${entityTypeFilter}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
-            class="px-4 py-2 border rounded-lg hover:bg-muted"
-          >
-            Previous
-          </a>
-        )}
-        <span class="px-4 py-2">
-          Page {page} of {totalPages}
-        </span>
-        {page < totalPages && (
-          <a
-            href={`/admin/media?page=${page + 1}${entityTypeFilter ? `&entityType=${entityTypeFilter}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
-            class="px-4 py-2 border rounded-lg hover:bg-muted"
-          >
-            Next
-          </a>
-        )}
-      </div>
+      <Pagination class="mt-6">
+        <PaginationContent>
+          {page > 1 && (
+            <PaginationItem>
+              <PaginationPrevious href={buildMediaUrl(page - 1)} />
+            </PaginationItem>
+          )}
+          <PaginationItem>
+            <PaginationLink class="px-4 py-2 border rounded-lg">
+              Page {page} of {totalPages}
+            </PaginationLink>
+          </PaginationItem>
+          {page < totalPages && (
+            <PaginationItem>
+              <PaginationNext href={buildMediaUrl(page + 1)} />
+            </PaginationItem>
+          )}
+        </PaginationContent>
+      </Pagination>
     )}
   </div>
 </AdminLayout>
 
-<script>
-  import { actions } from 'astro:actions';
-
-  // Event delegation for copy and delete actions
-  document.addEventListener('click', async (e) => {
-    const target = e.target as HTMLElement;
-    const btn = target.closest('[data-action]') as HTMLElement | null;
-    if (!btn) return;
-
-    const action = btn.dataset.action;
-
-    if (action === 'copy-url') {
-      const url = btn.dataset.url;
-      if (url) {
-        await navigator.clipboard.writeText(url);
-        alert('URL copied!');
-      }
-    } else if (action === 'delete-media') {
-      const id = btn.dataset.id;
-      if (!id) return;
-
-      if (!confirm('Delete this media? This cannot be undone.')) return;
-
-      try {
-        const result = await actions.media.deleteMedia({ id });
-
-        if (result.success) {
-          // Remove from DOM
-          btn.closest('.bg-card')?.remove();
-        } else {
-          alert(result.error?.message || 'Failed to delete');
-        }
-      } catch {
-        alert('Failed to delete');
-      }
-    }
-  });
-</script>
+<MediaIsland />

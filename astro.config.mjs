@@ -8,6 +8,22 @@ export default defineConfig({
     kvNamespaces: [],
     imageService: 'cloudflare-binding',
   }),
+  experimental: {
+    queuedRendering: {
+      enabled: true,
+      poolSize: 2000,
+    },
+  },
+  security: {
+    checkOrigin: true,
+    allowedDomains: [
+      { hostname: '**.timorup.com', protocol: 'https' },
+      { hostname: 'timorup.jasonwill.workers.dev', protocol: 'https' },
+      { hostname: 'localhost:*', protocol: 'http' },
+    ],
+    actionBodySizeLimit: 2 * 1024 * 1024,
+    serverIslandBodySizeLimit: 2 * 1024 * 1024,
+  },
   site: 'https://timorup.com',
 
   prefetch: {

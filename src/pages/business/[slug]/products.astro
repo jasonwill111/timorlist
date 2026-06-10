@@ -3,10 +3,11 @@
 export const prerender = false;
 
 import Layout from '../../../layouts/Layout.astro';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
+import { Button } from '../../../components/fulldev/button';
+import { Input } from '../../../components/fulldev/input';
+import { Label } from '../../../components/fulldev/label';
 import { actions } from 'astro:actions';
+import Progress from '../../../components/starwind/progress/Progress.astro';
 
 import {
   Card,
@@ -14,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '../../../components/ui/card';
+} from '../../../components/fulldev/card';
 ---
 
 <Layout title="Manage Products - TimorUp">
@@ -28,11 +29,9 @@ import {
     </a>
 
     <!-- Loading -->
-    <div id="loading" class="flex items-center justify-center min-h-[400px]">
-      <div class="text-center">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p class="mt-4 text-muted-foreground">Loading...</p>
-      </div>
+    <div id="loading" class="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <Progress variant="primary" class="w-64" />
+      <p class="text-muted-foreground">Loading products...</p>
     </div>
 
     <!-- Access Denied -->
@@ -98,11 +97,17 @@ import {
                 <CardTitle>Your Products</CardTitle>
                 <CardDescription>Manage your products and services</CardDescription>
               </div>
-              <div id="usage-indicator"></div>
+              <div id="usage-indicator" class="flex items-center gap-2 text-sm text-muted-foreground hidden">
+                <span id="usage-text"></span>
+                <div class="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                  <div id="usage-bar" class="h-full bg-primary" style="width: 0%"></div>
+                </div>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div id="products-loading" class="text-center py-8">
+            <div id="products-loading" class="py-8 space-y-4">
+              <Progress variant="primary" />
               <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
             <div id="products-empty" class="hidden text-center py-8">
@@ -277,18 +282,16 @@ import {
     // Show usage indicator
     if (subscriptionStatus?.skuLimit) {
       const usageEl = document.getElementById('usage-indicator');
-      if (usageEl) {
+      const usageText = document.getElementById('usage-text');
+      const usageBar = document.getElementById('usage-bar');
+      if (usageEl && usageText && usageBar) {
         const used = products.length;
         const total = subscriptionStatus.skuLimit;
         const percent = Math.round((used / total) * 100);
-        usageEl.innerHTML = DOMPurify.sanitize(`
-          <div class="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Products: ${used}/${total}</span>
-            <div class="w-24 h-2 bg-muted rounded-full overflow-hidden">
-              <div class="h-full ${percent >= 90 ? 'bg-red-500' : percent >= 70 ? 'bg-amber-500' : 'bg-primary'}" style="width: ${percent}%"></div>
-            </div>
-          </div>
-        `);
+        usageText.textContent = `Products: ${used}/${total}`;
+        usageBar.style.width = `${percent}%`;
+        usageBar.className = `h-full ${percent >= 90 ? 'bg-red-500' : percent >= 70 ? 'bg-amber-500' : 'bg-primary'}`;
+        usageEl.classList.remove('hidden');
       }
     }
 

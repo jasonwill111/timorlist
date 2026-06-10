@@ -2,14 +2,15 @@
   "main": "@astrojs/cloudflare/entrypoints/server",
   "name": "timorup",
   "account_id": "0b8c74af4a5531bd63c074724898a4c9",
-  "compatibility_date": "2026-05-06",
+  "compatibility_date": "2026-06-09",
   "compatibility_flags": [
-    "nodejs_compat_v2",
-    "nodejs_compat_populate_process_env",
-    "global_fetch_strictly_public",
-    "enable_nodejs_os_module",
-    "enable_nodejs_fs_module"
+    "nodejs_compat",
+    "global_fetch_strictly_public"
   ],
+  "observability": {
+    "logs": { "enabled": true },
+    "tracing": { "enabled": true },
+  },
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist/client"

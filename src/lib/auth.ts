@@ -1,5 +1,4 @@
 // Better Auth Configuration - Cloudflare Workers Compatible
-// Using d1Native for lighter bundle and faster init
 
 import { betterAuth } from 'better-auth';
 import type { Auth } from 'better-auth';
@@ -22,57 +21,73 @@ export function createAuthInstance(
     (env.BETTER_AUTH_URL as string) ||
     'https://timorup.jasonwill.workers.dev';
 
-  // single config object: withCloudflare merges platform defaults on top
-  const authConfig = withCloudflare({
-    d1Native: d1Db,
-    kv: env.SESSION,
-    geolocationTracking: false,
-    autoDetectIpAddress: false,
-    baseURL,
-    emailAndPassword: {
-      enabled: true,
-      requireEmailVerification: false,
+  // withCloudflare(cloudflareOptions, betterAuthOptions)
+  const auth = withCloudflare(
+    {
+      d1Native: d1Db,
+      kv: env.SESSION,
+      geolocationTracking: false,
+      autoDetectIpAddress: false,
     },
-    session: {
-      expiresIn: 60 * 60 * 24 * 7,
-      updateAge: 60 * 60 * 24,
-      storeSessionInDatabase: true,
-      cookieConfig: {
-        name: 'better-auth.session_token',
-        // secure flag derived from baseURL protocol automatically
-        sameSite: 'strict',
-        httpOnly: true,
-        path: '/',
-      },
-    },
-    trustedOrigins: [
+    {
       baseURL,
-      'http://localhost:4332',
-      'http://localhost:4323',
-      'http://localhost:4321',
-      'http://localhost:4322',
-      'http://localhost:4325',
-    ],
-    password: {
-      minLength: 8,
-      maxLength: 100,
-    },
-    rateLimit: {
-      enabled: true,
-      storage: 'kv',
-      window: 60,
-      max: 100,
-      customRules: {
-        'sign-in/email': { window: 60, max: 5 },
-        'sign-up/email': { window: 60, max: 3 },
+      emailAndPassword: {
+        enabled: true,
+        requireEmailVerification: false,
       },
-    },
-    csrf: {
-      checkOriginOnGet: false,
-    },
-  });
+      session: {
+        expiresIn: 60 * 60 * 24 * 7,
+        updateAge: 60 * 60 * 24,
+        storeSessionInDatabase: true,
+        cookieConfig: {
+          name: 'better-auth.session_token',
+          sameSite: 'strict',
+          httpOnly: true,
+          path: '/',
+        },
+      },
+      trustedOrigins: [
+        baseURL,
+        'http://localhost:4332',
+        'http://localhost:4323',
+        'http://localhost:4321',
+        'http://localhost:4322',
+        'http://localhost:4325',
+      ],
+      password: {
+        minLength: 8,
+        maxLength: 100,
+      },
+      rateLimit: {
+        enabled: true,
+        storage: 'kv',
+        window: 60,
+        max: 100,
+        customRules: {
+          'sign-in/email': { window: 60, max: 5 },
+          'sign-up/email': { window: 60, max: 3 },
+        },
+      },
+      csrf: {
+        checkOriginOnGet: false,
+      },
+      advanced: {
+        ipAddress: {
+          ipAddressHeaders: ['cf-connecting-ip'],
+        },
+        backgroundTasks: {
+          handler: (p: Promise<unknown>) => {
+            const ctx = (globalThis as unknown as { executionContext?: ExecutionContext }).executionContext;
+            if (ctx && typeof ctx === 'object' && 'waitUntil' in ctx) {
+              (ctx as unknown as { waitUntil: (p: Promise<unknown>) => void }).waitUntil(p);
+            }
+          },
+        },
+      },
+    }
+  );
 
-  return betterAuth(authConfig as Parameters<typeof betterAuth>[0]);
+  return auth;
 }
 
 export function initAuthInstance(

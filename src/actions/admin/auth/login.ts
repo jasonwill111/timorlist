@@ -19,7 +19,7 @@ export const login = defineAction({
       let env: Record<string, unknown>;
       try {
         const { env: workersEnv } = await import('cloudflare:workers');
-        env = workersEnv as Record<string, unknown>;
+        env = workersEnv as unknown as Record<string, unknown>;
       } catch {
         env = globalThis as Record<string, unknown>;
       }
@@ -43,9 +43,9 @@ export const login = defineAction({
         .limit(1)
         .get();
 
-      const userRole = dbUser?.role || 'user';
+      const userRole = (dbUser?.role as string) ?? 'user';
 
-      if (!ADMIN_ROLES.includes(userRole)) {
+      if (!ADMIN_ROLES.includes(userRole as 'super_admin' | 'admin' | 'editor')) {
         return { success: false, error: { message: 'Access denied. Admin role required.' } };
       }
 

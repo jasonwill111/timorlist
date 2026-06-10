@@ -2,7 +2,7 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'zod';
 import { getDb } from '@/lib/db';
-import { servicePackages, businesses, orders } from '@/db/schema';
+import { servicePackages, orders } from '@/db/schema';
 import { eq, asc, count } from 'drizzle-orm';
 import { getAdminUser } from '@/lib/admin-auth';
 import { createErrorResponse, ErrorCode } from '@/lib/errors';
@@ -36,15 +36,13 @@ const VariantSchema = z.object({
   features: z.array(z.string()).default([]),
 });
 
-// Package type enum
-const PackageTypeEnum = z.enum(['subscription', 'listing_renewal', 'ad_banner']);
+// Package relation enum
 const PackageRelationEnum = z.enum(['business', 'listing', 'business_product', 'homepage']);
 
 // Create schema
 const CreatePackageSchema = z.object({
   name: z.string().min(1).max(100),
   slug: z.string().min(1).max(100).optional(),
-  serviceType: PackageTypeEnum,
   serviceRelationTo: PackageRelationEnum.optional(),
   description: z.string().max(500).optional(),
   variants: z.array(VariantSchema).min(1),
@@ -57,7 +55,6 @@ const UpdatePackageSchema = z.object({
   id: z.string(),
   name: z.string().min(1).max(100).optional(),
   slug: z.string().min(1).max(100).optional(),
-  serviceType: PackageTypeEnum.optional(),
   serviceRelationTo: PackageRelationEnum.optional(),
   description: z.string().max(500).optional(),
   variants: z.array(VariantSchema).optional(),
@@ -116,12 +113,11 @@ export const servicePackagesAdmin = {
         id,
         name: input.name,
         slug,
-        serviceType: input.serviceType,
-        serviceRelationTo: input.serviceRelationTo || null,
-        description: input.description || null,
+        serviceRelationTo: input.serviceRelationTo ?? 'business',
+        description: input.description ?? null,
         variants: JSON.stringify(input.variants),
         isActive: input.isActive ? 1 : 0,
-        sortOrder: input.sortOrder || 0,
+        sortOrder: input.sortOrder ?? 0,
       });
       // Purge pricing page cache so changes appear immediately
       await purgePricingCache();
@@ -131,7 +127,6 @@ export const servicePackagesAdmin = {
           id,
           name: input.name,
           slug,
-          serviceType: input.serviceType,
           variants: input.variants,
         },
       };
@@ -168,7 +163,6 @@ export const servicePackagesAdmin = {
 
       if (data.name !== undefined) updateData.name = data.name;
       if (data.slug !== undefined) updateData.slug = data.slug;
-      if (data.serviceType !== undefined) updateData.serviceType = data.serviceType;
       if (data.serviceRelationTo !== undefined) updateData.serviceRelationTo = data.serviceRelationTo;
       if (data.description !== undefined) updateData.description = data.description;
       if (data.variants !== undefined) updateData.variants = JSON.stringify(data.variants);
@@ -237,29 +231,29 @@ export const servicePackagesAdmin = {
   // Get active packages by type (public view)
   getActiveByType: defineAction({
     input: z.object({
-      serviceType: PackageTypeEnum.optional(),
       serviceRelationTo: PackageRelationEnum.optional(),
     }).optional(),
     handler: async (input) => {
       const db = await getDb();
       if (!db) return createErrorResponse(ErrorCode.SERVER_DB_ERROR, 'Database not available');
 
-      let query = db.select()
+      const allActive = await db.select()
         .from(servicePackages)
         .where(eq(servicePackages.isActive, 1))
-        .orderBy(asc(servicePackages.sortOrder));
+        .orderBy(asc(servicePackages.sortOrder))
+        .all();
 
-      // Note: Drizzle's where doesn't support OR well, so we'll filter in JS
-      const allActive = await query.all();
-
-      let filtered = allActive;
-      if (input?.serviceType) {
-        filtered = filtered.filter(p => p.serviceType === input.serviceType);
+      if (!input?.serviceRelationTo) {
+        return {
+          success: true,
+          data: allActive.map(pkg => ({
+            ...pkg,
+            variants: JSON.parse(pkg.variants),
+          })),
+        };
       }
-      if (input?.serviceRelationTo) {
-        filtered = filtered.filter(p => p.serviceRelationTo === input.serviceRelationTo);
-      }
 
+      const filtered = allActive.filter(p => p.serviceRelationTo === input.serviceRelationTo);
       return {
         success: true,
         data: filtered.map(pkg => ({
